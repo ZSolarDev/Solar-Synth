@@ -1,0 +1,227 @@
+{
+    "name": "...perto.",
+    "settings": {
+        "test": false
+    },
+    "timeSignatureDenominator": 4,
+    "timeSignatureNumerator": 4,
+    "tracks": [
+        {
+            "muted": false,
+            "name": "Track 0",
+            "sections": [
+                {
+                    "bpm": 120,
+                    "duration": 50000,
+                    "name": "Vocals",
+                    "notes": [
+                        {
+                            "breathiness": [
+                                {
+                                    "time": 0,
+                                    "value": 1
+                                }
+                            ],
+                            "duration": 2000,
+                            "loopEnd": 3936,
+                            "loopStart": 1213,
+                            "mouth": [
+                                {
+                                    "time": 0,
+                                    "value": 0
+                                }
+                            ],
+                            "phoneme": "a",
+                            "pitches": [
+                                {
+                                    "time": 0,
+                                    "value": 0
+                                }
+                            ],
+                            "power": [
+                                {
+                                    "time": 0,
+                                    "value": 0
+                                }
+                            ],
+                            "shortEnd": false,
+                            "time": 0,
+                            "tone": [],
+                            "velocities": [
+                                {
+                                    "time": 0,
+                                    "value": 1
+                                }
+                            ]
+                        },
+                        {
+                            "breathiness": [
+                                {
+                                    "time": 0,
+                                    "value": 1
+                                }
+                            ],
+                            "duration": 1000,
+                            "loopEnd": 3936,
+                            "loopStart": 1213,
+                            "mouth": [
+                                {
+                                    "time": 0,
+                                    "value": 0
+                                }
+                            ],
+                            "phoneme": "o",
+                            "pitches": [
+                                {
+                                    "time": 0,
+                                    "value": 0
+                                }
+                            ],
+                            "power": [
+                                {
+                                    "time": 0,
+                                    "value": 0
+                                }
+                            ],
+                            "shortEnd": false,
+                            "time": 2000,
+                            "tone": [],
+                            "velocities": [
+                                {
+                                    "time": 0,
+                                    "value": 1
+                                }
+                            ]
+                        },
+                        {
+                            "breathiness": [
+                                {
+                                    "time": 0,
+                                    "value": 1
+                                }
+                            ],
+                            "duration": 3000,
+                            "loopEnd": 3936,
+                            "loopStart": 1213,
+                            "mouth": [
+                                {
+                                    "time": 0,
+                                    "value": 0
+                                }
+                            ],
+                            "phoneme": "b3",
+                            "pitches": [
+                                {
+                                    "time": 0,
+                                    "value": 0
+                                }
+                            ],
+                            "power": [
+                                {
+                                    "time": 0,
+                                    "value": 0
+                                }
+                            ],
+                            "shortEnd": false,
+                            "time": 3000,
+                            "tone": [],
+                            "velocities": [
+                                {
+                                    "time": 0,
+                                    "value": 1
+                                }
+                            ]
+                        },
+                        {
+                            "breathiness": [
+                                {
+                                    "time": 0,
+                                    "value": 1
+                                }
+                            ],
+                            "duration": 700,
+                            "loopEnd": 3936,
+                            "loopStart": 1213,
+                            "mouth": [],
+                            "phoneme": "ka",
+                            "pitches": [
+                                {
+                                    "time": 0,
+                                    "value": 0
+                                }
+                            ],
+                            "power": [
+                                {
+                                    "time": 0,
+                                    "value": 0
+                                }
+                            ],
+                            "shortEnd": false,
+                            "time": 6000,
+                            "tone": [],
+                            "velocities": [
+                                {
+                                    "time": 0,
+                                    "value": 1
+                                }
+                            ]
+                        },
+                        {
+                            "breathiness": [
+                                {
+                                    "time": 0,
+                                    "value": 1
+                                }
+                            ],
+                            "duration": 20000,
+                            "loopEnd": 3936,
+                            "loopStart": 1213,
+                            "mouth": [
+                                {
+                                    "time": 0,
+                                    "value": 0
+                                }
+                            ],
+                            "phoneme": "na",
+                            "pitches": [
+                                {
+                                    "time": 0,
+                                    "value": 0
+                                }
+                            ],
+                            "power": [
+                                {
+                                    "time": 0,
+                                    "value": 0
+                                }
+                            ],
+                            "shortEnd": false,
+                            "time": 6700,
+                            "tone": [],
+                            "velocities": [
+                                {
+                                    "time": 0,
+                                    "value": 1
+                                }
+                            ]
+                        }
+                    ],
+                    "soundPath": "",
+                    "time": 0,
+                    "type": "v"
+                },
+                {
+                    "bpm": 120,
+                    "duration": 50000,
+                    "name": "Instrumental",
+                    "notes": [],
+                    "soundPath": "",
+                    "time": 0,
+                    "type": "a"
+                }
+            ],
+            "volume": 1
+        }
+    ],
+    "voicebank": "Kasane Teto Lite"
+}

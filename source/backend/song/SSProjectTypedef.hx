@@ -5,8 +5,8 @@ typedef SSProjectTypedef =
 	var name:String;
 	var tracks:Array<SSTrackTypedef>;
 	var voicebank:String;
-	var bpms:Array<SongValue>;
-	var timeSignature:Float;
+	var timeSignatureNumerator:Int;
+	var timeSignatureDenominator:Int;
 	var settings:SSProjectSettingsTypedef;
 }
 
@@ -29,9 +29,20 @@ typedef NoteTypeDef =
 typedef SSTrackTypedef =
 {
 	var name:String;
-	var notes:Array<NoteTypeDef>;
+	var sections:Array<SSSectionTypedef>;
 	var muted:Bool;
 	var volume:Float;
+}
+
+typedef SSSectionTypedef =
+{
+	var name:String;
+	var time:Float;
+	var duration:Float;
+	var type:String;
+	var soundPath:String;
+	var notes:Array<NoteTypeDef>;
+	var bpm:Float;
 }
 
 typedef SSProjectSettingsTypedef =

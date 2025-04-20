@@ -24,7 +24,10 @@ class NoteProcessor
 	{
 		var generators = [];
 		for (section in sections)
-			generators.push(generateVocalsFromNotes(section.notes, voiceBank));
+		{
+			if (section.type == 'v')
+				generators.push(generateVocalsFromNotes(section.notes, voiceBank));
+		}
 		return generators;
 	}
 }

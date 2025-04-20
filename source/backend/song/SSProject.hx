@@ -22,6 +22,9 @@ typedef SSSection =
 {
 	var name:String;
 	var time:Float;
+	var duration:Float;
+	var type:String;
+	var soundPath:String;
 	var notes:Array<Note>;
 	var bpm:Float;
 }

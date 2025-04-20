@@ -12,7 +12,7 @@ class Note
 	public var shortEnd:Bool = false;
 	public var power:Array<SongValue>;
 	public var breathiness:Array<SongValue>;
-	public var tone:Array<SongValue>;
+	public var tone:Array<SongValue> = [];
 	public var mouth:Array<SongValue>;
 
 	public function new(phoneme:String, time:Float, duration:Float, loopStart:Float, loopEnd:Float, shortEnd:Bool, pitches:Array<SongValue>,

@@ -1,21 +1,23 @@
 package frontend.startmenu;
 
+import backend.utils.SSProjectUtil;
+import haxe.Json;
+import openfl.events.Event;
+import openfl.net.FileFilter;
+import openfl.net.FileReference;
+import sys.io.File;
+
 class Project extends FlxSpriteGroup
 {
-	public var bg:FlxSprite;
 	public var txt:FlxText;
 	public var tab:Tab;
 
 	override public function new(tab:Tab, name:String)
 	{
 		super();
-		bg = new FlxSprite(0, 0).makeGraphic(tab.width, 30, 0xFFFFFF);
-		add(bg);
-
 		txt = new FlxText(2, 5, 0, name, 20);
 		txt.font = '_assets/ui.otf';
 		add(txt);
-
 		this.tab = tab;
 	}
 
@@ -25,63 +27,31 @@ class Project extends FlxSpriteGroup
 		{
 			if (FlxG.mouse.overlaps(this, tab) && FlxG.mouse.justPressed)
 			{
+				inline function loadSongEditor(path:String)
+					FlxG.switchState(() -> new frontend.editor.SongEditor(SSProjectUtil.typedefToProject(cast Json.parse(File.getContent(path)))));
 				switch (txt.text)
 				{
 					case 'New project...':
-						FlxG.switchState(() -> new SongEditor({
-							name: 'Untitled',
-							voicebank: 'Kasane Teto Lite',
-							timeSignatureNumerator: 4,
-							timeSignatureDenominator: 4,
-							tracks: [
-								{
-									name: 'Track 0',
-									sections: [
-										{
-											time: 0,
-											name: 'Section 0',
-											notes: [],
-											bpm: 120
-										}
-									],
-									muted: false,
-									volume: 1
-								}
-							],
-							settings: {
-								test: false
-							}
-						}));
+						FlxG.state.openSubState(new NewProject());
 					case 'Open project...':
-						FlxG.switchState(() -> new SongEditor({
-							name: 'Untitled',
-							voicebank: 'Kasane Teto Lite',
-							timeSignatureNumerator: 4,
-							timeSignatureDenominator: 4,
-							tracks: [
-								{
-									name: 'Track 0',
-									sections: [
-										{
-											time: 0,
-											name: 'Section 0',
-											notes: [],
-											bpm: 120
-										}
-									],
-									muted: false,
-									volume: 1
-								}
-							],
-							settings: {
-								test: false
-							}
-						}));
+						var file = new FileReference();
+						file.addEventListener(Event.SELECT, (_) ->
+						{
+							var path:String = '';
+							@:privateAccess
+							if (file.__path != null)
+								path = file.__path;
+							if (path != '')
+								loadSongEditor(path);
+						});
+						file.browse([new FileFilter('Solar Synth Projects(*.ssp)', '*.ssp')]);
 					default:
+						loadSongEditor(txt.text);
 				}
 			}
 		}
-		catch (e) {}
+		catch (e)
+			trace(e.details);
 	}
 }
 
