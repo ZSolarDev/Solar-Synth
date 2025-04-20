@@ -2,7 +2,7 @@
 > Solar Synth is no where near complete! Builds might not be released for a long time.
 
 <h2 align="center">
-  <img width="400" src="https://raw.githubusercontent.com/ZSolarDev/Solar-Synth/refs/heads/main/assets/Banner.png">
+  <img width="1000" src="https://raw.githubusercontent.com/ZSolarDev/Solar-Synth/refs/heads/main/assets/Banner.png">
   <br> A vocal synthesis engine built to bridge the gap between free tools and high-end vocal synths without sacrificing creative freedom.
 </h2>
 
