@@ -3,12 +3,12 @@
 
 <h2 align="center">
   <img width="400" src="https://raw.githubusercontent.com/ZSolarDev/Solar-Synth/refs/heads/main/assets/Banner.png">
-  <br> A vocal synthesis engine which intends to bridge the quality gap between hobbyist tools and pricey vocal synths, aiming for a hefty amount of creative freedom.
+  <br> A vocal synthesis engine built to bridge the gap between free tools and high-end vocal synths without sacrificing creative freedom.
 </h2>
 
 # About Solar Synth
 ### What *exactly* is Solar Synth?
-If you read the top and would like to know more, I'll tell you more. By hobbyist tools, I'm reffering to things such as Utau and OpenUtau. By pricey vocal synths, I'm reffering to programs like Vocaloid and SynthesizerV; and I'm sure you can grasp what "creative freedom" means. When this program releases, I hope for it to be easy to use, customizable, and high quality.
+If you read the top and would like to know more, I'll tell you more. By free tools I'm reffering to things such as Utau and OpenUtau. By high-end vocal synths, I'm reffering to programs like Vocaloid and SynthesizerV; and I'm sure you can grasp what "creative freedom" means. When this program releases, I hope for it to be easy to use, customizable, and high quality.
 
 <br>
 
