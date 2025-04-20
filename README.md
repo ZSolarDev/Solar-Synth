@@ -8,7 +8,7 @@
 
 # About Solar Synth
 ### What *exactly* is Solar Synth?
-If you read the top and would like to know more, I'll tell you more. By free tools I'm reffering to things such as Utau and OpenUtau. By high-end vocal synths, I'm reffering to programs like Vocaloid and SynthesizerV; and I'm sure you can grasp what "creative freedom" means. When this program releases, I hope for it to be easy to use, customizable, and high quality.
+If you read the top and would like to know more, I'll tell you more. By free tools I'm reffering to things such as [Utau](http://utau2008.xrea.jp/) and [OpenUtau](https://www.openutau.com). By high-end vocal synths, I'm reffering to programs like [Vocaloid](https://www.vocaloid.com/en/) and [SynthesizerV](https://dreamtonics.com/synthesizerv/); and I'm sure you can grasp what "creative freedom" means. When this program releases, I hope for it to be easy to use, customizable, and high quality.
 
 <br>
 
