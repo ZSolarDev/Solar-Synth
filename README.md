@@ -167,7 +167,7 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
  - [ ] Add build-in multilingual support
  - [ ] Utau support
     - [ ] Ust (shouldn't be that hard..)
-    - [ ] Voicebanks (I have to find out how to read an oto.ini and convert samples to work with Solar Synth 😭😭)
+    - [ ] Voicebanks (I have to find out how to read an oto.ini and convert samples to work with Solar Synth)
  - [ ] Themes
     - [ ] Custom themes
- - [ ] Reach out to Twindrill to ask if they're down for making a Kasane Teto voicebank for Solar Synth(I'm broke at the time of writing and they prob gonna ask for hella moneyyy 😭)
+ - [ ] Reach out to Twindrill to ask if they're down for making a Kasane Teto voicebank for Solar Synth(I'm broke at the time of writing and they prob gonna ask for hella moneyyy 😭😭)
