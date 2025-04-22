@@ -8,7 +8,7 @@
 
 # About Solar Synth
 ### What *exactly* is Solar Synth?
-If you read the top and would like to know more, I'll tell you more. By free tools I'm reffering to things such as Utau and OpenUtau. By high-end vocal synths, I'm reffering to programs like Vocaloid and SynthesizerV; and I'm sure you can grasp what "creative freedom" means. When this program releases, I hope for it to be easy to use, customizable, and high quality.
+If you read the top and would like to know more, I'll tell you more. By free tools I'm reffering to things such as [Utau](http://utau2008.xrea.jp/) and [OpenUtau](https://www.openutau.com). By high-end vocal synths, I'm reffering to programs like [Vocaloid](https://www.vocaloid.com/en/) and [SynthesizerV](https://dreamtonics.com/synthesizerv/); and I'm sure you can grasp what "creative freedom" means. When this program releases, I hope for it to be easy to use, customizable, and high quality.
 
 <br>
 
@@ -167,7 +167,7 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
  - [ ] Add build-in multilingual support
  - [ ] Utau support
     - [ ] Ust (shouldn't be that hard..)
-    - [ ] Voicebanks (I have to find out how to read an oto.ini and convert samples to work with Solar Synth 😭😭)
+    - [ ] Voicebanks (I have to find out how to read an oto.ini and convert samples to work with Solar Synth)
  - [ ] Themes
     - [ ] Custom themes
- - [ ] Reach out to Twindrill to ask if they're down for making a Kasane Teto voicebank for Solar Synth(I'm broke at the time of writing and they prob gonna ask for hella moneyyy 😭)
+ - [ ] Reach out to Twindrill to ask if they're down for making a Kasane Teto voicebank for Solar Synth(I'm broke at the time of writing and they prob gonna ask for hella moneyyy 😭😭)
