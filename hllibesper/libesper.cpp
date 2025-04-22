@@ -16,6 +16,8 @@ static engineCfg cfg = {
         355,                    // frameSize
         0.05f                   // breCompPremul
 };
+
+// getters and setters
 HL_PRIM int HL_NAME(get_sample_rate)() {
     return cfg.sampleRate;
 }
@@ -96,11 +98,11 @@ HL_PRIM void HL_NAME(set_frame_size)(int frameSize) {
 DEFINE_PRIM(_VOID, set_frame_size, _I32);
 
 
-HL_PRIM float HL_NAME(get_)() {
-    return cfg.frameSize;
+HL_PRIM float HL_NAME(get_bre_comp_premul)() {
+    return cfg.breCompPremul;
 }
-DEFINE_PRIM(_F32, get_);
-HL_PRIM void HL_NAME(set_)(float frameSize) {
-    cfg.frameSize = frameSize;
+DEFINE_PRIM(_F32, get_bre_comp_premul);
+HL_PRIM void HL_NAME(set_bre_comp_premul)(float breCompPremul) {
+    cfg.breCompPremul = breCompPremul;
 }
-DEFINE_PRIM(_VOID, set_, _F32);
+DEFINE_PRIM(_VOID, set_bre_comp_premul, _F32);
