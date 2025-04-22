@@ -3,3 +3,9 @@
 
 ## Build 614, 4/20/2025-11:07 AM || *A plan.*
 I have a plan. My old broken method for pitch shifting was time stretching preserving pitch(currently has a nasty undertone for some reason), pitch shifting via shrinking/stretching sample without preserving pitch, and formant shifting(completly busted...). Instead of trying to fix that, I just realized something existed. ***libESPER;*** a resampler. I can create Hashlink externs for it, and use it to pitch/formant shift the samples. I'm using hashlink externs cause hashlink works across Windows, MacOS, and Linux. Wish me luck..!
+
+## Build 614, 4/21/2025-8:22 AM || libESPER Day 2
+Ok so its not working correctly(and by that I mean It's doing nothing to the audio.). I'll figure this out when I get back from school.
+
+## Build 614, 4/21/2025-9:45 AM || libESPER Day 2
+Ok now the extern is but Isn't linking back to haxe? Like it registers the function but doesn't actually run the extern function code. I don't know what I did wrong..

@@ -1,0 +1,12 @@
+C:\Haxe Games\Solar-Synth\hllibesper\libesper.cpp;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\libesper.obj
+C:\Haxe Games\Solar-Synth\hllibesper\nfft_win\simple_test.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\simple_test.obj
+C:\Haxe Games\Solar-Synth\hllibesper\src\ESPER\components.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\components.obj
+C:\Haxe Games\Solar-Synth\hllibesper\src\ESPER\esper.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\esper.obj
+C:\Haxe Games\Solar-Synth\hllibesper\src\ESPER\pitchCalcFallback.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\pitchCalcFallback.obj
+C:\Haxe Games\Solar-Synth\hllibesper\src\fft.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\fft.obj
+C:\Haxe Games\Solar-Synth\hllibesper\src\interpolation.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\interpolation.obj
+C:\Haxe Games\Solar-Synth\hllibesper\src\Renderer\modifiers.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\modifiers.obj
+C:\Haxe Games\Solar-Synth\hllibesper\src\Renderer\renderer.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\renderer.obj
+C:\Haxe Games\Solar-Synth\hllibesper\src\Resampler\loop.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\loop.obj
+C:\Haxe Games\Solar-Synth\hllibesper\src\Resampler\resampler.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\resampler.obj
+C:\Haxe Games\Solar-Synth\hllibesper\src\util.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\util.obj

@@ -1,0 +1,15 @@
+LIBRARY "esper"
+EXPORTS
+    pitchCalcFallback
+    specCalc
+    resampleSpecharm
+    resamplePitch
+    applyBreathiness
+    pitchShift
+    applyDynamics
+    applyBrightness
+    applyGrowl
+    applyRoughness
+    renderUnvoiced
+    renderVoiced
+    render

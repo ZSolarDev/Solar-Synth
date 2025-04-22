@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{f9c74c86-68bf-4369-9142-37f50ca70afc}</ProjectGuid>
+    <RootNamespace>hllibesper</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Program Files\HashLink\1.14.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files\HashLink\1.14.0;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Program Files\HashLink\1.14.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files\HashLink\1.14.0;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Haxe Games\Solar-Synth\hllibesper\nfft_win;C:\Haxe Games\Solar-Synth\hllibesper\src;C:\Haxe Games\Solar-Synth\hllibesper\fftw_win;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libhl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Haxe Games\Solar-Synth\hllibesper\nfft_win;C:\Haxe Games\Solar-Synth\hllibesper\src;C:\Haxe Games\Solar-Synth\hllibesper\fftw_win;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libhl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\Users\almos\Downloads\libESPER-main\CMakeLists.txt" />
+    <Text Include="..\..\..\Users\almos\Downloads\libESPER-main\COPYING.txt" />
+    <Text Include="hllibesper\x64\Debug\hllibesper.log" />
+    <Text Include="nfft_win\readme-windows.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Users\almos\Downloads\libESPER-main\README.md" />
+    <None Include="esper.def" />
+    <None Include="fftw_win\COPYING" />
+    <None Include="fftw_win\COPYRIGHT" />
+    <None Include="fftw_win\fftw-wisdom.exe" />
+    <None Include="fftw_win\fftwf-wisdom.exe" />
+    <None Include="fftw_win\fftwl-wisdom.exe" />
+    <None Include="fftw_win\libfftw3-3.def" />
+    <None Include="fftw_win\libfftw3-3.dll" />
+    <None Include="fftw_win\libfftw3-3.exp" />
+    <None Include="fftw_win\libfftw3f-3.def" />
+    <None Include="fftw_win\libfftw3f-3.dll" />
+    <None Include="fftw_win\libfftw3f-3.exp" />
+    <None Include="fftw_win\libfftw3l-3.def" />
+    <None Include="fftw_win\libfftw3l-3.dll" />
+    <None Include="fftw_win\libfftw3l-3.exp" />
+    <None Include="fftw_win\NEWS" />
+    <None Include="fftw_win\README" />
+    <None Include="fftw_win\README-WINDOWS" />
+    <None Include="hllibesper\x64\Debug\hllibesper.dll.recipe" />
+    <None Include="hllibesper\x64\Debug\hllibesper.tlog\hllibesper.lastbuildstate" />
+    <None Include="nfft_win\COPYING" />
+    <None Include="nfft_win\libnfft3_threads-4.def" />
+    <None Include="nfft_win\libnfft3_threads-4.dll" />
+    <None Include="nfft_win\libnfft3_threads-4.exp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="libesper.cpp" />
+    <ClCompile Include="nfft_win\simple_test.c" />
+    <ClCompile Include="src\ESPER\components.c" />
+    <ClCompile Include="src\ESPER\esper.c" />
+    <ClCompile Include="src\ESPER\pitchCalcFallback.c" />
+    <ClCompile Include="src\fft.c" />
+    <ClCompile Include="src\interpolation.c" />
+    <ClCompile Include="src\Renderer\modifiers.c" />
+    <ClCompile Include="src\Renderer\renderer.c" />
+    <ClCompile Include="src\Resampler\loop.c" />
+    <ClCompile Include="src\Resampler\resampler.c" />
+    <ClCompile Include="src\util.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="esper.h" />
+    <ClInclude Include="fftw_win\fftw3.h" />
+    <ClInclude Include="nfft_win\fftw3.h" />
+    <ClInclude Include="nfft_win\nfft3.h" />
+    <ClInclude Include="nfft_win\nfft3mp.h" />
+    <ClInclude Include="src\ESPER\components.h" />
+    <ClInclude Include="src\ESPER\esper.h" />
+    <ClInclude Include="src\ESPER\pitchCalcFallback.h" />
+    <ClInclude Include="src\fft.h" />
+    <ClInclude Include="src\interpolation.h" />
+    <ClInclude Include="src\Renderer\modifiers.h" />
+    <ClInclude Include="src\Renderer\renderer.h" />
+    <ClInclude Include="src\Resampler\loop.h" />
+    <ClInclude Include="src\Resampler\resampler.h" />
+    <ClInclude Include="src\util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="fftw_win\libfftw3-3.lib" />
+    <Library Include="fftw_win\libfftw3f-3.lib" />
+    <Library Include="fftw_win\libfftw3l-3.lib" />
+    <Library Include="nfft_win\libnfft3_threads-4.lib" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

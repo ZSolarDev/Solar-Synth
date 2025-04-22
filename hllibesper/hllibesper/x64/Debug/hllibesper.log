@@ -1,0 +1,12 @@
+﻿  libesper.cpp
+C:\Haxe Games\Solar-Synth\hllibesper\libesper.cpp(14,11): error C2082: redefinition of formal parameter 'breathiness'
+C:\Haxe Games\Solar-Synth\hllibesper\libesper.cpp(16,9): warning C4838: conversion from 'int' to 'unsigned int' requires a narrowing conversion
+C:\Haxe Games\Solar-Synth\hllibesper\libesper.cpp(48,11): error C2082: redefinition of formal parameter 'breathiness'
+C:\Haxe Games\Solar-Synth\hllibesper\libesper.cpp(50,9): warning C4838: conversion from 'int' to 'unsigned int' requires a narrowing conversion
+C:\Haxe Games\Solar-Synth\hllibesper\libesper.cpp(51,9): warning C4838: conversion from 'short' to 'unsigned short' requires a narrowing conversion
+C:\Haxe Games\Solar-Synth\hllibesper\libesper.cpp(52,9): warning C4838: conversion from 'int' to 'unsigned int' requires a narrowing conversion
+C:\Haxe Games\Solar-Synth\hllibesper\libesper.cpp(53,9): warning C4838: conversion from 'int' to 'unsigned int' requires a narrowing conversion
+C:\Haxe Games\Solar-Synth\hllibesper\libesper.cpp(54,9): warning C4838: conversion from 'int' to 'unsigned int' requires a narrowing conversion
+C:\Haxe Games\Solar-Synth\hllibesper\libesper.cpp(55,9): warning C4838: conversion from 'int' to 'unsigned int' requires a narrowing conversion
+C:\Haxe Games\Solar-Synth\hllibesper\libesper.cpp(56,9): warning C4838: conversion from 'int' to 'unsigned int' requires a narrowing conversion
+C:\Haxe Games\Solar-Synth\hllibesper\libesper.cpp(57,9): warning C4838: conversion from 'int' to 'unsigned int' requires a narrowing conversion
