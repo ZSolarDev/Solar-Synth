@@ -210,7 +210,7 @@ extern "C" LIBESPER_EXPORT void LIBESPER_CDECL pitchShift(float* specharm, float
 //applies a dynamics effect to a specharm array. Also requires a pitch array.
 extern "C" LIBESPER_EXPORT void LIBESPER_CDECL applyDynamics(float* specharm, float* dynamics, float* pitch, int length, engineCfg config);
 
-//applies a brightness effectto a specharm array.
+//applies a brightness effect to a specharm array.
 extern "C" void LIBESPER_CDECL applyBrightness(float* specharm, float* brightness, int length, engineCfg config);
 
 //applies a growl effect to a specharm array. lfophase is a pointer to a single float value representing the phase of the growl effect at the beginning of the sample. It will be updated to the phase at the end of the sample.
