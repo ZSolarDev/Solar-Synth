@@ -172,6 +172,7 @@
     <None Include="nfft_win\libnfft3_threads-4.exp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="engineconfig.cpp" />
     <ClCompile Include="libesper.cpp" />
     <ClCompile Include="nfft_win\simple_test.c" />
     <ClCompile Include="src\ESPER\components.c" />

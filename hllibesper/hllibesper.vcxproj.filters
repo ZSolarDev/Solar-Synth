@@ -94,6 +94,9 @@
     <ClCompile Include="src\ESPER\pitchCalcFallback.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engineconfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="esper.h">

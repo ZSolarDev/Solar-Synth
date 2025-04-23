@@ -5,7 +5,7 @@
 #include <iostream>
 #include <math.h>
 
-public static engineCfg cfg = {
+static engineCfg cfg = {
         44100,                  // sampleRate (Hz)
         230,                    // tickRate
         192,                    // batchSize
