@@ -4,77 +4,9 @@
 #include <hl.h>
 #include <iostream>
 #include <math.h>
+#include "utils.cpp"
+#include "csamples.cpp"
 #include "engineconfig.cpp"
-
-static cSample* cSamples;
-static int cSamplesCount = 0;
-
-cSampleCfg makeCSampleConfig(int length, int batches, int pitchLength, int markerLength, int pitch, int isVoiced, int isPlosive, int useVariance, float expectedPitch, float searchRange, int tempWidth)
-{
-    cSampleCfg sampleConfig = { length, batches, pitchLength, markerLength, pitch, isVoiced, isPlosive, useVariance, expectedPitch, searchRange, tempWidth };
-    return sampleConfig;
-}
-
-cSample makeCSample(float* waveform, int* pitchDeltas, int* pitchMarkers, char* pitchMarkerValidity, float* specharm, float* avgSpecharm, cSampleCfg config)
-{
-    cSample sample = { waveform, pitchDeltas, pitchMarkers, pitchMarkerValidity, specharm, avgSpecharm, config };
-    return sample;
-}
-
-segmentTiming makeSegmentTiming(int start1, int start2, int start3, int end1, int end2, int end3, int windowStart, int windowEnd, int offset)
-{
-    segmentTiming segTiming = { start1, start2, start3, end1, end2, end3, windowStart, windowEnd, offset };
-    return segTiming;
-}
-
-HL_PRIM void HL_NAME(setc_sample_waveform)(int index, float* waveform) {
-    cSamples[index].waveform = waveform;
-}
-DEFINE_PRIM(_VOID, setc_sample_waveform, _I32 _ARR);
-
-HL_PRIM void HL_NAME(setc_sample_pitchDeltas)(int index, int* pitchDeltas) {
-    cSamples[index].pitchDeltas = pitchDeltas;
-}
-DEFINE_PRIM(_VOID, setc_sample_pitchDeltas, _I32 _ARR);
-
-HL_PRIM void HL_NAME(setc_sample_pitchMarkers)(int index, int* pitchMarkers) {
-    cSamples[index].pitchMarkers = pitchMarkers;
-}
-DEFINE_PRIM(_VOID, setc_sample_pitchMarkers, _I32 _ARR);
-
-HL_PRIM void HL_NAME(setc_sample_pitch_marker_validity)(int index, vstring pitchMarkerValidity) {
-    cSamples[index].pitchMarkerValidity = hl_to_utf8(pitchMarkerValidity->bytes);kj;
-}
-DEFINE_PRIM(_VOID, setc_sample_pitch_marker_validity, _I32 _ARR);
-
-HL_PRIM void HL_NAME(setc_sample_specharm)(int index, float* specharm) {
-    cSamples[index].specharm = specharm;
-}
-DEFINE_PRIM(_VOID, setc_sample_specharm, _I32 _ARR);
-
-HL_PRIM void HL_NAME(setc_sample_avgSpecharm)(int index, float* avgSpecharm) {
-    cSamples[index].avgSpecharm = avgSpecharm;
-}
-DEFINE_PRIM(_VOID, setc_sample_avgSpecharm, _I32 _ARR);
-
-HL_PRIM void HL_NAME(pushc_sample)(float* waveform, int* pitchDeltas, int* pitchMarkers, vstring pitchMarkerValidity, float* specharm, float* avgSpecharm, int length, int batches, int pitchLength, int markerLength, int pitch, int isVoiced, int isPlosive, int useVariance, float expectedPitch, float searchRange, int tempWidth) {
-    const char* _pitchMarkerValidity = hl_to_utf8(pitchMarkerValidity->bytes);
-    cSampleCfg sampleConfig = makeCSampleConfig(length, batches, pitchLength, markerLength, pitch, isVoiced, isPlosive, useVariance, expectedPitch, searchRange, tempWidth);
-    cSample sample = makeCSample(waveform, pitchDeltas, pitchMarkers, _pitchMarkerValidity, specharm, avgSpecharm, sampleConfig);
-    int newSize = cSamplesCount + 1;
-    cSample* newSamples = (cSample*)hl_gc_alloc_noptr(sizeof(cSample) * newSize);
-    for (int i = 0; i < cSamplesCount; i++)
-        newSamples[i] = cSamples[i];
-    cSamples = newSamples;
-    cSamplesCount = newSize;
-}
-DEFINE_PRIM(_VOID, pushc_sample, _ARR _ARR _ARR _STRING _ARR _ARR _I32 _I32 _I32 _I32 _I32 _I32 _I32 _I32 _I32 _F32 _F32 _I32);
-
-HL_PRIM void HL_NAME(clearc_samples)() {
-    memset(cSamples, 0, sizeof(cSample) * cSamplesCount);
-    cSamplesCount = 0;
-}
-DEFINE_PRIM(_VOID, clearc_samples);
 
 HL_PRIM void HL_NAME(pitch_calc_fallback)() {
     pitchCalcFallback(cSamples, cfg);
