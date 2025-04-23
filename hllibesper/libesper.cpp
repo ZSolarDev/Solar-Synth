@@ -42,10 +42,10 @@ HL_PRIM void HL_NAME(setc_sample_pitchMarkers)(int index, int* pitchMarkers) {
 }
 DEFINE_PRIM(_VOID, setc_sample_pitchMarkers, _I32 _ARR);
 
-HL_PRIM void HL_NAME(setc_sample_waveform)(int index, float* waveform) {
-    cSamples[index].waveform = waveform;
+HL_PRIM void HL_NAME(setc_sample_pitch_marker_validity)(int index, vstring pitchMarkerValidity) {
+    cSamples[index].pitchMarkerValidity = hl_to_utf8(pitchMarkerValidity->bytes);kj;
 }
-DEFINE_PRIM(_VOID, setc_sample_waveform, _I32 _ARR);
+DEFINE_PRIM(_VOID, setc_sample_pitch_marker_validity, _I32 _ARR);
 
 HL_PRIM void HL_NAME(setc_sample_specharm)(int index, float* specharm) {
     cSamples[index].specharm = specharm;
@@ -57,7 +57,7 @@ HL_PRIM void HL_NAME(setc_sample_avgSpecharm)(int index, float* avgSpecharm) {
 }
 DEFINE_PRIM(_VOID, setc_sample_avgSpecharm, _I32 _ARR);
 
-HL_PRIM void HL_NAME(pushc_sample)(float* waveform, int* pitchDeltas, int* pitchMarkers, vstring* pitchMarkerValidity, float* specharm, float* avgSpecharm, int length, int batches, int pitchLength, int markerLength, int pitch, int isVoiced, int isPlosive, int useVariance, float expectedPitch, float searchRange, int tempWidth) {
+HL_PRIM void HL_NAME(pushc_sample)(float* waveform, int* pitchDeltas, int* pitchMarkers, vstring pitchMarkerValidity, float* specharm, float* avgSpecharm, int length, int batches, int pitchLength, int markerLength, int pitch, int isVoiced, int isPlosive, int useVariance, float expectedPitch, float searchRange, int tempWidth) {
     const char* _pitchMarkerValidity = hl_to_utf8(pitchMarkerValidity->bytes);
     cSampleCfg sampleConfig = makeCSampleConfig(length, batches, pitchLength, markerLength, pitch, isVoiced, isPlosive, useVariance, expectedPitch, searchRange, tempWidth);
     cSample sample = makeCSample(waveform, pitchDeltas, pitchMarkers, _pitchMarkerValidity, specharm, avgSpecharm, sampleConfig);
@@ -81,7 +81,7 @@ HL_PRIM void HL_NAME(pitch_calc_fallback)() {
 }
 DEFINE_PRIM(_VOID, pitch_calc_fallback);
 
-HL_PRIM void HL_NAME(spec_calc)(float* waveform, int* pitchDeltas, int* pitchMarkers, vstring* pitchMarkerValidity, float* specharm, float* avgSpecharm, int length, int batches, int pitchLength, int markerLength, int pitch, int isVoiced, int isPlosive, int useVariance, float expectedPitch, float searchRange, int tempWidth) {
+HL_PRIM void HL_NAME(spec_calc)(float* waveform, int* pitchDeltas, int* pitchMarkers, vstring pitchMarkerValidity, float* specharm, float* avgSpecharm, int length, int batches, int pitchLength, int markerLength, int pitch, int isVoiced, int isPlosive, int useVariance, float expectedPitch, float searchRange, int tempWidth) {
     const char* _pitchMarkerValidity = hl_to_utf8(pitchMarkerValidity->bytes);
     cSampleCfg sampleConfig = makeCSampleConfig(length, batches, pitchLength, markerLength, pitch, isVoiced, isPlosive, useVariance, expectedPitch, searchRange, tempWidth);
     cSample sample = makeCSample(waveform, pitchDeltas, pitchMarkers, _pitchMarkerValidity, specharm, avgSpecharm, sampleConfig);
