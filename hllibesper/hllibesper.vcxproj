@@ -172,6 +172,7 @@
     <None Include="nfft_win\libnfft3_threads-4.exp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="csamples.cpp" />
     <ClCompile Include="engineconfig.cpp" />
     <ClCompile Include="libesper.cpp" />
     <ClCompile Include="nfft_win\simple_test.c" />
@@ -185,8 +186,11 @@
     <ClCompile Include="src\Resampler\loop.c" />
     <ClCompile Include="src\Resampler\resampler.c" />
     <ClCompile Include="src\util.c" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="csamples.hpp" />
+    <ClInclude Include="engineconfig.hpp" />
     <ClInclude Include="esper.h" />
     <ClInclude Include="fftw_win\fftw3.h" />
     <ClInclude Include="nfft_win\fftw3.h" />
@@ -202,6 +206,7 @@
     <ClInclude Include="src\Resampler\loop.h" />
     <ClInclude Include="src\Resampler\resampler.h" />
     <ClInclude Include="src\util.h" />
+    <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="fftw_win\libfftw3-3.lib" />

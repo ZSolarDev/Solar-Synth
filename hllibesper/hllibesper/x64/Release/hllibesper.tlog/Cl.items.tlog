@@ -1,3 +1,5 @@
+C:\Haxe Games\Solar-Synth\hllibesper\csamples.cpp;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\csamples.obj
+C:\Haxe Games\Solar-Synth\hllibesper\engineconfig.cpp;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\engineconfig.obj
 C:\Haxe Games\Solar-Synth\hllibesper\libesper.cpp;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\libesper.obj
 C:\Haxe Games\Solar-Synth\hllibesper\nfft_win\simple_test.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\simple_test.obj
 C:\Haxe Games\Solar-Synth\hllibesper\src\ESPER\components.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\components.obj
@@ -10,3 +12,4 @@ C:\Haxe Games\Solar-Synth\hllibesper\src\Renderer\renderer.c;C:\Haxe Games\Solar
 C:\Haxe Games\Solar-Synth\hllibesper\src\Resampler\loop.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\loop.obj
 C:\Haxe Games\Solar-Synth\hllibesper\src\Resampler\resampler.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\resampler.obj
 C:\Haxe Games\Solar-Synth\hllibesper\src\util.c;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\util.obj
+C:\Haxe Games\Solar-Synth\hllibesper\utils.cpp;C:\Haxe Games\Solar-Synth\hllibesper\hllibesper\x64\Release\utils.obj

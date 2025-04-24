@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "C:\\Haxe Games\\Solar-Synth\\hllibesper\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F9C74C86-68BF-4369-9142-37F50CA70AFC}|hllibesper.vcxproj|C:\\Haxe Games\\Solar-Synth\\hllibesper\\libesper.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F9C74C86-68BF-4369-9142-37F50CA70AFC}|hllibesper.vcxproj|solutionrelative:libesper.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F9C74C86-68BF-4369-9142-37F50CA70AFC}|hllibesper.vcxproj|C:\\Haxe Games\\Solar-Synth\\hllibesper\\esper.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F9C74C86-68BF-4369-9142-37F50CA70AFC}|hllibesper.vcxproj|solutionrelative:esper.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{F9C74C86-68BF-4369-9142-37F50CA70AFC}|hllibesper.vcxproj|C:\\Haxe Games\\Solar-Synth\\hllibesper\\csamples.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F9C74C86-68BF-4369-9142-37F50CA70AFC}|hllibesper.vcxproj|solutionrelative:csamples.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F9C74C86-68BF-4369-9142-37F50CA70AFC}|hllibesper.vcxproj|C:\\Haxe Games\\Solar-Synth\\hllibesper\\engineconfig.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{F9C74C86-68BF-4369-9142-37F50CA70AFC}|hllibesper.vcxproj|solutionrelative:engineconfig.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F9C74C86-68BF-4369-9142-37F50CA70AFC}|hllibesper.vcxproj|C:\\Haxe Games\\Solar-Synth\\hllibesper\\libesper.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F9C74C86-68BF-4369-9142-37F50CA70AFC}|hllibesper.vcxproj|solutionrelative:libesper.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,50 +22,45 @@
       "DocumentGroups": [
         {
           "DockedWidth": 238,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "libesper.cpp",
               "DocumentMoniker": "C:\\Haxe Games\\Solar-Synth\\hllibesper\\libesper.cpp",
               "RelativeDocumentMoniker": "libesper.cpp",
               "ToolTip": "C:\\Haxe Games\\Solar-Synth\\hllibesper\\libesper.cpp",
               "RelativeToolTip": "libesper.cpp",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAswCYAAAAcAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-04-22T23:50:58.348Z",
+              "WhenOpened": "2025-04-23T21:26:26.889Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "engineconfig.cpp",
               "DocumentMoniker": "C:\\Haxe Games\\Solar-Synth\\hllibesper\\engineconfig.cpp",
               "RelativeDocumentMoniker": "engineconfig.cpp",
               "ToolTip": "C:\\Haxe Games\\Solar-Synth\\hllibesper\\engineconfig.cpp",
               "RelativeToolTip": "engineconfig.cpp",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAcAAAAUAAAAAAAAAA==",
+              "ViewState": "AgIAAEUAAAAAAAAAAAAAAFQAAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-04-22T23:50:24.83Z"
-            }
-          ]
-        },
-        {
-          "DockedWidth": 162,
-          "SelectedChildIndex": 0,
-          "Children": [
+              "WhenOpened": "2025-04-23T21:26:12.016Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "esper.h",
-              "DocumentMoniker": "C:\\Haxe Games\\Solar-Synth\\hllibesper\\esper.h",
-              "RelativeDocumentMoniker": "esper.h",
-              "ToolTip": "C:\\Haxe Games\\Solar-Synth\\hllibesper\\esper.h",
-              "RelativeToolTip": "esper.h",
-              "ViewState": "AgIAAI0AAAAAAAAAAAAAAJcAAABAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-04-22T23:53:21.613Z",
+              "DocumentIndex": 0,
+              "Title": "csamples.cpp",
+              "DocumentMoniker": "C:\\Haxe Games\\Solar-Synth\\hllibesper\\csamples.cpp",
+              "RelativeDocumentMoniker": "csamples.cpp",
+              "ToolTip": "C:\\Haxe Games\\Solar-Synth\\hllibesper\\csamples.cpp",
+              "RelativeToolTip": "csamples.cpp",
+              "ViewState": "AgIAAFIAAAAAAAAAAAAAAGEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-04-23T21:22:18.983Z",
               "EditorCaption": ""
             }
           ]
