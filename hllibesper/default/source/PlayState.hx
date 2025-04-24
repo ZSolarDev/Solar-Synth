@@ -156,8 +156,8 @@ class PlayState extends FlxState
 		for (i in 0...4)
 			e[i] = i;
 
-		LibESPER.set_test_ee(e);
-		trace(e);
+		// var wowies = LibESPER.set_test_ee(e);
+		// trace(wowies);
 	}
 
 	override public function update(elapsed:Float)
