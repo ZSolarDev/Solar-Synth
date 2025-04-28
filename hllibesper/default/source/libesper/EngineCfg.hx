@@ -13,18 +13,7 @@ class EngineCfg
 	public var breCompPremul(get, set):Float;
 
 	@:allow(libesper.LibESPER)
-	private function new()
-	{
-		sampleRate = EsperEXT.get_sample_rate();
-		tickRate = EsperEXT.get_tick_rate();
-		batchSize = EsperEXT.get_batch_size();
-		tripleBatchSize = EsperEXT.get_triple_batch_size();
-		halfTripleBatchSize = EsperEXT.get_half_triple_batch_size();
-		nHarmonics = EsperEXT.getn_harmonics();
-		halfHarmonics = EsperEXT.get_half_harmonics();
-		frameSize = EsperEXT.get_frame_size();
-		breCompPremul = EsperEXT.get_bre_comp_premul();
-	}
+	private function new() {}
 
 	function get_sampleRate():Int
 		return EsperEXT.get_sample_rate();

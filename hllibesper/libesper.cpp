@@ -2,6 +2,7 @@
 
 #include "esper.h"
 #include <hl.h>
+#include <iostream>
 #include "utils.hpp"
 #include "csamples.hpp"
 #include "engineconfig.hpp"
@@ -22,7 +23,7 @@ HL_PRIM void HL_NAME(spec_calc)(varray* waveform, varray* pitchDeltas, varray* p
     cSample sample = makeCSample(_waveform, _pitchDeltas, _pitchMarkers, _pitchMarkerValidity, _specharm, _avgSpecharm, sampleConfig);;
     specCalc(sample, cfg);
 }
-DEFINE_PRIM(_VOID, spec_calc, _ARR _ARR _ARR _STRING _ARR _ARR _I32 _I32 _I32 _I32 _I32 _I32 _I32 _I32 _I32 _F32 _F32 _I32);
+DEFINE_PRIM(_VOID, spec_calc, _ARR _ARR _ARR _STRING _ARR _ARR _I32 _I32 _I32 _I32 _I32 _I32 _I32 _I32 _F32 _F32 _I32);
 
 HL_PRIM void HL_NAME(resample_specharm)(varray* specharm, varray* avgSpecharm, int length, varray* steadiness, float spacing, int startCap, int endCap, varray* output, int start1, int start2, int start3, int end1, int end2, int end3, int windowStart, int windowEnd, int offset) {
     float* _specharm = hl_aptr(specharm, float);
@@ -40,7 +41,7 @@ HL_PRIM void HL_NAME(resample_pitch)(varray* pitchDeltas, int length, float pitc
     segmentTiming segTiming = makeSegmentTiming(start1, start2, start3, end1, end2, end3, windowStart, windowEnd, offset);
     resamplePitch(_pitchDeltas, length, pitch, spacing, startCap, endCap, _output, requiredSize, segTiming);
 }
-DEFINE_PRIM(_VOID, resample_pitch, _ARR _I32 _F32 _F32 _F32 _I32 _I32 _ARR _I32 _I32 _I32 _I32 _I32 _I32 _I32 _I32 _I32 _I32);
+DEFINE_PRIM(_VOID, resample_pitch, _ARR _I32 _F32 _F32 _I32 _I32 _ARR _I32 _I32 _I32 _I32 _I32 _I32 _I32 _I32 _I32 _I32);
 
 HL_PRIM void HL_NAME(apply_breathiness)(varray* specharm, varray* breathiness, int length) {
     float* _specharm = hl_aptr(specharm, float);

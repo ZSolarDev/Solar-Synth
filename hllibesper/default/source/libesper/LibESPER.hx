@@ -1,18 +1,18 @@
 package libesper;
 
+import fft.*;
 import hl.F32;
 import hl.NativeArray;
 
-// TODO: ADD get_sample_count EXTERN FOR CSAMPLES
 class LibESPER
 {
 	public static var engineConfig:EngineCfg = new EngineCfg();
 	public static var cSamples:CSamples = new CSamples();
 
-	static function nativeArrayToArray<T>(arr:NativeArray<T>):Array<T>
+	public static function nativeArrayToArray<T>(arr:NativeArray<T>):Array<T>
 		return [for (itm in arr) itm];
 
-	static function arrayToNativeArray<T>(arr:Array<T>):NativeArray<T>
+	public static function arrayToNativeArray<T>(arr:Array<T>):NativeArray<T>
 	{
 		var narr:NativeArray<T> = new NativeArray<T>(arr.length);
 		for (i in 0...arr.length)
@@ -20,27 +20,95 @@ class LibESPER
 		return narr;
 	}
 
-	static function f32ArrayToFloatArray(arr:Array<F32>):Array<Float>
+	public static function f32ArrayToFloatArray(arr:Array<F32>):Array<Float>
 		return [for (f32 in arr) f32];
 
-	static function floatArrayToF32Array(arr:Array<Float>):Array<F32>
+	public static function floatArrayToF32Array(arr:Array<Float>):Array<F32>
 		return [for (float in arr) float];
 
-	static function convertArrayToNF32(array:Array<Float>):NativeArray<F32>
+	public static function convertArrayToNF32(array:Array<Float>):NativeArray<F32>
 		return arrayToNativeArray(floatArrayToF32Array(array));
 
-	static function convertArrayFromNF32(array:NativeArray<F32>):Array<Float>
+	public static function convertArrayFromNF32(array:NativeArray<F32>):Array<Float>
 		return f32ArrayToFloatArray(nativeArrayToArray(array));
 
-	static function convertArrayToNInt(array:Array<Int>):NativeArray<Int>
+	public static function convertArrayToNInt(array:Array<Int>):NativeArray<Int>
 		return arrayToNativeArray(array);
 
-	static function convertArrayFromNInt(array:NativeArray<Int>):Array<Int>
+	public static function convertArrayFromNInt(array:NativeArray<Int>):Array<Int>
 		return nativeArrayToArray(array);
 
-	public static function applyBreathiness(specharm:Array<Float>, breathiness:Array<Float>)
+	public static function pitchCalcFallback()
 	{
-		EsperEXT.apply_breathiness(convertArrayToNF32(specharm), convertArrayToNF32(breathiness), specharm.length);
+		EsperEXT.pitch_calc_fallback();
+	}
+
+	public static function specCalc(sample:CSample)
+	{
+		EsperEXT.spec_calc(convertArrayToNF32(sample.waveform), convertArrayToNInt(sample.pitchDeltas), convertArrayToNInt(sample.pitchMarkers),
+			sample.pitchMarkerValidity, convertArrayToNF32(sample.specharm), convertArrayToNF32(sample.avgSpecharm), sample.config.length,
+			sample.config.batches, sample.config.pitchLength, sample.config.markerLength, sample.config.pitch, sample.config.isVoiced,
+			sample.config.isPlosive, sample.config.useVariance, sample.config.expectedPitch, sample.config.searchRange, sample.config.tempWidth);
+	}
+
+	public static function resampleSpecharm(specharm:Array<Float>, avgSpecharm:Array<Float>, steadiness:Array<Float>, output:Array<Float>, spacing:Float,
+			startCap:Int, endCap:Int, timing:SegmentTiming)
+	{
+		EsperEXT.resample_specharm(convertArrayToNF32(specharm), convertArrayToNF32(avgSpecharm), specharm.length, convertArrayToNF32(steadiness), spacing,
+			startCap, endCap, convertArrayToNF32(output), timing.start1, timing.start2, timing.start3, timing.end1, timing.end2, timing.end3,
+			timing.windowStart, timing.windowEnd, timing.offset);
+	}
+
+	public static function resamplePitch(pitchDeltas:Array<Int>, pitch:Float, spacing:Float, startCap:Int, endCap:Int, output:Array<Float>, requiredSize:Int,
+			timing:SegmentTiming)
+	{
+		EsperEXT.resample_pitch(convertArrayToNInt(pitchDeltas), pitchDeltas.length, pitch, spacing, startCap, endCap, convertArrayToNF32(output),
+			requiredSize, timing.start1, timing.start2, timing.start3, timing.end1, timing.end2, timing.end3, timing.windowStart, timing.windowEnd,
+			timing.offset);
+	}
+
+	public static function applyBreathiness(samples:Array<Float>, breathiness:Array<Float>)
+	{
+		samples = runFromSamples(samples, (frame, i) ->
+		{
+			var breathFrame = breathiness.slice(i * frame.length, (i + 1) * frame.length);
+			EsperEXT.apply_breathiness(convertArrayToNF32(frame), convertArrayToNF32(breathFrame), frame.length);
+		});
+	}
+
+	public static function runFromSamples(samples:Array<Float>, callback:(Array<Float>, Int) -> Void):Array<Float>
+	{
+		var complexSpectrum = FFT.fftFull(samples);
+		trace(1);
+		var frames = new Array<Array<Complex>>();
+		var frameSize = LibESPER.engineConfig.nHarmonics; // Not frameSize!
+
+		for (i in 0...Std.int(complexSpectrum.length / frameSize))
+			frames.push(complexSpectrum.slice(i * frameSize, (i + 1) * frameSize));
+
+		trace(2);
+
+		for (i in 0...frames.length)
+		{
+			var magnitudes = FFT.getMagnitudes(frames[i]);
+			callback(magnitudes, i);
+			FFT.updateFrameMagnitudes(frames[i], magnitudes);
+		}
+
+		trace(3);
+
+		// Rebuild full spectrum
+		var fullSpectrum = [];
+		for (frame in frames)
+			fullSpectrum = fullSpectrum.concat(frame);
+
+		if (fullSpectrum.length != complexSpectrum.length)
+		{
+			throw "Spectrum length mismatch after processing!";
+		}
+
+		trace(4);
+		return FFT.ifftFloat(fullSpectrum);
 	}
 
 	public static function pitchShift(specharm:Array<Float>, srcPitch:Array<Float>, tgtPitch:Array<Float>, formantShift:Array<Float>, breathiness:Array<Float>)

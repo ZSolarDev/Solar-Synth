@@ -2,54 +2,64 @@ package libesper;
 
 class CSamples
 {
+	public var length(get, null):Int;
+
 	@:allow(libesper.LibESPER)
 	private function new() {}
 
 	public inline function get(index:Int):CSample
 	{
-		if (index < 0 || index >= EsperEXT.get_sample_count()) // Assuming such function exists
+		if (index < 0 || index >= EsperEXT.getc_samples_count()) // Assuming such function exists
 			throw 'Sample at index $index does not exist.';
 		return new CSample(index);
 	}
 
 	public inline function set(index:Int, sample:CSample):Void
 	{
-		if (index < 0 || index >= EsperEXT.get_sample_count())
+		if (index < 0 || index >= EsperEXT.getc_samples_count())
 			throw 'Cannot set sample at index $index because it does not exist.';
 
-		EsperEXT.set_sample_waveform(index, sample.get_waveform());
-		EsperEXT.set_sample_pitchDeltas(index, sample.get_pitchDeltas());
-		EsperEXT.set_sample_pitchMarkers(index, sample.get_pitchMarkers());
-		EsperEXT.set_sample_pitch_marker_validity(index, sample.get_pitchMarkerValidity());
-		EsperEXT.set_sample_specharm(index, sample.get_specharm());
-		EsperEXT.set_sample_avgSpecharm(index, sample.get_avgSpecharm());
+		EsperEXT.setc_sample_waveform(index, LibESPER.convertArrayToNF32(sample.waveform));
+		EsperEXT.setc_sample_pitch_deltas(index, LibESPER.convertArrayToNInt(sample.pitchDeltas));
+		EsperEXT.setc_sample_pitch_markers(index, LibESPER.convertArrayToNInt(sample.pitchMarkers));
+		EsperEXT.setc_sample_pitch_marker_validity(index, sample.pitchMarkerValidity);
+		EsperEXT.setc_sample_specharm(index, LibESPER.convertArrayToNF32(sample.specharm));
+		EsperEXT.setc_sample_avg_specharm(index, LibESPER.convertArrayToNF32(sample.avgSpecharm));
 
-		EsperEXT.set_sample_config_length(index, sample.get_length());
-		EsperEXT.set_sample_config_batches(index, sample.get_batches());
-		EsperEXT.set_sample_config_pitch_length(index, sample.get_pitchLength());
-		EsperEXT.set_sample_config_marker_length(index, sample.get_markerLength());
-		EsperEXT.set_sample_config_pitch(index, sample.get_pitch());
-		EsperEXT.set_sample_config_is_voiced(index, sample.get_isVoiced());
-		EsperEXT.set_sample_config_is_plosive(index, sample.get_isPlosive());
-		EsperEXT.set_sample_config_use_variance(index, sample.get_useVariance());
-		EsperEXT.set_sample_config_expected_pitch(index, sample.get_expectedPitch());
-		EsperEXT.set_sample_config_search_range(index, sample.get_searchRange());
-		EsperEXT.set_sample_config_temp_width(index, sample.get_tempWidth());
+		EsperEXT.setc_sample_config_length(index, sample.config.length);
+		EsperEXT.setc_sample_config_batches(index, sample.config.batches);
+		EsperEXT.setc_sample_config_pitch_length(index, sample.config.pitchLength);
+		EsperEXT.setc_sample_config_marker_length(index, sample.config.markerLength);
+		EsperEXT.setc_sample_config_pitch(index, sample.config.pitch);
+		EsperEXT.setc_sample_config_is_voiced(index, sample.config.isVoiced);
+		EsperEXT.setc_sample_config_is_plosive(index, sample.config.isPlosive);
+		EsperEXT.setc_sample_config_use_variance(index, sample.config.useVariance);
+		EsperEXT.setc_sample_config_expected_pitch(index, sample.config.expectedPitch);
+		EsperEXT.setc_sample_config_search_range(index, sample.config.searchRange);
+		EsperEXT.setc_sample_config_temp_width(index, sample.config.tempWidth);
 	}
 
-	public function iterator():Iterator<CSample>
+	public function iterator():CSamplesIterator
+		return new CSamplesIterator(this);
+
+	public inline function get_length():Int
+		return EsperEXT.getc_samples_count();
+}
+
+class CSamplesIterator
+{
+	var s:CSamples;
+	var i:Int;
+
+	public function new(s:CSamples)
 	{
-		return
-		{
-			var i = 0;
-			var max = EsperEXT.get_sample_count(); // You need this implemented
-			function hasNext()
-				return i < max;
-			function next()
-				return new CSample(i++);
-		};
+		this.s = s;
+		i = 0;
 	}
 
-	public inline function length():Int
-		return EsperEXT.get_sample_count();
+	public function hasNext()
+		return i < s.length;
+
+	public function next()
+		return new CSample(i++);
 }

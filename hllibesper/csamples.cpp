@@ -11,17 +11,17 @@ HL_PRIM void HL_NAME(setc_sample_waveform)(int index, varray* waveform) {
 }
 DEFINE_PRIM(_VOID, setc_sample_waveform, _I32 _ARR);
 
-HL_PRIM void HL_NAME(setc_sample_pitchDeltas)(int index, varray* pitchDeltas) {
+HL_PRIM void HL_NAME(setc_sample_pitch_deltas)(int index, varray* pitchDeltas) {
     int* _pitchDeltas = hl_aptr(pitchDeltas, int);
     cSamples[index].pitchDeltas = _pitchDeltas;
 }
-DEFINE_PRIM(_VOID, setc_sample_pitchDeltas, _I32 _ARR);
+DEFINE_PRIM(_VOID, setc_sample_pitch_deltas, _I32 _ARR);
 
-HL_PRIM void HL_NAME(setc_sample_pitchMarkers)(int index, varray* pitchMarkers) {
+HL_PRIM void HL_NAME(setc_sample_pitch_markers)(int index, varray* pitchMarkers) {
     int* _pitchMarkers = hl_aptr(pitchMarkers, int);
     cSamples[index].pitchMarkers = _pitchMarkers;
 }
-DEFINE_PRIM(_VOID, setc_sample_pitchMarkers, _I32 _ARR);
+DEFINE_PRIM(_VOID, setc_sample_pitch_markers, _I32 _ARR);
 
 HL_PRIM void HL_NAME(setc_sample_pitch_marker_validity)(int index, vstring* pitchMarkerValidity) {
     cSamples[index].pitchMarkerValidity = hl_to_utf8(pitchMarkerValidity->bytes);
@@ -34,11 +34,11 @@ HL_PRIM void HL_NAME(setc_sample_specharm)(int index, varray* specharm) {
 }
 DEFINE_PRIM(_VOID, setc_sample_specharm, _I32 _ARR);
 
-HL_PRIM void HL_NAME(setc_sample_avgSpecharm)(int index, varray* avgSpecharm) {
+HL_PRIM void HL_NAME(setc_sample_avg_specharm)(int index, varray* avgSpecharm) {
     float* _avgSpecharm = hl_aptr(avgSpecharm, float);
     cSamples[index].avgSpecharm = _avgSpecharm;
 }
-DEFINE_PRIM(_VOID, setc_sample_avgSpecharm, _I32 _ARR);
+DEFINE_PRIM(_VOID, setc_sample_avg_specharm, _I32 _ARR);
 
 // Config setters
 HL_PRIM void HL_NAME(setc_sample_config_length)(int index, int length) {
@@ -105,15 +105,15 @@ HL_PRIM varray* HL_NAME(getc_sample_waveform)(int index) {
 }
 DEFINE_PRIM(_ARR, getc_sample_waveform, _I32);
 
-HL_PRIM varray* HL_NAME(getc_sample_pitchDeltas)(int index) {
+HL_PRIM varray* HL_NAME(getc_sample_pitch_deltas)(int index) {
     return (varray*)cSamples[index].pitchDeltas;
 }
-DEFINE_PRIM(_ARR, getc_sample_pitchDeltas, _I32);
+DEFINE_PRIM(_ARR, getc_sample_pitch_deltas, _I32);
 
-HL_PRIM varray* HL_NAME(getc_sample_pitchMarkers)(int index) {
+HL_PRIM varray* HL_NAME(getc_sample_pitch_markers)(int index) {
     return (varray*)cSamples[index].pitchMarkers;
 }
-DEFINE_PRIM(_ARR, getc_sample_pitchMarkers, _I32);
+DEFINE_PRIM(_ARR, getc_sample_pitch_markers, _I32);
 
 HL_PRIM vstring* HL_NAME(getc_sample_pitch_marker_validity)(int index) {
     return char_to_vstring(cSamples[index].pitchMarkerValidity);
@@ -125,10 +125,10 @@ HL_PRIM varray* HL_NAME(getc_sample_specharm)(int index) {
 }
 DEFINE_PRIM(_ARR, getc_sample_specharm, _I32);
 
-HL_PRIM varray* HL_NAME(getc_sample_avgSpecharm)(int index) {
+HL_PRIM varray* HL_NAME(getc_sample_avg_specharm)(int index) {
     return (varray*)cSamples[index].avgSpecharm;
 }
-DEFINE_PRIM(_ARR, getc_sample_avgSpecharm, _I32);
+DEFINE_PRIM(_ARR, getc_sample_avg_specharm, _I32);
 
 // Config getters
 HL_PRIM int HL_NAME(getc_sample_config_length)(int index) {
@@ -186,6 +186,10 @@ HL_PRIM int HL_NAME(getc_sample_config_temp_width)(int index) {
 }
 DEFINE_PRIM(_I32, getc_sample_config_temp_width, _I32);
 
+HL_PRIM int HL_NAME(getc_samples_count)() {
+    return cSamplesCount;
+}
+DEFINE_PRIM(_I32, getc_samples_count);
 
 
 
@@ -206,7 +210,7 @@ HL_PRIM void HL_NAME(pushc_sample)(varray* waveform, varray* pitchDeltas, varray
     cSamples = newSamples;
     cSamplesCount = newSize;
 }
-DEFINE_PRIM(_VOID, pushc_sample, _ARR _ARR _ARR _STRING _ARR _ARR _I32 _I32 _I32 _I32 _I32 _I32 _I32 _I32 _I32 _F32 _F32 _I32);
+DEFINE_PRIM(_VOID, pushc_sample, _ARR _ARR _ARR _STRING _ARR _ARR _I32 _I32 _I32 _I32 _I32 _I32 _I32 _I32 _F32 _F32 _I32);
 
 HL_PRIM void HL_NAME(clearc_samples)() {
     memset(cSamples, 0, sizeof(cSample) * cSamplesCount);

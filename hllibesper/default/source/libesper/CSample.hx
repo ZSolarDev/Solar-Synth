@@ -1,14 +1,16 @@
 package libesper;
 
+import libesper.CSampleConfig.CSampleConfigPushable;
+
 class CSample
 {
 	public var index:Int;
-	public var waveform(get, set):NativeArray<F32>;
-	public var pitchDeltas(get, set):NativeArray<Int>;
-	public var pitchMarkers(get, set):NativeArray<Int>;
+	public var waveform(get, set):Array<Float>;
+	public var pitchDeltas(get, set):Array<Int>;
+	public var pitchMarkers(get, set):Array<Int>;
 	public var pitchMarkerValidity(get, set):String;
-	public var specharm(get, set):NativeArray<F32>;
-	public var avgSpecharm(get, set):NativeArray<F32>;
+	public var specharm(get, set):Array<Float>;
+	public var avgSpecharm(get, set):Array<Float>;
 
 	public var config:CSampleConfig;
 
@@ -16,89 +18,112 @@ class CSample
 	{
 		this.index = index;
 		config = new CSampleConfig(index);
-		waveform = EsperEXT.get_sample_waveform(index);
-		pitchDeltas = EsperEXT.get_sample_pitchDeltas(index);
-		pitchMarkers = EsperEXT.get_sample_pitchMarkers(index);
-		pitchMarkerValidity = EsperEXT.get_sample_pitch_marker_validity(index);
-		specharm = EsperEXT.get_sample_specharm(index);
-		avgSpecharm = EsperEXT.get_sample_avgSpecharm(index);
 	}
 
 	// Non-config setters and getters
-	public function get_waveform():NativeArray<F32>
+	function get_waveform():Array<Float>
+		return LibESPER.convertArrayFromNF32(EsperEXT.getc_sample_waveform(index));
+
+	function set_waveform(value:Array<Float>):Array<Float>
 	{
-		return EsperEXT.get_sample_waveform(index);
+		EsperEXT.setc_sample_waveform(index, LibESPER.convertArrayToNF32(value));
+		return value;
 	}
 
-	public function set_waveform(value:NativeArray<F32>):Void
+	function get_pitchDeltas():Array<Int>
+		return LibESPER.convertArrayFromNInt(EsperEXT.getc_sample_pitch_deltas(index));
+
+	function set_pitchDeltas(value:Array<Int>):Array<Int>
 	{
-		EsperEXT.set_sample_waveform(index, value);
+		EsperEXT.setc_sample_pitch_deltas(index, LibESPER.convertArrayToNInt(value));
+		return value;
 	}
 
-	public function get_pitchDeltas():NativeArray<Int>
+	function get_pitchMarkers():Array<Int>
+		return LibESPER.convertArrayFromNInt(EsperEXT.getc_sample_pitch_markers(index));
+
+	function set_pitchMarkers(value:Array<Int>):Array<Int>
 	{
-		return EsperEXT.get_sample_pitchDeltas(index);
+		EsperEXT.setc_sample_pitch_markers(index, LibESPER.convertArrayToNInt(value));
+		return value;
 	}
 
-	public function set_pitchDeltas(value:NativeArray<Int>):Void
+	function get_pitchMarkerValidity():String
+		return EsperEXT.getc_sample_pitch_marker_validity(index);
+
+	function set_pitchMarkerValidity(value:String):String
 	{
-		EsperEXT.set_sample_pitchDeltas(index, value);
+		EsperEXT.setc_sample_pitch_marker_validity(index, value);
+		return value;
 	}
 
-	public function get_pitchMarkers():NativeArray<Int>
+	function get_specharm():Array<Float>
+		return LibESPER.convertArrayFromNF32(EsperEXT.getc_sample_specharm(index));
+
+	function set_specharm(value:Array<Float>):Array<Float>
 	{
-		return EsperEXT.get_sample_pitchMarkers(index);
+		EsperEXT.setc_sample_specharm(index, LibESPER.convertArrayToNF32(value));
+		return value;
 	}
 
-	public function set_pitchMarkers(value:NativeArray<Int>):Void
+	function get_avgSpecharm():Array<Float>
+		return LibESPER.convertArrayFromNF32(EsperEXT.getc_sample_avg_specharm(index));
+
+	function set_avgSpecharm(value:Array<Float>):Array<Float>
 	{
-		EsperEXT.set_sample_pitchMarkers(index, value);
+		EsperEXT.setc_sample_avg_specharm(index, LibESPER.convertArrayToNF32(value));
+		return value;
 	}
 
-	public function get_pitchMarkerValidity():String
+	public function push()
 	{
-		return EsperEXT.get_sample_pitch_marker_validity(index);
-	}
-
-	public function set_pitchMarkerValidity(value:String):Void
-	{
-		EsperEXT.set_sample_pitch_marker_validity(index, value);
-	}
-
-	public function get_specharm():NativeArray<F32>
-	{
-		return EsperEXT.get_sample_specharm(index);
-	}
-
-	public function set_specharm(value:NativeArray<F32>):Void
-	{
-		EsperEXT.set_sample_specharm(index, value);
-	}
-
-	public function get_avgSpecharm():NativeArray<F32>
-	{
-		return EsperEXT.get_sample_avgSpecharm(index);
-	}
-
-	public function set_avgSpecharm(value:NativeArray<F32>):Void
-	{
-		EsperEXT.set_sample_avgSpecharm(index, value);
-	}
-
-	// Push method to add a sample
-	public function push():Void
-	{
-		// Prepare the data arrays for the push operation
-		var waveformData = waveform;
-		var pitchDeltasData = pitchDeltas;
-		var pitchMarkersData = pitchMarkers;
+		var waveformData = LibESPER.convertArrayToNF32(waveform);
+		var pitchDeltasData = LibESPER.convertArrayToNInt(pitchDeltas);
+		var pitchMarkersData = LibESPER.convertArrayToNInt(pitchMarkers);
 		var pitchMarkerValidityData = pitchMarkerValidity;
-		var specharmData = specharm;
-		var avgSpecharmData = avgSpecharm;
+		var specharmData = LibESPER.convertArrayToNF32(specharm);
+		var avgSpecharmData = LibESPER.convertArrayToNF32(avgSpecharm);
 
-		// Push the sample using the extern function
-		EsperEXT.push_sample(waveformData, pitchDeltasData, pitchMarkersData, pitchMarkerValidityData, specharmData, avgSpecharmData, config.length,
+		EsperEXT.pushc_sample(waveformData, pitchDeltasData, pitchMarkersData, pitchMarkerValidityData, specharmData, avgSpecharmData, config.length,
 			config.batches, config.pitchLength, config.markerLength, config.pitch, config.isVoiced, config.isPlosive, config.useVariance,
 			config.expectedPitch, config.searchRange, config.tempWidth);
+	}
+}
+
+class CSamplePushable
+{
+	public var waveform:Array<Float>;
+	public var pitchDeltas:Array<Int>;
+	public var pitchMarkers:Array<Int>;
+	public var pitchMarkerValidity:String;
+	public var specharm:Array<Float>;
+	public var avgSpecharm:Array<Float>;
+
+	public var config:CSampleConfigPushable;
+
+	public function new(waveform:Array<Float>, pitchDeltas:Array<Int>, pitchMarkers:Array<Int>, pitchMarkerValidity:String, specharm:Array<Float>,
+			avgSpecharm:Array<Float>)
+	{
+		this.waveform = waveform;
+		this.pitchDeltas = pitchDeltas;
+		this.pitchMarkers = pitchMarkers;
+		this.pitchMarkerValidity = pitchMarkerValidity;
+		this.specharm = specharm;
+		this.avgSpecharm = avgSpecharm;
+	}
+
+	public function push():CSample
+	{
+		var waveformData = LibESPER.convertArrayToNF32(waveform);
+		var pitchDeltasData = LibESPER.convertArrayToNInt(pitchDeltas);
+		var pitchMarkersData = LibESPER.convertArrayToNInt(pitchMarkers);
+		var pitchMarkerValidityData = pitchMarkerValidity;
+		var specharmData = LibESPER.convertArrayToNF32(specharm);
+		var avgSpecharmData = LibESPER.convertArrayToNF32(avgSpecharm);
+
+		EsperEXT.pushc_sample(waveformData, pitchDeltasData, pitchMarkersData, pitchMarkerValidityData, specharmData, avgSpecharmData, config.length,
+			config.batches, config.pitchLength, config.markerLength, config.pitch, config.isVoiced, config.isPlosive, config.useVariance,
+			config.expectedPitch, config.searchRange, config.tempWidth);
+		return new CSample(EsperEXT.getc_samples_count());
 	}
 }

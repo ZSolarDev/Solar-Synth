@@ -153,148 +153,152 @@ class EsperEXT
 		return;
 
 	@:hlNative('libesper')
-	public static function get_sample_waveform(index:Int):NativeArray<F32>
+	public static function getc_sample_waveform(index:Int):NativeArray<F32>
 		return cast [];
 
 	@:hlNative('libesper')
-	public static function get_sample_pitchDeltas(index:Int):hl.NativeArray<Int>
+	public static function getc_sample_pitch_deltas(index:Int):hl.NativeArray<Int>
 		return cast [];
 
 	@:hlNative('libesper')
-	public static function get_sample_pitchMarkers(index:Int):hl.NativeArray<Int>
+	public static function getc_sample_pitch_markers(index:Int):hl.NativeArray<Int>
 		return cast [];
 
 	@:hlNative('libesper')
-	public static function get_sample_pitch_marker_validity(index:Int):String
+	public static function getc_sample_pitch_marker_validity(index:Int):String
 		return '';
 
 	@:hlNative('libesper')
-	public static function get_sample_specharm(index:Int):NativeArray<F32>
+	public static function getc_sample_specharm(index:Int):NativeArray<F32>
 		return cast [];
 
 	@:hlNative('libesper')
-	public static function get_sample_avgSpecharm(index:Int):NativeArray<F32>
+	public static function getc_sample_avg_specharm(index:Int):NativeArray<F32>
 		return cast [];
 
 	@:hlNative('libesper')
-	public static function get_sample_config_length(index:Int):Int
+	public static function getc_sample_config_length(index:Int):Int
 		return 0;
 
 	@:hlNative('libesper')
-	public static function get_sample_config_batches(index:Int):Int
+	public static function getc_sample_config_batches(index:Int):Int
 		return 0;
 
 	@:hlNative('libesper')
-	public static function get_sample_config_pitch_length(index:Int):Int
+	public static function getc_sample_config_pitch_length(index:Int):Int
 		return 0;
 
 	@:hlNative('libesper')
-	public static function get_sample_config_marker_length(index:Int):Int
+	public static function getc_sample_config_marker_length(index:Int):Int
 		return 0;
 
 	@:hlNative('libesper')
-	public static function get_sample_config_pitch(index:Int):Int
+	public static function getc_sample_config_pitch(index:Int):Int
 		return 0;
 
 	@:hlNative('libesper')
-	public static function get_sample_config_is_voiced(index:Int):Int
+	public static function getc_sample_config_is_voiced(index:Int):Int
 		return 0;
 
 	@:hlNative('libesper')
-	public static function get_sample_config_is_plosive(index:Int):Int
+	public static function getc_sample_config_is_plosive(index:Int):Int
 		return 0;
 
 	@:hlNative('libesper')
-	public static function get_sample_config_use_variance(index:Int):Int
+	public static function getc_sample_config_use_variance(index:Int):Int
 		return 0;
 
 	@:hlNative('libesper')
-	public static function get_sample_config_expected_pitch(index:Int):F32
+	public static function getc_sample_config_expected_pitch(index:Int):F32
 		return 0.0;
 
 	@:hlNative('libesper')
-	public static function get_sample_config_search_range(index:Int):F32
+	public static function getc_sample_config_search_range(index:Int):F32
 		return 0.0;
 
 	@:hlNative('libesper')
-	public static function get_sample_config_temp_width(index:Int):Int
+	public static function getc_sample_config_temp_width(index:Int):Int
 		return 0;
 
 	@:hlNative('libesper')
-	public static function set_sample_waveform(index:Int, waveform:NativeArray<F32>)
+	public static function getc_samples_count():Int
+		return 0;
+
+	@:hlNative('libesper')
+	public static function setc_sample_waveform(index:Int, waveform:NativeArray<F32>)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_pitchDeltas(index:Int, pitchDeltas:hl.NativeArray<Int>)
+	public static function setc_sample_pitch_deltas(index:Int, pitchDeltas:hl.NativeArray<Int>)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_pitchMarkers(index:Int, pitchMarkers:hl.NativeArray<Int>)
+	public static function setc_sample_pitch_markers(index:Int, pitchMarkers:hl.NativeArray<Int>)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_pitch_marker_validity(index:Int, validity:String)
+	public static function setc_sample_pitch_marker_validity(index:Int, validity:String)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_specharm(index:Int, specharm:NativeArray<F32>)
+	public static function setc_sample_specharm(index:Int, specharm:NativeArray<F32>)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_avgSpecharm(index:Int, avgSpecharm:NativeArray<F32>)
+	public static function setc_sample_avg_specharm(index:Int, avgSpecharm:NativeArray<F32>)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_config_length(index:Int, length:Int)
+	public static function setc_sample_config_length(index:Int, length:Int)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_config_batches(index:Int, batches:Int)
+	public static function setc_sample_config_batches(index:Int, batches:Int)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_config_pitch_length(index:Int, pitchLength:Int)
+	public static function setc_sample_config_pitch_length(index:Int, pitchLength:Int)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_config_marker_length(index:Int, markerLength:Int)
+	public static function setc_sample_config_marker_length(index:Int, markerLength:Int)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_config_pitch(index:Int, pitch:Int)
+	public static function setc_sample_config_pitch(index:Int, pitch:Int)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_config_is_voiced(index:Int, isVoiced:Int)
+	public static function setc_sample_config_is_voiced(index:Int, isVoiced:Int)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_config_is_plosive(index:Int, isPlosive:Int)
+	public static function setc_sample_config_is_plosive(index:Int, isPlosive:Int)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_config_use_variance(index:Int, useVariance:Int)
+	public static function setc_sample_config_use_variance(index:Int, useVariance:Int)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_config_expected_pitch(index:Int, expectedPitch:F32)
+	public static function setc_sample_config_expected_pitch(index:Int, expectedPitch:F32)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_config_search_range(index:Int, searchRange:F32)
+	public static function setc_sample_config_search_range(index:Int, searchRange:F32)
 		return;
 
 	@:hlNative('libesper')
-	public static function set_sample_config_temp_width(index:Int, tempWidth:Int)
+	public static function setc_sample_config_temp_width(index:Int, tempWidth:Int)
 		return;
 
 	@:hlNative('libesper')
-	public static function push_sample(waveform:NativeArray<F32>, pitchDeltas:hl.NativeArray<Int>, pitchMarkers:hl.NativeArray<Int>,
+	public static function pushc_sample(waveform:NativeArray<F32>, pitchDeltas:hl.NativeArray<Int>, pitchMarkers:hl.NativeArray<Int>,
 			pitchMarkerValidity:String, specharm:NativeArray<F32>, avgSpecharm:NativeArray<F32>, length:Int, batches:Int, pitchLength:Int, markerLength:Int,
 			pitch:Int, isVoiced:Int, isPlosive:Int, useVariance:Int, expectedPitch:F32, searchRange:F32, tempWidth:Int)
 		return;
 
 	@:hlNative('libesper')
-	public static function clear_samples()
+	public static function clearc_samples()
 		return;
 }

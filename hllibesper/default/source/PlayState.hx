@@ -1,5 +1,6 @@
 package;
 
+import fft.*;
 import flixel.FlxState;
 import haxe.io.Bytes;
 import hl.F32;
@@ -126,38 +127,33 @@ class PlayState extends FlxState
 	override public function create()
 	{
 		super.create();
-		// var ogSample = File.getBytes('assets/test.wav');
-		// ogSample = ogSample.sub(44, ogSample.length - 44);
-		// var totalSamples:Int = cast ogSample.length / 2;
-		// var samples:Array<Float> = [];
-		// for (i in 0...totalSamples)
-		// {
-		// var offset = i * 2;
-		// if (offset + 2 <= ogSample.length)
-		// samples.push(getInt16(ogSample, offset, true) / 32768.0);
-		// else
-		// samples.push(0.0);
-		// }
-		// var resampledSamples = LibESPER.processSamples(44100, samples, 12, 3, 12);
-		// var resampledSamples = samples;
-		// trace(resampledSamples);
-		// var finalSample = Bytes.alloc(cast samples.length * 2);
-		// for (i in 0...samples.length)
-		// {
-		// var sample = Std.int(clamp(cast samples[i] * 32767, -32768, 32767));
-		// setInt16(finalSample, i * 2, sample, true);
-		// }
-		// var wavHeader:Bytes = createWavHeader(totalSamples, 1, 44100, 2);
-		// var complete:Bytes = Bytes.alloc(wavHeader.length + finalSample.length);
-		// complete.blit(0, wavHeader, 0, wavHeader.length);
-		// complete.blit(wavHeader.length, finalSample, 0, finalSample.length);
-		// File.saveBytes('testResampled.wav', complete);
-		var e:NativeArray<F32> = new NativeArray(5);
-		for (i in 0...4)
-			e[i] = i;
-
-		// var wowies = LibESPER.set_test_ee(e);
-		// trace(wowies);
+		var ogSample = File.getBytes('assets/test.wav');
+		ogSample = ogSample.sub(44, ogSample.length - 44);
+		var totalSamples:Int = cast ogSample.length / 2;
+		var samples:Array<Float> = [];
+		for (i in 0...totalSamples)
+		{
+			var offset = i * 2;
+			if (offset + 2 <= ogSample.length)
+				samples.push(getInt16(ogSample, offset, true) / 32768.0);
+			else
+				samples.push(0.0);
+		}
+		var breathiness = [0.0];
+		for (i in 0...samples.length * 2)
+			breathiness[i] = 0.5;
+		LibESPER.applyBreathiness(samples, breathiness);
+		var finalSample = Bytes.alloc(cast samples.length * 2);
+		for (i in 0...samples.length)
+		{
+			var sample = Std.int(clamp(cast samples[i] * 32767, -32768, 32767));
+			setInt16(finalSample, i * 2, sample, true);
+		}
+		var wavHeader:Bytes = createWavHeader(totalSamples, 1, 44100, 2);
+		var complete:Bytes = Bytes.alloc(wavHeader.length + finalSample.length);
+		complete.blit(0, wavHeader, 0, wavHeader.length);
+		complete.blit(wavHeader.length, finalSample, 0, finalSample.length);
+		File.saveBytes('testfftTest.wav', complete);
 	}
 
 	override public function update(elapsed:Float)
