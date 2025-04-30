@@ -1,6 +1,6 @@
-package libesper;
+package esperhl;
 
-import libesper.CSampleConfig.CSampleConfigPushable;
+import esperhl.CSampleConfig.CSampleConfigPushable;
 
 class CSample
 {
@@ -22,29 +22,29 @@ class CSample
 
 	// Non-config setters and getters
 	function get_waveform():Array<Float>
-		return LibESPER.convertArrayFromNF32(EsperEXT.getc_sample_waveform(index));
+		return EsperUtil.convertArrayFromNF32(EsperEXT.getc_sample_waveform(index));
 
 	function set_waveform(value:Array<Float>):Array<Float>
 	{
-		EsperEXT.setc_sample_waveform(index, LibESPER.convertArrayToNF32(value));
+		EsperEXT.setc_sample_waveform(index, EsperUtil.convertArrayToNF32(value));
 		return value;
 	}
 
 	function get_pitchDeltas():Array<Int>
-		return LibESPER.convertArrayFromNInt(EsperEXT.getc_sample_pitch_deltas(index));
+		return EsperUtil.convertArrayFromNInt(EsperEXT.getc_sample_pitch_deltas(index));
 
 	function set_pitchDeltas(value:Array<Int>):Array<Int>
 	{
-		EsperEXT.setc_sample_pitch_deltas(index, LibESPER.convertArrayToNInt(value));
+		EsperEXT.setc_sample_pitch_deltas(index, EsperUtil.convertArrayToNInt(value));
 		return value;
 	}
 
 	function get_pitchMarkers():Array<Int>
-		return LibESPER.convertArrayFromNInt(EsperEXT.getc_sample_pitch_markers(index));
+		return EsperUtil.convertArrayFromNInt(EsperEXT.getc_sample_pitch_markers(index));
 
 	function set_pitchMarkers(value:Array<Int>):Array<Int>
 	{
-		EsperEXT.setc_sample_pitch_markers(index, LibESPER.convertArrayToNInt(value));
+		EsperEXT.setc_sample_pitch_markers(index, EsperUtil.convertArrayToNInt(value));
 		return value;
 	}
 
@@ -58,31 +58,31 @@ class CSample
 	}
 
 	function get_specharm():Array<Float>
-		return LibESPER.convertArrayFromNF32(EsperEXT.getc_sample_specharm(index));
+		return EsperUtil.convertArrayFromNF32(EsperEXT.getc_sample_specharm(index));
 
 	function set_specharm(value:Array<Float>):Array<Float>
 	{
-		EsperEXT.setc_sample_specharm(index, LibESPER.convertArrayToNF32(value));
+		EsperEXT.setc_sample_specharm(index, EsperUtil.convertArrayToNF32(value));
 		return value;
 	}
 
 	function get_avgSpecharm():Array<Float>
-		return LibESPER.convertArrayFromNF32(EsperEXT.getc_sample_avg_specharm(index));
+		return EsperUtil.convertArrayFromNF32(EsperEXT.getc_sample_avg_specharm(index));
 
 	function set_avgSpecharm(value:Array<Float>):Array<Float>
 	{
-		EsperEXT.setc_sample_avg_specharm(index, LibESPER.convertArrayToNF32(value));
+		EsperEXT.setc_sample_avg_specharm(index, EsperUtil.convertArrayToNF32(value));
 		return value;
 	}
 
 	public function push()
 	{
-		var waveformData = LibESPER.convertArrayToNF32(waveform);
-		var pitchDeltasData = LibESPER.convertArrayToNInt(pitchDeltas);
-		var pitchMarkersData = LibESPER.convertArrayToNInt(pitchMarkers);
+		var waveformData = EsperUtil.convertArrayToNF32(waveform);
+		var pitchDeltasData = EsperUtil.convertArrayToNInt(pitchDeltas);
+		var pitchMarkersData = EsperUtil.convertArrayToNInt(pitchMarkers);
 		var pitchMarkerValidityData = pitchMarkerValidity;
-		var specharmData = LibESPER.convertArrayToNF32(specharm);
-		var avgSpecharmData = LibESPER.convertArrayToNF32(avgSpecharm);
+		var specharmData = EsperUtil.convertArrayToNF32(specharm);
+		var avgSpecharmData = EsperUtil.convertArrayToNF32(avgSpecharm);
 
 		EsperEXT.pushc_sample(waveformData, pitchDeltasData, pitchMarkersData, pitchMarkerValidityData, specharmData, avgSpecharmData, config.length,
 			config.batches, config.pitchLength, config.markerLength, config.pitch, config.isVoiced, config.isPlosive, config.useVariance,
@@ -114,12 +114,12 @@ class CSamplePushable
 
 	public function push():CSample
 	{
-		var waveformData = LibESPER.convertArrayToNF32(waveform);
-		var pitchDeltasData = LibESPER.convertArrayToNInt(pitchDeltas);
-		var pitchMarkersData = LibESPER.convertArrayToNInt(pitchMarkers);
+		var waveformData = EsperUtil.convertArrayToNF32(waveform);
+		var pitchDeltasData = EsperUtil.convertArrayToNInt(pitchDeltas);
+		var pitchMarkersData = EsperUtil.convertArrayToNInt(pitchMarkers);
 		var pitchMarkerValidityData = pitchMarkerValidity;
-		var specharmData = LibESPER.convertArrayToNF32(specharm);
-		var avgSpecharmData = LibESPER.convertArrayToNF32(avgSpecharm);
+		var specharmData = EsperUtil.convertArrayToNF32(specharm);
+		var avgSpecharmData = EsperUtil.convertArrayToNF32(avgSpecharm);
 
 		EsperEXT.pushc_sample(waveformData, pitchDeltasData, pitchMarkersData, pitchMarkerValidityData, specharmData, avgSpecharmData, config.length,
 			config.batches, config.pitchLength, config.markerLength, config.pitch, config.isVoiced, config.isPlosive, config.useVariance,

@@ -1,4 +1,4 @@
-package libesper;
+package esperhl;
 
 import hl.*;
 

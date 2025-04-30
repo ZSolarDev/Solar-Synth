@@ -1,4 +1,4 @@
-package libesper;
+package esperhl;
 
 import hl.F32;
 import hl.NativeArray;
@@ -301,4 +301,8 @@ class EsperEXT
 	@:hlNative('libesper')
 	public static function clearc_samples()
 		return;
+
+	// ESPER-UTAU
+	public static function esper_utau(samples):NativeArray<Float>
+		return [];
 }

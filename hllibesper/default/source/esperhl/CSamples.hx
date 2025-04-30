@@ -1,10 +1,10 @@
-package libesper;
+package esperhl;
 
 class CSamples
 {
 	public var length(get, null):Int;
 
-	@:allow(libesper.LibESPER)
+	@:allow(esperhl.LibESPER)
 	private function new() {}
 
 	public inline function get(index:Int):CSample
@@ -19,12 +19,12 @@ class CSamples
 		if (index < 0 || index >= EsperEXT.getc_samples_count())
 			throw 'Cannot set sample at index $index because it does not exist.';
 
-		EsperEXT.setc_sample_waveform(index, LibESPER.convertArrayToNF32(sample.waveform));
-		EsperEXT.setc_sample_pitch_deltas(index, LibESPER.convertArrayToNInt(sample.pitchDeltas));
-		EsperEXT.setc_sample_pitch_markers(index, LibESPER.convertArrayToNInt(sample.pitchMarkers));
+		EsperEXT.setc_sample_waveform(index, EsperUtil.convertArrayToNF32(sample.waveform));
+		EsperEXT.setc_sample_pitch_deltas(index, EsperUtil.convertArrayToNInt(sample.pitchDeltas));
+		EsperEXT.setc_sample_pitch_markers(index, EsperUtil.convertArrayToNInt(sample.pitchMarkers));
 		EsperEXT.setc_sample_pitch_marker_validity(index, sample.pitchMarkerValidity);
-		EsperEXT.setc_sample_specharm(index, LibESPER.convertArrayToNF32(sample.specharm));
-		EsperEXT.setc_sample_avg_specharm(index, LibESPER.convertArrayToNF32(sample.avgSpecharm));
+		EsperEXT.setc_sample_specharm(index, EsperUtil.convertArrayToNF32(sample.specharm));
+		EsperEXT.setc_sample_avg_specharm(index, EsperUtil.convertArrayToNF32(sample.avgSpecharm));
 
 		EsperEXT.setc_sample_config_length(index, sample.config.length);
 		EsperEXT.setc_sample_config_batches(index, sample.config.batches);

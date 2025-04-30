@@ -1,4 +1,4 @@
-package libesper;
+package esperhl;
 
 class EngineCfg
 {
@@ -12,7 +12,7 @@ class EngineCfg
 	public var frameSize(get, set):Int;
 	public var breCompPremul(get, set):Float;
 
-	@:allow(libesper.LibESPER)
+	@:allow(esperhl.LibESPER)
 	private function new() {}
 
 	function get_sampleRate():Int
