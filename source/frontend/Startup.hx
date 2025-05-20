@@ -1,6 +1,5 @@
 package frontend;
 
-import backend.audio.FFT;
 import sys.thread.Thread;
 
 class Startup extends FlxState
@@ -32,7 +31,6 @@ class Startup extends FlxState
 
 	function loadSS()
 	{
-		FFT.initialize();
 		loadingProg++;
 	}
 

@@ -18,6 +18,7 @@
 	<set name="BUILD_DIR" value="export" />
 	<source path="source" />
 	<assets path="voicebanks" />
+    <assets path="esper" />
     <assets path="_assets" embed="true"/>
 
 	<!--Libraries-->

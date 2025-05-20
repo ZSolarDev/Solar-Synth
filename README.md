@@ -28,8 +28,9 @@ For this, I need to talk more in depth about Utau, OpenUtau, SynthesizerV, and V
 I realized that there was nothing free that was of similar quality to SynthV. I basically just said, "f*ck it, I'll just do it myself." I started this when I was 12 and look where I am now..
 
 ### Credits
-Johannes Klatt([CdrSonan](https://github.com/CdrSonan)), the creator of [libESPER](https://github.com/CdrSonan/libESPER). I'm using it for the synthesis engine.
+Johannes Klatt([CdrSonan](https://github.com/CdrSonan)), the creator of [ESPER-Utau](https://github.com/CdrSonan/ESPER-Utau). I'm using it for the synthesis engine.
 
+[Wikiti](https://gitlab.com/wikiti)/[Wikiti - Random stuff](https://gitlab.com/wikiti-random-stuff/), the creator of [hxIni](https://gitlab.com/wikiti-random-stuff/hxini). I'm using it for the voicebank system.
 <br>
 <br>
 
@@ -105,6 +106,7 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
             - [ ] Voicebank switcher(with functionality to import voicebanks)
                 - [ ] Make sure it warns user about unsupported parameters
             - [ ] Edit project name
+            - [ ] Threads Reserved while rendering
         - [ ] General settings(opens a substate with a camera with the settings tab from the start menu ui, then when done, reload the editor state with a warning saying it will clear undo history.)
     - [ ] General Copy/Paste System
     - [ ] General Redo/Undo System

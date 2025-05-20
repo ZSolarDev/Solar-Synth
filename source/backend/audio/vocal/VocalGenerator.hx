@@ -1,10 +1,12 @@
 package backend.audio.vocal;
 
 import backend.song.*;
+import backend.utils.AudioUtil;
 import backend.utils.SSMath;
 import backend.utils.VocalUtil;
 import haxe.io.Bytes;
 import lime.media.AudioBuffer;
+import openfl.events.Event;
 import openfl.media.Sound;
 import sys.io.File;
 
@@ -70,184 +72,132 @@ class VocalGenerator
 			dest.set(destOffset + i, source.get(srcOffset + i));
 	}
 
-	public function generateVocalsFromParameterName(paramName:String = 'normal'):Bytes
-	{
-		var sampleRate:Int = voiceBank.sampleRate;
-		var channels:Int = 1;
-		var bitsPerSample:Int = 16;
-		var bytesPerSample:Int = Std.int((bitsPerSample * channels) / 8);
+	var sampleRate:Int;
+	var channels:Int = 1;
+	var bitsPerSample:Int = 16;
+	var bytesPerSample:Int;
+	var threading:EsperUTAUThreading;
+	var sampleIndexMap:Map<Int, Int>;
+	var masterBytes:Bytes;
+	var totalSamples:Int;
+	var paramName:String;
+	var generated:Bool = false;
 
+	public function generateVocalsFromParameterName(paramName:String = 'normal')
+	{
+		this.paramName = paramName;
+		generated = false;
+		sampleRate = voiceBank.sampleRate;
+		bytesPerSample = Std.int((bitsPerSample * channels) / 8);
 		var totalDurationMs:Float = 0;
 		for (note in notes)
 			totalDurationMs = Math.max(totalDurationMs, note.time + note.duration);
 		totalDurationMs += 100;
 
-		var totalSamples:Int = Math.ceil(totalDurationMs / 1000 * sampleRate);
-		var masterBytes:Bytes = Bytes.alloc(totalSamples * bytesPerSample);
+		totalSamples = Math.ceil(totalDurationMs / 1000 * sampleRate);
+		masterBytes = Bytes.alloc(totalSamples * bytesPerSample);
 		for (i in 0...masterBytes.length)
 			masterBytes.set(i, 0);
 
 		notes.sort(function(a, b) return Std.int(a.time - b.time));
 
-		var noteSamples = new Map<Int, Bytes>();
+		var sampleSets:Array<{samples:Array<Float>, params:String}> = [];
+		sampleIndexMap = new Map();
 		for (i in 0...notes.length)
 		{
 			var note = notes[i];
 			if (note.phoneme == "rest")
 				continue;
+
 			var filePath:String = '';
 			if (VocalUtil.isBreath(note.phoneme))
 				filePath = voiceBank.samples.get(note.phoneme);
 			else
 				filePath = voiceBank.samples.get(paramName == 'normal' ? note.phoneme : '$paramName//${note.phoneme}');
+
 			if (filePath != null)
 			{
 				var sampleBytes = ConvertFormat.convertWav(File.getBytes(filePath),
 					VocalUtil.isVowel(note.phoneme) ? voiceBank.sampleStart : voiceBank.consonantSampleStart);
-				noteSamples.set(i, sampleBytes.sub(44, sampleBytes.length - 44));
+				sampleSets.push({
+					samples: AudioUtil.pcm16BytesToFloatArray(sampleBytes),
+					params: 'C4 100 "pstb100" 0 ${note.duration} 0 0 100 0 T120 AA#${note.duration - 1}#'
+				});
+				sampleIndexMap.set(i, sampleSets.length - 1);
 			}
 		}
 
-		var noteOffsets = new Map<Int, Int>();
-		var crossfadedNotes = new Map<Int, Bool>();
+		threading = new EsperUTAUThreading(sampleSets);
+		threading.runBatches();
+		FlxG.stage.addEventListener(Event.ENTER_FRAME, postEsper);
+	}
 
-		for (noteIndex in 0...notes.length)
+	function postEsper(_)
+	{
+		if (threading.completed)
 		{
-			var note = notes[noteIndex];
-			if (note.phoneme == "rest" || !noteSamples.exists(noteIndex))
-				continue;
-
-			var sampleData = noteSamples.get(noteIndex);
-			var noteStartSample = Std.int(note.time / 1000 * sampleRate);
-			var noteDurationSamples = Std.int(note.duration / 1000 * sampleRate);
-
-			var hasPrev = noteIndex > 0;
-			var prevNote = hasPrev ? notes[noteIndex - 1] : null;
-
-			var hasNext = noteIndex < notes.length - 1;
-			var nextNote = hasNext ? notes[noteIndex + 1] : null;
-
-			var needsFadeIn = false;
-
-			if (!hasPrev
-				|| (hasPrev && (prevNote.time + prevNote.duration < note.time))
-				|| (VocalUtil.isBreath(note.phoneme))
-				|| (VocalUtil.isBreath(prevNote.phoneme)))
+			FlxG.stage.removeEventListener(Event.ENTER_FRAME, postEsper);
+			var noteSamples = new Map<Int, Bytes>();
+			for (i in sampleIndexMap.keys())
 			{
-				needsFadeIn = true;
+				var outputIndex = sampleIndexMap.get(i);
+				var finalSamples = AudioUtil.floatArrayToPCM16Bytes(threading.outputSampleSets[outputIndex]);
+				noteSamples.set(i, finalSamples.sub(44, finalSamples.length - 44)); // skip WAV header
 			}
-
-			var needsFadeOut = false;
-
-			if (!hasNext
-				|| (hasNext && (note.time + note.duration < nextNote.time + 100))
-				|| (VocalUtil.isBreath(note.phoneme))
-				|| (VocalUtil.isBreath(nextNote.phoneme)))
+			var noteOffsets = new Map<Int, Int>();
+			var crossfadedNotes = new Map<Int, Bool>();
+			for (noteIndex in 0...notes.length)
 			{
-				needsFadeOut = true;
-			}
-
-			var offsetAddition = noteOffsets.exists(noteIndex) ? noteOffsets.get(noteIndex) : 0;
-
-			var fadeInSamples = Std.int((VocalUtil.isBreath(note.phoneme) ? 500 : (note.shortEnd ? 10 : 50)) / 1000 * sampleRate);
-			var fadeOutSamples = Std.int((VocalUtil.isBreath(note.phoneme) ? 500 : (50)) / 1000 * sampleRate);
-
-			// Get loop points (in samples)
-			var loopStart = Std.int(voiceBank.sampleLoop / 1000 * sampleRate);
-			var loopEnd = Std.int(voiceBank.sampleLoopEnd / 1000 * sampleRate);
-
-			// Apply samples
-			for (j in 0...noteDurationSamples)
-			{
-				var srcIndex = j + offsetAddition;
-				var destOffset = (noteStartSample + j) * bytesPerSample;
-
-				// Skip if destination is out of bounds
-				if (destOffset + bytesPerSample > masterBytes.length)
+				var note = notes[noteIndex];
+				if (note.phoneme == "rest" || !noteSamples.exists(noteIndex))
 					continue;
 
-				// Apply loop logic
-				if (srcIndex >= loopEnd)
+				var sampleData = noteSamples.get(noteIndex);
+				var noteStartSample = Std.int(note.time / 1000 * sampleRate);
+				var noteDurationSamples = Std.int(note.duration / 1000 * sampleRate);
+
+				var hasPrev = noteIndex > 0;
+				var prevNote = hasPrev ? notes[noteIndex - 1] : null;
+
+				var hasNext = noteIndex < notes.length - 1;
+				var nextNote = hasNext ? notes[noteIndex + 1] : null;
+
+				var needsFadeIn = false;
+
+				if (!hasPrev
+					|| (hasPrev && (prevNote.time + prevNote.duration < note.time))
+					|| (VocalUtil.isBreath(note.phoneme))
+					|| (VocalUtil.isBreath(prevNote.phoneme)))
 				{
-					// Calculate position within the loop
-					var loopLength = loopEnd - loopStart;
-					var loopPosition = (srcIndex - loopStart) % loopLength + loopStart;
-
-					// Calculate if we need crossfading
-					var halfLoopLength = Std.int(loopLength / 2);
-					var positionInLoop = (srcIndex - loopStart) % loopLength;
-					var needsCrossfade = positionInLoop >= halfLoopLength;
-
-					if (needsCrossfade)
-					{
-						// Get position in first half of loop for crossfade source
-						var crossfadePosition = loopStart + (positionInLoop - halfLoopLength);
-
-						// Calculate crossfade ratio (0.0 to 1.0)
-						var crossfadeRatio = (positionInLoop - halfLoopLength) / halfLoopLength;
-
-						// Apply cosine-based crossfade
-						var currentSample = 0;
-						var nextLoopSample = 0;
-
-						if (loopPosition * bytesPerSample < sampleData.length)
-							currentSample = getInt16(sampleData, loopPosition * bytesPerSample, true);
-
-						if (crossfadePosition * bytesPerSample < sampleData.length)
-							nextLoopSample = getInt16(sampleData, crossfadePosition * bytesPerSample, true);
-
-						// Smooth crossfade with cosine curve
-						var fadeOutGain = Math.cos(Math.PI * crossfadeRatio / 2);
-						var fadeInGain = Math.sin(Math.PI * crossfadeRatio / 2);
-
-						var blendedSample = Std.int(currentSample * fadeOutGain + nextLoopSample * fadeInGain);
-
-						// Apply regular fades if needed
-						if (needsFadeIn && j < fadeInSamples && !crossfadedNotes.exists(noteIndex))
-						{
-							var gain = 0.5 * (1 - Math.cos(Math.PI * j / fadeInSamples));
-							blendedSample = Std.int(blendedSample * gain);
-						}
-						else if (needsFadeOut && j >= noteDurationSamples - fadeOutSamples)
-						{
-							var fadeOutIndex = j - (noteDurationSamples - fadeOutSamples);
-							var gain = 0.5 * (1 + Math.cos(Math.PI * fadeOutIndex / fadeOutSamples));
-							blendedSample = Std.int(blendedSample * gain);
-						}
-
-						setInt16(masterBytes, destOffset, blendedSample, true);
-					}
-					else
-					{
-						// Just use the looped sample without crossfade
-						var srcOffset = loopPosition * bytesPerSample;
-
-						if (srcOffset < sampleData.length)
-						{
-							// Apply regular fades if needed
-							if (needsFadeIn && j < fadeInSamples && !crossfadedNotes.exists(noteIndex))
-							{
-								var gain = 0.5 * (1 - Math.cos(Math.PI * j / fadeInSamples));
-								var sample = getInt16(sampleData, srcOffset, true) * gain;
-								setInt16(masterBytes, destOffset, Std.int(sample), true);
-							}
-							else if (needsFadeOut && j >= noteDurationSamples - fadeOutSamples)
-							{
-								var fadeOutIndex = j - (noteDurationSamples - fadeOutSamples);
-								var gain = 0.5 * (1 + Math.cos(Math.PI * fadeOutIndex / fadeOutSamples));
-								var sample = getInt16(sampleData, srcOffset, true) * gain;
-								setInt16(masterBytes, destOffset, Std.int(sample), true);
-							}
-							else
-							{
-								copyBlock(sampleData, srcOffset, masterBytes, destOffset, bytesPerSample);
-							}
-						}
-					}
+					needsFadeIn = true;
 				}
-				else
+
+				var needsFadeOut = false;
+
+				if (!hasNext
+					|| (hasNext && (note.time + note.duration < nextNote.time + 100))
+					|| (VocalUtil.isBreath(note.phoneme))
+					|| (VocalUtil.isBreath(nextNote.phoneme)))
 				{
-					// Regular (non-looped) sample processing
+					needsFadeOut = true;
+				}
+
+				var offsetAddition = noteOffsets.exists(noteIndex) ? noteOffsets.get(noteIndex) : 0;
+
+				var fadeInSamples = Std.int((VocalUtil.isBreath(note.phoneme) ? 500 : (note.shortEnd ? 10 : 50)) / 1000 * sampleRate);
+				var fadeOutSamples = Std.int((VocalUtil.isBreath(note.phoneme) ? 500 : (50)) / 1000 * sampleRate);
+
+				// Apply samples
+				for (j in 0...noteDurationSamples)
+				{
+					var srcIndex = j + offsetAddition;
+					var destOffset = (noteStartSample + j) * bytesPerSample;
+
+					// Skip if destination is out of bounds
+					if (destOffset + bytesPerSample > masterBytes.length)
+						continue;
+
+					// Regular sample processing
 					var srcOffset = srcIndex * bytesPerSample;
 
 					if (srcOffset < sampleData.length)
@@ -271,189 +221,189 @@ class VocalGenerator
 						}
 					}
 				}
-			}
 
-			var hasNext = noteIndex < notes.length - 1;
-			if (hasNext)
-			{
-				var nextNote = notes[noteIndex + 1];
-				if (nextNote.phoneme == "rest" || !noteSamples.exists(noteIndex + 1))
-					continue;
-
-				var crossfadeSamples = Std.int(voiceBank.vowelBlendRatio / 1000 * sampleRate);
-
-				if (!VocalUtil.isVowel(note.phoneme) && !VocalUtil.isVowel(nextNote.phoneme))
-					crossfadeSamples = Std.int(voiceBank.consonantBlendRatio / 1000 * sampleRate);
-				if (VocalUtil.isVowel(note.phoneme) && !VocalUtil.isVowel(nextNote.phoneme) && !(VocalUtil.isBreath(nextNote.phoneme)))
-					crossfadeSamples = 0;
-
-				var offsetNext = 0;
-				noteOffsets.set(noteIndex + 1, crossfadeSamples);
-				crossfadedNotes.set(noteIndex + 1, true);
-
-				// only apply crossfade if notes are touching
-				if (Math.abs((note.time + note.duration) - nextNote.time) < 1)
+				var hasNext = noteIndex < notes.length - 1;
+				if (hasNext)
 				{
-					var nextSampleData = noteSamples.get(noteIndex + 1).sub(0, crossfadeSamples * bytesPerSample);
-					var nextStartSample = Std.int(nextNote.time / 1000 * sampleRate);
+					var nextNote = notes[noteIndex + 1];
+					if (nextNote.phoneme == "rest" || !noteSamples.exists(noteIndex + 1))
+						continue;
 
-					var blendStart = Math.min(nextStartSample - crossfadeSamples, noteStartSample + noteDurationSamples - crossfadeSamples);
-					if (blendStart < 0)
-						blendStart = 0;
+					var crossfadeSamples = Std.int(voiceBank.vowelBlendRatio / 1000 * sampleRate);
 
-					if (offsetNext * bytesPerSample < nextSampleData.length)
+					if (!VocalUtil.isVowel(note.phoneme) && !VocalUtil.isVowel(nextNote.phoneme))
+						crossfadeSamples = Std.int(voiceBank.consonantBlendRatio / 1000 * sampleRate);
+					if (VocalUtil.isVowel(note.phoneme) && !VocalUtil.isVowel(nextNote.phoneme) && !(VocalUtil.isBreath(nextNote.phoneme)))
+						crossfadeSamples = 0;
+
+					var offsetNext = 0;
+					noteOffsets.set(noteIndex + 1, crossfadeSamples);
+					crossfadedNotes.set(noteIndex + 1, true);
+
+					// only apply crossfade if notes are touching
+					if (Math.abs((note.time + note.duration) - nextNote.time) < 1)
 					{
-						var availableSamples:Int = cast Math.floor((nextSampleData.length - offsetNext * bytesPerSample) / bytesPerSample);
-						var actualCrossfadeSamples:Int = cast Math.min(crossfadeSamples, availableSamples);
-						var loopedNext = nextSampleData.sub(offsetNext * bytesPerSample, actualCrossfadeSamples * bytesPerSample);
+						var nextSampleData = noteSamples.get(noteIndex + 1).sub(0, crossfadeSamples * bytesPerSample);
+						var nextStartSample = Std.int(nextNote.time / 1000 * sampleRate);
 
-						for (j in 0...actualCrossfadeSamples)
+						var blendStart = Math.min(nextStartSample - crossfadeSamples, noteStartSample + noteDurationSamples - crossfadeSamples);
+						if (blendStart < 0)
+							blendStart = 0;
+
+						if (offsetNext * bytesPerSample < nextSampleData.length)
 						{
-							var masterPos:Int = cast(blendStart + j) * bytesPerSample;
+							var availableSamples:Int = cast Math.floor((nextSampleData.length - offsetNext * bytesPerSample) / bytesPerSample);
+							var actualCrossfadeSamples:Int = cast Math.min(crossfadeSamples, availableSamples);
+							var loopedNext = nextSampleData.sub(offsetNext * bytesPerSample, actualCrossfadeSamples * bytesPerSample);
 
-							if (masterPos + bytesPerSample <= masterBytes.length && j * bytesPerSample < loopedNext.length)
+							for (j in 0...actualCrossfadeSamples)
 							{
-								var fadeOutSample = 0.0;
-								var fadeInSample = 0.0;
+								var masterPos:Int = cast(blendStart + j) * bytesPerSample;
 
-								var ratio = 0.5 * (1 - Math.cos(Math.PI * j / actualCrossfadeSamples));
-								fadeOutSample = getInt16(masterBytes, masterPos, true) * (1 - ratio);
-								fadeInSample = getInt16(loopedNext, j * bytesPerSample, true) * ratio;
+								if (masterPos + bytesPerSample <= masterBytes.length && j * bytesPerSample < loopedNext.length)
+								{
+									var fadeOutSample = 0.0;
+									var fadeInSample = 0.0;
 
-								var blended = SSMath.clamp(Std.int(fadeOutSample + fadeInSample), -32768, 32767);
-								setInt16(masterBytes, masterPos, blended, true);
+									var ratio = 0.5 * (1 - Math.cos(Math.PI * j / actualCrossfadeSamples));
+									fadeOutSample = getInt16(masterBytes, masterPos, true) * (1 - ratio);
+									fadeInSample = getInt16(loopedNext, j * bytesPerSample, true) * ratio;
+
+									var blended = SSMath.clamp(Std.int(fadeOutSample + fadeInSample), -32768, 32767);
+									setInt16(masterBytes, masterPos, blended, true);
+								}
 							}
 						}
 					}
 				}
 			}
-		}
 
-		// Second pass: note paramaters/velocity
-		for (noteIndex in 0...notes.length)
-		{
-			var note = notes[noteIndex];
-			if (note.phoneme == "rest")
-				continue;
-
-			var noteStartSample:Int = Std.int(note.time / 1000 * sampleRate);
-			var noteEndSample:Int = Std.int((note.time + note.duration) / 1000 * sampleRate);
-			noteEndSample = cast Math.min(noteEndSample, totalSamples);
-
-			var velocities:Array<SongValue> = [];
-
-			for (p in note.power)
+			// Second pass: note paramaters/velocity
+			for (noteIndex in 0...notes.length)
 			{
-				var time = p.time;
+				var note = notes[noteIndex];
+				if (note.phoneme == "rest")
+					continue;
 
-				var velocityParam:SongValue = {value: 1.0, time: time};
-				for (v in note.velocities)
+				var noteStartSample:Int = Std.int(note.time / 1000 * sampleRate);
+				var noteEndSample:Int = Std.int((note.time + note.duration) / 1000 * sampleRate);
+				noteEndSample = cast Math.min(noteEndSample, totalSamples);
+
+				var velocities:Array<SongValue> = [];
+
+				for (p in note.power)
 				{
-					if (v.time == time)
-						velocityParam = v;
-					else
-						break;
-				}
+					var time = p.time;
 
-				var mouthParam:SongValue = {value: 1.0, time: time};
-				for (m in note.mouth)
-				{
-					if (m.time == time)
-						mouthParam = m;
-					else
-						break;
-				}
-
-				var softness = Math.max(0, 1 - p.value);
-				var normal = Math.max(0, 1 - Math.abs(p.value - 1));
-				var powerful = Math.max(0, p.value - 1);
-
-				var finalVelocity:Float = 0.0;
-
-				switch (paramName)
-				{
-					case "soft":
-						finalVelocity = softness * velocityParam.value;
-					case "mouthSoft":
-						finalVelocity = softness * velocityParam.value * mouthParam.value;
-					case "normal":
-						finalVelocity = normal * velocityParam.value;
-					case "mouth":
-						finalVelocity = normal * velocityParam.value * mouthParam.value;
-					case "power":
-						finalVelocity = powerful * velocityParam.value;
-					case "mouthPower":
-						finalVelocity = powerful * velocityParam.value * mouthParam.value;
-					default:
-						continue;
-				}
-
-				velocities.push({value: finalVelocity, time: time});
-			}
-
-			// for breathiness parameter
-			for (b in note.breathiness)
-			{
-				var time = b.time;
-
-				var velocityParam:SongValue = {value: 1.0, time: time};
-				for (v in note.velocities)
-				{
-					if (v.time == time)
-						velocityParam = v;
-					else
-						break;
-				}
-
-				var mouthParam:SongValue = {value: 1.0, time: time};
-				for (m in note.mouth)
-				{
-					if (m.time == time)
-						mouthParam = m;
-					else
-						break;
-				}
-
-				var breathValue = Math.max(0, b.value);
-
-				var finalVelocity:Float = 0.0;
-
-				switch (paramName)
-				{
-					case "breaths":
-						finalVelocity = breathValue * velocityParam.value;
-					case "mouthBreath":
-						finalVelocity = breathValue * velocityParam.value * mouthParam.value;
-					default:
-						continue;
-				}
-
-				velocities.push({value: finalVelocity, time: time});
-			}
-
-			for (v in 0...velocities.length)
-			{
-				var vel:SongValue = velocities[v];
-				var segStartMs:Float = vel.time;
-				var segEndMs:Float = (v < velocities.length - 1) ? velocities[v + 1].time : note.duration;
-
-				var segStartSample:Int = noteStartSample + Std.int(segStartMs / 1000 * sampleRate);
-				var segEndSample:Int = noteStartSample + Std.int(segEndMs / 1000 * sampleRate);
-				segEndSample = cast Math.min(segEndSample, noteEndSample);
-
-				for (i in segStartSample...segEndSample)
-				{
-					var destOffset:Int = i * bytesPerSample;
-					if (destOffset + bytesPerSample <= masterBytes.length)
+					var velocityParam:SongValue = {value: 1.0, time: time};
+					for (v in note.velocities)
 					{
-						var sampleVal:Int = getInt16(masterBytes, destOffset, true);
-						var newVal:Int = Std.int(SSMath.clamp(cast sampleVal * vel.value, -32768, 32767));
-						setInt16(masterBytes, destOffset, newVal, true);
+						if (v.time == time)
+							velocityParam = v;
+						else
+							break;
+					}
+
+					var mouthParam:SongValue = {value: 1.0, time: time};
+					for (m in note.mouth)
+					{
+						if (m.time == time)
+							mouthParam = m;
+						else
+							break;
+					}
+
+					var softness = Math.max(0, 1 - p.value);
+					var normal = Math.max(0, 1 - Math.abs(p.value - 1));
+					var powerful = Math.max(0, p.value - 1);
+
+					var finalVelocity:Float = 0.0;
+
+					switch (paramName)
+					{
+						case "soft":
+							finalVelocity = softness * velocityParam.value;
+						case "mouthSoft":
+							finalVelocity = softness * velocityParam.value * mouthParam.value;
+						case "normal":
+							finalVelocity = normal * velocityParam.value;
+						case "mouth":
+							finalVelocity = normal * velocityParam.value * mouthParam.value;
+						case "power":
+							finalVelocity = powerful * velocityParam.value;
+						case "mouthPower":
+							finalVelocity = powerful * velocityParam.value * mouthParam.value;
+						default:
+							continue;
+					}
+
+					velocities.push({value: finalVelocity, time: time});
+				}
+
+				// for breathiness parameter
+				for (b in note.breathiness)
+				{
+					var time = b.time;
+
+					var velocityParam:SongValue = {value: 1.0, time: time};
+					for (v in note.velocities)
+					{
+						if (v.time == time)
+							velocityParam = v;
+						else
+							break;
+					}
+
+					var mouthParam:SongValue = {value: 1.0, time: time};
+					for (m in note.mouth)
+					{
+						if (m.time == time)
+							mouthParam = m;
+						else
+							break;
+					}
+
+					var breathValue = Math.max(0, b.value);
+
+					var finalVelocity:Float = 0.0;
+
+					switch (paramName)
+					{
+						case "breaths":
+							finalVelocity = breathValue * velocityParam.value;
+						case "mouthBreath":
+							finalVelocity = breathValue * velocityParam.value * mouthParam.value;
+						default:
+							continue;
+					}
+
+					velocities.push({value: finalVelocity, time: time});
+				}
+
+				for (v in 0...velocities.length)
+				{
+					var vel:SongValue = velocities[v];
+					var segStartMs:Float = vel.time;
+					var segEndMs:Float = (v < velocities.length - 1) ? velocities[v + 1].time : note.duration;
+
+					var segStartSample:Int = noteStartSample + Std.int(segStartMs / 1000 * sampleRate);
+					var segEndSample:Int = noteStartSample + Std.int(segEndMs / 1000 * sampleRate);
+					segEndSample = cast Math.min(segEndSample, noteEndSample);
+
+					for (i in segStartSample...segEndSample)
+					{
+						var destOffset:Int = i * bytesPerSample;
+						if (destOffset + bytesPerSample <= masterBytes.length)
+						{
+							var sampleVal:Int = getInt16(masterBytes, destOffset, true);
+							var newVal:Int = Std.int(SSMath.clamp(cast sampleVal * vel.value, -32768, 32767));
+							setInt16(masterBytes, destOffset, newVal, true);
+						}
 					}
 				}
 			}
+			generated = true;
 		}
-		return masterBytes;
 	}
 
 	function hasPitchData():Bool
@@ -466,229 +416,227 @@ class VocalGenerator
 		return false;
 	}
 
-	function createWavHeader(numSamples:Int, numChannels:Int, sampleRate:Int, bitsPerSample:Int):Bytes
+	var generating = '';
+	var normal:Bytes;
+	var mouth:Bytes;
+	var breath:Bytes;
+	var mouthBreath:Bytes;
+	var power:Bytes;
+	var mouthPower:Bytes;
+	var soft:Bytes;
+	var mouthSoft:Bytes;
+	var filled:Bool = false;
+
+	function waitForVocals(_)
 	{
-		var dataSize:Int = numSamples * numChannels * (bitsPerSample >> 3);
-		var headerSize:Int = 44;
-		var header:Bytes = Bytes.alloc(headerSize);
-
-		header.set(0, "R".charCodeAt(0));
-		header.set(1, "I".charCodeAt(0));
-		header.set(2, "F".charCodeAt(0));
-		header.set(3, "F".charCodeAt(0));
-
-		var fileSize:Int = dataSize + 36;
-		header.set(4, fileSize & 0xff);
-		header.set(5, (fileSize >> 8) & 0xff);
-		header.set(6, (fileSize >> 16) & 0xff);
-		header.set(7, (fileSize >> 24) & 0xff);
-
-		header.set(8, "W".charCodeAt(0));
-		header.set(9, "A".charCodeAt(0));
-		header.set(10, "V".charCodeAt(0));
-		header.set(11, "E".charCodeAt(0));
-
-		header.set(12, "f".charCodeAt(0));
-		header.set(13, "m".charCodeAt(0));
-		header.set(14, "t".charCodeAt(0));
-		header.set(15, " ".charCodeAt(0));
-
-		header.set(16, 16);
-		header.set(17, 0);
-		header.set(18, 0);
-		header.set(19, 0);
-
-		header.set(20, 1);
-		header.set(21, 0);
-
-		header.set(22, numChannels & 0xff);
-		header.set(23, (numChannels >> 8) & 0xff);
-
-		header.set(24, sampleRate & 0xff);
-		header.set(25, (sampleRate >> 8) & 0xff);
-		header.set(26, (sampleRate >> 16) & 0xff);
-		header.set(27, (sampleRate >> 24) & 0xff);
-
-		var byteRate:Int = sampleRate * numChannels * (bitsPerSample >> 3);
-		header.set(28, byteRate & 0xff);
-		header.set(29, (byteRate >> 8) & 0xff);
-		header.set(30, (byteRate >> 16) & 0xff);
-		header.set(31, (byteRate >> 24) & 0xff);
-
-		var blockAlign:Int = numChannels * (bitsPerSample >> 3);
-		header.set(32, blockAlign & 0xff);
-		header.set(33, (blockAlign >> 8) & 0xff);
-
-		header.set(34, bitsPerSample & 0xff);
-		header.set(35, (bitsPerSample >> 8) & 0xff);
-
-		header.set(36, "d".charCodeAt(0));
-		header.set(37, "a".charCodeAt(0));
-		header.set(38, "t".charCodeAt(0));
-		header.set(39, "a".charCodeAt(0));
-
-		header.set(40, dataSize & 0xff);
-		header.set(41, (dataSize >> 8) & 0xff);
-		header.set(42, (dataSize >> 16) & 0xff);
-		header.set(43, (dataSize >> 24) & 0xff);
-
-		return header;
-	}
-
-	public function generateVocals():Sound
-	{
-		// merge everything together
-		var finalSnd:Sound = null;
-
-		var normal:Bytes = generateVocalsFromParameterName("normal");
-		var mouth:Bytes = (voiceBank.mouth ? generateVocalsFromParameterName("mouth") : null);
-		var breath:Bytes = (voiceBank.breaths ? generateVocalsFromParameterName("breaths") : null);
-		var mouthBreath:Bytes = (voiceBank.mouthBreath ? generateVocalsFromParameterName("mouthBreath") : null);
-		var power:Bytes = (voiceBank.power ? generateVocalsFromParameterName("power") : null);
-		var mouthPower:Bytes = (voiceBank.mouthPower ? generateVocalsFromParameterName("mouthPower") : null);
-		var soft:Bytes = (voiceBank.soft ? generateVocalsFromParameterName("soft") : null);
-		var mouthSoft:Bytes = (voiceBank.mouthSoft ? generateVocalsFromParameterName("mouthSoft") : null);
-
-		var channels:Int = 1;
-		var bitsPerSample:Int = 16;
-		var bytesPerSample:Int = Std.int((bitsPerSample * channels) / 8);
-
-		var sounds:Array<Bytes> = [normal, mouth, breath, mouthBreath, power, mouthPower, soft, mouthSoft];
-		var soundNames:Array<String> = [
-			"normal",
-			"mouth",
-			"breaths",
-			"mouthBreath",
-			"power",
-			"mouthPower",
-			"soft",
-			"mouthSoft"
-		];
-
-		var i = 0;
-		while (i < sounds.length)
+		switch (generating)
 		{
-			if (sounds[i] == null)
+			case '':
+				generateVocalsFromParameterName("normal");
+			case 'normal':
+				if (generated)
+				{
+					normal = Bytes.alloc(masterBytes.length);
+					normal.blit(0, masterBytes, 0, masterBytes.length);
+					generating = 'mouth';
+					generateVocalsFromParameterName("mouth");
+				}
+			case 'mouth':
+				if (generated)
+				{
+					mouth = Bytes.alloc(masterBytes.length);
+					mouth.blit(0, masterBytes, 0, masterBytes.length);
+					generating = 'breaths';
+					generateVocalsFromParameterName("breaths");
+				}
+			case 'breaths':
+				if (generated)
+				{
+					breath = Bytes.alloc(masterBytes.length);
+					breath.blit(0, masterBytes, 0, masterBytes.length);
+					generating = 'mouthBreath';
+					generateVocalsFromParameterName("mouthBreath");
+				}
+			case 'mouthBreath':
+				if (generated)
+				{
+					mouthBreath = Bytes.alloc(masterBytes.length);
+					mouthBreath.blit(0, masterBytes, 0, masterBytes.length);
+					generating = 'power';
+					generateVocalsFromParameterName("power");
+				}
+			case 'power':
+				if (generated)
+				{
+					power = Bytes.alloc(masterBytes.length);
+					power.blit(0, masterBytes, 0, masterBytes.length);
+					generating = 'mouthPower';
+					generateVocalsFromParameterName("mouthPower");
+				}
+			case 'mouthPower':
+				if (generated)
+				{
+					mouthPower = Bytes.alloc(masterBytes.length);
+					mouthPower.blit(0, masterBytes, 0, masterBytes.length);
+					generating = 'soft';
+					generateVocalsFromParameterName("soft");
+				}
+			case 'soft':
+				if (generated)
+				{
+					soft = Bytes.alloc(masterBytes.length);
+					soft.blit(0, masterBytes, 0, masterBytes.length);
+					generating = 'mouthSoft';
+					generateVocalsFromParameterName("mouthSoft");
+				}
+			case 'mouthSoft':
+				if (generated)
+				{
+					mouthSoft = Bytes.alloc(masterBytes.length);
+					mouthSoft.blit(0, masterBytes, 0, masterBytes.length);
+					filled = true;
+				}
+		}
+		if (filled)
+		{
+			var sounds:Array<Bytes> = [normal, mouth, breath, mouthBreath, power, mouthPower, soft, mouthSoft];
+			var soundNames:Array<String> = [
+				"normal",
+				"mouth",
+				"breaths",
+				"mouthBreath",
+				"power",
+				"mouthPower",
+				"soft",
+				"mouthSoft"
+			];
+
+			var i = 0;
+			while (i < sounds.length)
 			{
-				sounds.splice(i, 1);
-				soundNames.splice(i, 1);
+				if (sounds[i] == null)
+				{
+					sounds.splice(i, 1);
+					soundNames.splice(i, 1);
+				}
+				else
+					i++;
 			}
-			else
-				i++;
-		}
 
-		var maxLength:Int = 0;
-		for (sound in sounds)
-		{
-			if (sound.length > maxLength)
-				maxLength = sound.length;
-		}
-
-		var mergedBytes:Bytes = Bytes.alloc(maxLength);
-		for (i in 0...mergedBytes.length)
-			mergedBytes.set(i, 0);
-
-		var numSamples:Int = Std.int(maxLength / bytesPerSample);
-		for (i in 0...numSamples)
-		{
-			var breathSampleSum:Int = 0;
-			var breathSampleCount:Int = 0;
-
-			for (j in 0...sounds.length)
+			var maxLength:Int = 0;
+			for (sound in sounds)
 			{
-				if (soundNames[j] == "breaths" || soundNames[j] == "mouthBreath")
+				if (sound.length > maxLength)
+					maxLength = sound.length;
+			}
+
+			var mergedBytes:Bytes = Bytes.alloc(maxLength);
+			for (i in 0...mergedBytes.length)
+				mergedBytes.set(i, 0);
+
+			var numSamples:Int = Std.int(maxLength / bytesPerSample);
+			for (i in 0...numSamples)
+			{
+				var breathSampleSum:Int = 0;
+				var breathSampleCount:Int = 0;
+
+				for (j in 0...sounds.length)
+				{
+					if (soundNames[j] == "breaths" || soundNames[j] == "mouthBreath")
+					{
+						var offset:Int = i * bytesPerSample;
+						if (offset + bytesPerSample <= sounds[j].length)
+						{
+							var sample = getInt16(sounds[j], offset, true);
+							if (Math.abs(sample) > 0)
+							{
+								breathSampleSum += cast Math.abs(sample);
+								breathSampleCount++;
+							}
+						}
+					}
+				}
+
+				var breathIntensity:Float = 0.0;
+				if (breathSampleCount > 0)
+					breathIntensity = Math.min(1.0, (breathSampleSum / breathSampleCount) / 16384.0);
+
+				var mixedSample:Int = 0;
+				var nonBreathSampleCount:Int = 0;
+				var nonBreathSampleSum:Int = 0;
+				var breathOnlySampleSum:Int = 0;
+
+				for (j in 0...sounds.length)
 				{
 					var offset:Int = i * bytesPerSample;
 					if (offset + bytesPerSample <= sounds[j].length)
 					{
 						var sample = getInt16(sounds[j], offset, true);
-						if (Math.abs(sample) > 0)
+
+						if (soundNames[j] == "breaths" || soundNames[j] == "mouthBreath")
+							breathOnlySampleSum += sample;
+						else
 						{
-							breathSampleSum += cast Math.abs(sample);
-							breathSampleCount++;
+							var attenuationFactor:Float = 1.0 - breathIntensity;
+							nonBreathSampleSum += Std.int(sample * attenuationFactor);
+							if (Math.abs(sample) > 0)
+								nonBreathSampleCount++;
 						}
 					}
 				}
+
+				mixedSample = breathOnlySampleSum + nonBreathSampleSum;
+
+				if (Math.abs(mixedSample) > 32767)
+					mixedSample = (mixedSample > 0) ? 32767 : -32768;
+
+				setInt16(mergedBytes, i * bytesPerSample, mixedSample, true);
 			}
 
-			var breathIntensity:Float = 0.0;
-			if (breathSampleCount > 0)
-				breathIntensity = Math.min(1.0, (breathSampleSum / breathSampleCount) / 16384.0);
-
-			var mixedSample:Int = 0;
-			var nonBreathSampleCount:Int = 0;
-			var nonBreathSampleSum:Int = 0;
-			var breathOnlySampleSum:Int = 0;
-
-			for (j in 0...sounds.length)
+			var totalSamples:Int = numSamples;
+			// Pitch processing
+			if (hasPitchData())
 			{
-				var offset:Int = i * bytesPerSample;
-				if (offset + bytesPerSample <= sounds[j].length)
+				// convert mergedBytes to samples for simpler processing
+				var samples:Array<Float> = [];
+				for (i in 0...totalSamples)
 				{
-					var sample = getInt16(sounds[j], offset, true);
-
-					if (soundNames[j] == "breaths" || soundNames[j] == "mouthBreath")
-						breathOnlySampleSum += sample;
+					var offset = i * bytesPerSample;
+					if (offset + bytesPerSample <= mergedBytes.length)
+						samples.push(getInt16(mergedBytes, offset, true) / 32768.0);
 					else
-					{
-						var attenuationFactor:Float = 1.0 - breathIntensity;
-						nonBreathSampleSum += Std.int(sample * attenuationFactor);
-						if (Math.abs(sample) > 0)
-							nonBreathSampleCount++;
-					}
+						samples.push(0.0);
+				}
+				// process pitch modulation
+				var pitches:Array<SongValue> = [];
+				for (note in notes)
+				{
+					for (pitch in note.pitches)
+						pitches.push({time: pitch.time, value: pitch.value});
+				}
+				var formantCorrectedSamples = samples;
+
+				// convert back to bytes
+				mergedBytes = Bytes.alloc(cast formantCorrectedSamples.length * bytesPerSample);
+				for (i in 0...formantCorrectedSamples.length)
+				{
+					var sample = Std.int(SSMath.clamp(cast formantCorrectedSamples[i] * 32767, -32768, 32767));
+					setInt16(mergedBytes, i * bytesPerSample, sample, true);
 				}
 			}
+			var wavHeader:Bytes = AudioUtil.createWavHeader(totalSamples, channels, voiceBank.sampleRate, bitsPerSample);
+			var complete:Bytes = Bytes.alloc(wavHeader.length + mergedBytes.length);
+			complete.blit(0, wavHeader, 0, wavHeader.length);
+			complete.blit(wavHeader.length, mergedBytes, 0, mergedBytes.length);
 
-			mixedSample = breathOnlySampleSum + nonBreathSampleSum;
-
-			if (Math.abs(mixedSample) > 32767)
-				mixedSample = (mixedSample > 0) ? 32767 : -32768;
-
-			setInt16(mergedBytes, i * bytesPerSample, mixedSample, true);
+			#if debug File.saveBytes('vocals.wav', complete); #end
+			sound = Sound.fromAudioBuffer(AudioBuffer.fromBytes(complete));
+			FlxG.stage.removeEventListener(Event.ENTER_FRAME, waitForVocals);
 		}
+	}
 
-		var totalSamples:Int = numSamples;
-		// Pitch processing
-		if (hasPitchData())
-		{
-			// convert mergedBytes to samples for simpler processing
-			var samples:Array<Float> = [];
-			for (i in 0...totalSamples)
-			{
-				var offset = i * bytesPerSample;
-				if (offset + bytesPerSample <= mergedBytes.length)
-					samples.push(getInt16(mergedBytes, offset, true) / 32768.0);
-				else
-					samples.push(0.0);
-			}
-			// process pitch modulation
-			var pitches:Array<SongValue> = [];
-			for (note in notes)
-			{
-				for (pitch in note.pitches)
-					pitches.push({time: pitch.time, value: pitch.value});
-			}
-			// var stretchedSamples = TimeStretcher.processInSemitones(samples, 44100, pitches);
-			// var pitchedSamples = PitchShifter.process(stretchedSamples, 44100, pitches);
-			// var formantCorrectedSamples = FormantCorrector.process(pitchedSamples, 44100, pitches);
-			var formantCorrectedSamples = samples;
-
-			// convert back to bytes
-			mergedBytes = Bytes.alloc(cast formantCorrectedSamples.length * bytesPerSample);
-			for (i in 0...formantCorrectedSamples.length)
-			{
-				var sample = Std.int(SSMath.clamp(cast formantCorrectedSamples[i] * 32767, -32768, 32767));
-				setInt16(mergedBytes, i * bytesPerSample, sample, true);
-			}
-		}
-		var wavHeader:Bytes = createWavHeader(totalSamples, channels, voiceBank.sampleRate, bitsPerSample);
-		var complete:Bytes = Bytes.alloc(wavHeader.length + mergedBytes.length);
-		complete.blit(0, wavHeader, 0, wavHeader.length);
-		complete.blit(wavHeader.length, mergedBytes, 0, mergedBytes.length);
-
-		File.saveBytes('vocals.wav', complete);
-		finalSnd = Sound.fromAudioBuffer(AudioBuffer.fromBytes(complete));
-		sound = finalSnd;
-		return finalSnd;
+	public function generateVocals()
+	{
+		FlxG.stage.addEventListener(Event.ENTER_FRAME, waitForVocals);
 	}
 }

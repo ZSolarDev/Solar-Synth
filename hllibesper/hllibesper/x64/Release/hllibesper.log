@@ -1,9 +1,0 @@
-﻿  libesper.cpp
-C:\Haxe Games\Solar-Synth\hllibesper\libesper.cpp(13,1): warning C4003: not enough arguments for function-like macro invocation 'DEFINE_PRIM'
-     Creating library C:\Haxe Games\Solar-Synth\hllibesper\x64\Release\hllibesper.lib and object C:\Haxe Games\Solar-Synth\hllibesper\x64\Release\hllibesper.exp
-  Generating code
-  2 of 203 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  hllibesper.vcxproj -> C:\Haxe Games\Solar-Synth\hllibesper\x64\Release\hllibesper.dll

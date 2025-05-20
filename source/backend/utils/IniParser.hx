@@ -5,7 +5,7 @@ import StringTools;
 import sys.FileSystem;
 import sys.io.File;
 
-// This came from HXIni, had to modify some things cause the original wouldn't compile.
+// This came from hxIni, had to modify some things cause the original wouldn't compile.
 
 /**
  * INI section (like [Program] or [Settings]). Used to organize variables. An Ini object is composed by IniSections.

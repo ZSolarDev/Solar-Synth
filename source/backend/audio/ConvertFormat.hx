@@ -5,7 +5,7 @@ import haxe.io.BytesBuffer;
 import haxe.io.BytesOutput;
 
 /* omg what is thiss 😭 never again bro. I do NOT like making vocal synths.. 
-	I just added a bunch of comments so i can remember what everything was can tbh im not remembering allat
+	I just added a bunch of comments so i can remember what everything was can tbh im not remembering this shit..
  */
 class ConvertFormat
 {
@@ -103,7 +103,7 @@ class ConvertFormat
 		var blockAlign = wavBytes.getUInt16(fmtChunk.offset + 20);
 		var bitsPerSample = wavBytes.getUInt16(fmtChunk.offset + 22);
 
-		// only support pcm for now
+		// only support pcm for now(most likely will only support pcm, i'm lazy asfff)
 		if (audioFormat != 1)
 		{
 			trace("Only PCM format supported");
@@ -147,7 +147,7 @@ class ConvertFormat
 
 			if (channels == 2)
 			{
-				// stareo -> mono
+				// stereo to mono
 				var left = readSample(wavBytes, frameOffset, bytesPerSample, bitsPerSample);
 				var right = readSample(wavBytes, frameOffset + bytesPerSample, bytesPerSample, bitsPerSample);
 				var mono = Std.int((left + right) / 2);
@@ -172,7 +172,7 @@ class ConvertFormat
 		output.writeString("fmt ");
 		setUInt32(output, 16);
 
-		// audio format (pcm)
+		// audio format (pcm ofc)
 		output.writeByte(1);
 		output.writeByte(0);
 

@@ -4,7 +4,9 @@ import backend.audio.vocal.NoteProcessor;
 import backend.song.*;
 import backend.utils.SSProjectUtil;
 import backend.utils.VBLoader;
+import frontend.editor.actions.*;
 import haxe.Json;
+import openfl.media.Sound;
 import sys.io.File;
 
 class SongEditor extends FlxState
@@ -13,6 +15,9 @@ class SongEditor extends FlxState
 
 	public var project:SSProject;
 	public var voiceBank:Voicebank;
+	public var sound:Sound;
+	public var qeuedActions:Array<IAction> = [];
+	public var currentAction:IAction;
 
 	override public function new(project:SSProject)
 	{
@@ -48,6 +53,30 @@ class SongEditor extends FlxState
 		if (FlxG.mouse.cursor != null)
 			FlxG.mouse.cursor.bitmapData = FlxGraphic.fromAssetKey("_assets/cursor.png").bitmap;
 		updateInput();
+		manageActions();
+	}
+
+	function manageActions()
+	{
+		if (currentAction != null)
+		{
+			if (!currentAction.running && currentAction is Play)
+				currentAction.startExecute(project.tracks[0].sections[0].notes);
+			else
+			{
+				if (!currentAction.running)
+					currentAction.startExecute();
+				else
+				{
+					if (currentAction.complete)
+						currentAction = qeuedActions.shift();
+					else
+						currentAction.update();
+				}
+			}
+		}
+		else
+			currentAction = qeuedActions.shift();
 	}
 
 	function updateInput()
@@ -107,14 +136,11 @@ class SongEditor extends FlxState
 				return res;
 			}
 			File.saveContent(validateName(project.name) + '.ssp', Json.stringify(proj, null, '    '));
-			var generator = NoteProcessor.generateVocalsFromNotes(notes, voiceBank);
-			generator.sound.play();
 		}
 		if (FlxG.keys.justPressed.P)
 		{
-			var generators = NoteProcessor.generateVocalsFromSections(project.tracks[0].sections, voiceBank);
-			for (generator in generators)
-				generator.sound.play();
+			qeuedActions.push(new Play());
+			trace('pushed');
 		}
 	}
 }
