@@ -43,7 +43,7 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
 # TODO
 ## Goals:
  - [X] Finish Startup Visuals(Loading)
-    - [ ] Add more stuff to load if needed
+   - Add more stuff to load if needed..
  - [ ] Finish Start Menu UI - (rest of the ui require systems that are currently being worked on(ex. project loading, settings, voicebanks, etc.))
  - [ ] Finish Synthesis Engine
     - [ ] Add pitch
