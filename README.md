@@ -46,6 +46,11 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
     - [ ] Add more stuff to load if needed
  - [ ] Finish Start Menu UI - (rest of the ui require systems that are currently being worked on(ex. project loading, settings, voicebanks, etc.))
  - [ ] Finish Synthesis Engine
+    - [ ] Add pitch
+        - [ ] Get it working
+        - [ ] Add multi-octave support
+    - [ ] Add note lenth increasing
+    - [ ] Improve Phoneme blending
  - [ ] Plugin system
     - [ ] A way to add more right-click options to any built-in dropdowns or just custom dropdowns anywhere
     - [ ] A way to add buttons to the top bar
@@ -113,6 +118,8 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
  - [X] Project saving/loading system via .ssp(just json data ALSO MAKE SURE THAT IT CONVERTS THE PROJECT NAME TO A VALID WINDOWS FILE NAME!!!!!!!)
  - [ ] Voicebank System
     - [ ] Add .ssvb(solar synth voicebank) file support for saving(in another program) and loading voicebanks
+    - [ ] Add voicebank cache
+    - [ ] Make program to create them(After SS is done)
  - [ ] exe-file interaction
     - [ ] Add ability to drag and drop a project/voicebank into solar synth
     - [ ] Add ability to open a project/voicebank with solar synth
@@ -148,20 +155,19 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
         - [ ] Actually find people for the voicebanks
         - [ ] For file downloading, make another render website, this one will be made in nodejs and it will download a file based on what you requested and close itself after downloading it.
     - [ ] Pin the website second repository to my top repositories on my profile
- - [ ] Make a youtube video announcing its release, documenting what it can do, and using the various voicebanks for a multitude of example songs. Try to get example covers that the youtubers from before had made; But don't release it quite yet, read the next step.
-  - [ ] Try to start building a community and establish a release date after the video is done. That way everything will be ready to go when the release date is hit. Make the release date quite far as this is your first time releasing anything that has *this* much potential.
- - [ ] Release Solar Synth if all goes well..!
+    - [ ] Make a youtube video announcing its release, documenting what it can do, and using the various voicebanks for a multitude of example songs. Try to get example covers that the youtubers from before had made; But don't release it quite yet, read the next step.
+    - [ ] Try to start building a community and establish a release date after the video is done. That way everything will be ready to go when the release date is hit. Make the release date quite far as this is your first time releasing anything that has *this* much potential.
+    - [ ] Release Solar Synth if all goes well..!
 
 ## Current Todo:
  - [X] Make a GitHub repository so I don't lose my progress at all
     - [X] Make branding and a huge fancy readme with what Solar Synth is, then Solar Synths backstory. Then maybe add a hardcoded sample or 2 if audio previews work with GitHub markdown after pitch shifting is fixed(That last part is optional, cause I'll most-likely run out of gas after typing up the entire readme.)
-    - [ ] Pin Solar Synth to my top repositories on my profile
- - [ ] Fix note looping
- - [ ] Add pitch shifting(via Esper-Utau externs)
+    - [X] Pin Solar Synth to my top repositories on my profile
+ - [ ] Finish Synthesis Engine
  - [ ] Make a hardcoded sample of the synthesis engine using the temporary teto lite voicebank I made in like an hour, then show it to friends and feel good about myself.
  - [ ] Take a break from this project when previous tasks are complete.
-    - I feel like I deserve this break. I've been working hard on this since march 19th, and I've already gotten this much done within a couple of months. A whole japanese vocal synthesis engine! SOLO!!! I'm not a huge expensive crazy corporation at all, and I managed to make an entire synthesis engine with 0$ and half of my sanity per day spent. Impressive if I say so myself. Also, I just genuinely need time to work on things that *actually* need to be done irl(especially that one school project.)
-    - [ ] Actually take a break for a few days so you don't get burnt out, burn out will be a fr issue. ESPECIALLY when doing the tedious task of editor ui.
+    - I feel like I deserve this break. I've been working hard on this since March 19th, and I've already gotten this much done within a couple of months. A whole japanese vocal synthesis engine! SOLO!!! I'm not a huge expensive crazy corporation at all, and I managed to make an entire synthesis engine with 0$ and half of my sanity per day spent. Impressive if I say so myself. Also, I just genuinely need time to work on things that *actually* need to be done irl(especially that one school project. UPDATE: Already finished it. It's already summer, this took so much longer than I thought!)
+    - [ ] Actually take a break for a few days so you don't get burnt out, burn out will be an issue. ESPECIALLY when doing the tedious task of editor ui.
 
 ## Future Goals:
  - [ ] Make a mod application form
