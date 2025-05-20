@@ -18,7 +18,7 @@ I couldn't even make it run parallel on the cpu! What am I even expecting anymor
 
 ## 5/20/2025-8:26 AM || ANOTHER PLAN
 THIS MIGHT WORK, TRUST ME.
-I only needed libESPER for pitch shifting originally. Once I found out I can change things like breathiness, dynamics, etc, I got hooked. I thought I could have a normal render mode where it used samples from the voicebank, and a mode where it used libESPER. I thought I needed a new pitch shifting method, then I realized what I originally wanted libESPER for; pitch shifting.
+I only needed libESPER for pitch shifting originally. Once I found out I can change things like breathiness, dynamics, etc, I got hooked. I thought I could have a normal render mode where it used samples from the voicebank, and a mode where it used libESPER. I thought I needed a new pitch shifting method when that extra side-tangent failed, then I realized what I originally wanted libESPER for; pitch shifting.
 
 I realized I just needed to render the final result of the vocal synthesis into a file and shove it into libESPER with pitch bend curves. Some parts might have to go in again due to it being outside of the original 2 octave range, but the concept is still the same. This also means I don't need externs, only the resampler. That also means people can use a resampler of their choice.
 
