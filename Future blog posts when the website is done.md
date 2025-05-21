@@ -27,3 +27,6 @@ The best part of this is that I can still have a libESPER mode; automation just 
 Also note duration is quite a struggle for the synthesis engine currently, so I thought of a fix. With the program used to make the voicebank(I'm making my own,) I will add a button to generate a cache with the voicebank. This will run every sample through the resampler to extend the samples length to 30 seconds if it isn't already that long. You can also flag a sample to not go through the resampler. If the resampler is Esper-UTAU, it will generate frequency and esper files that are put into the cache as well. This all means that I'll only have to resample a note if either there is no cache and the og sample isn't long enough, or if the cached sample isn't long enough. Best part is if the cache uses Esper-UTAU and you're using Esper-UTAU, the resampler will be much faster if there is a cache due to the already existing frequency and esper files.
 
 This could work!
+
+## 5/20/2025-8:47 PM || Seriously...?
+I knew there was a chance ESPER-Utau might not like the fact that I stuffed more than 1 phoneme in it, but it was unhappier than I thought. The resulting noise came out distorted, almost crunchy. I'll ask CdrSonan if he can give suggestions.
