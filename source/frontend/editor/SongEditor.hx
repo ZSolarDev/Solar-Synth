@@ -109,15 +109,15 @@ class SongEditor extends FlxState
 				volume: 1
 			}
 			var notes = project.tracks[0].sections[0].notes;
-			notes.push(new Note("a", 0, 2000, 1213, 3936, false, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}], [{time: 0, value: 1}],
-				[{time: 0, value: 0}]));
-			notes.push(new Note("o", 2000, 1000, 1213, 3936, false, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+			notes.push(new Note("a", 0, 2000, 1213, 3936, false, false, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 				[{time: 0, value: 1}], [{time: 0, value: 0}]));
-			notes.push(new Note("b3", 3000, 3000, 1213, 3936, false, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+			notes.push(new Note("o", 2000, 1000, 1213, 3936, false, false, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 				[{time: 0, value: 1}], [{time: 0, value: 0}]));
-			notes.push(new Note("ka", 6000, 700, 1213, 3936, false, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+			notes.push(new Note("b3", 3000, 3000, 1213, 3936, false, false, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+				[{time: 0, value: 1}], [{time: 0, value: 0}]));
+			notes.push(new Note("ka", 6000, 700, 1213, 3936, false, false, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 				[{time: 0, value: 1}], []));
-			notes.push(new Note("na", 6700, 20000, 1213, 3936, false, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+			notes.push(new Note("na", 6700, 20000, 1213, 3936, false, false, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 				[{time: 0, value: 1}], [{time: 0, value: 0}]));
 
 			var proj = SSProjectUtil.projectToTypedef(project);

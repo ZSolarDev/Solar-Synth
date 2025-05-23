@@ -3,10 +3,8 @@ package backend.audio.vocal;
 import backend.utils.AudioUtil;
 import haxe.io.Path;
 import sys.FileSystem;
-import sys.io.File;
-import sys.io.Process;
 
-class EsperUTAU
+class ESPERUtau
 {
 	public var samples:Array<Float> = [];
 	public var outputSamples:Array<Float> = [];

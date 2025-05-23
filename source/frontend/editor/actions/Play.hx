@@ -34,7 +34,6 @@ class Play implements IAction
 	{
 		try
 		{
-			trace('updating!!');
 			if (generator.sound != null)
 			{
 				editor.sound = generator.sound;

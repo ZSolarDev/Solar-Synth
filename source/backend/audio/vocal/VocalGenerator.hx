@@ -15,13 +15,15 @@ using StringTools;
 class VocalGenerator
 {
 	public var notes:Array<Note> = [];
+	public var esperMode:Bool;
 	public var voiceBank:Voicebank;
 	public var sound:Sound;
 
-	public function new(notes:Array<Note>, voiceBank:Voicebank)
+	public function new(notes:Array<Note>, voiceBank:Voicebank, ?esperMode:Bool = false)
 	{
 		this.notes = notes;
 		this.voiceBank = voiceBank;
+		this.esperMode = esperMode;
 	}
 
 	function getInt16(bytes:Bytes, index:Int, littleEndian:Bool = true):Int
@@ -76,15 +78,17 @@ class VocalGenerator
 	var channels:Int = 1;
 	var bitsPerSample:Int = 16;
 	var bytesPerSample:Int;
-	var threading:EsperUTAUThreading;
+	var threadedEsper:ESPERUtauThreaded;
 	var sampleIndexMap:Map<Int, Int>;
 	var masterBytes:Bytes;
 	var totalSamples:Int;
 	var paramName:String;
 	var generated:Bool = false;
+	var noteSamples:Map<Int, Bytes> = new Map();
 
 	public function generateVocalsFromParameterName(paramName:String = 'normal')
 	{
+		noteSamples = new Map();
 		this.paramName = paramName;
 		generated = false;
 		sampleRate = voiceBank.sampleRate;
@@ -119,29 +123,35 @@ class VocalGenerator
 			{
 				var sampleBytes = ConvertFormat.convertWav(File.getBytes(filePath),
 					VocalUtil.isVowel(note.phoneme) ? voiceBank.sampleStart : voiceBank.consonantSampleStart);
+				// no way there is gonna be an entry at index 2147483640. That's pushing to the 32 bit integer limit...
+				var mappedPower = Math.round(note.power[2147483640] != null ? (note.power[2147483640].value - 1) * 100 : 0);
+				var mappedBreathiness = Math.round(((note.breathiness[2147483640] != null ? note.breathiness[2147483640].value : 0) - note.tension) * 100);
+				inline function esperParams():String
+					return 'C4 100 "pstb100bri${mappedPower}dyn${mappedPower}bre${mappedBreathiness}rgh${note.roughness * 100}" 0 ${note.duration} 0 0 100 0 T120 ${PitchBendEncoder.encodePitchBend(note.pitches)}';
+
 				sampleSets.push({
 					samples: AudioUtil.pcm16BytesToFloatArray(sampleBytes),
-					params: 'C4 100 "pstb100" 0 ${note.duration} 0 0 100 0 T120 AA#${note.duration - 1}#'
+					params: esperMode ? esperParams() : 'C4 100 "pstb100bre${- (note.tension * 100)}rgh${note.roughness * 100}" 0 ${note.duration} 0 0 100 0 T120 ${PitchBendEncoder.encodePitchBend(note.pitches)}'
 				});
 				sampleIndexMap.set(i, sampleSets.length - 1);
 			}
 		}
 
-		threading = new EsperUTAUThreading(sampleSets);
-		threading.runBatches();
+		threadedEsper = new ESPERUtauThreaded(sampleSets);
+		threadedEsper.runBatches();
 		FlxG.stage.addEventListener(Event.ENTER_FRAME, postEsper);
 	}
 
 	function postEsper(_)
 	{
-		if (threading.completed)
+		if (threadedEsper.completed)
 		{
 			FlxG.stage.removeEventListener(Event.ENTER_FRAME, postEsper);
-			var noteSamples = new Map<Int, Bytes>();
+
 			for (i in sampleIndexMap.keys())
 			{
 				var outputIndex = sampleIndexMap.get(i);
-				var finalSamples = AudioUtil.floatArrayToPCM16Bytes(threading.outputSampleSets[outputIndex]);
+				var finalSamples = AudioUtil.floatArrayToPCM16Bytes(threadedEsper.outputSampleSets[outputIndex]);
 				noteSamples.set(i, finalSamples.sub(44, finalSamples.length - 44)); // skip WAV header
 			}
 			var noteOffsets = new Map<Int, Int>();
@@ -291,93 +301,100 @@ class VocalGenerator
 
 				var velocities:Array<SongValue> = [];
 
-				for (p in note.power)
+				if (esperMode)
 				{
-					var time = p.time;
-
-					var velocityParam:SongValue = {value: 1.0, time: time};
-					for (v in note.velocities)
-					{
-						if (v.time == time)
-							velocityParam = v;
-						else
-							break;
-					}
-
-					var mouthParam:SongValue = {value: 1.0, time: time};
-					for (m in note.mouth)
-					{
-						if (m.time == time)
-							mouthParam = m;
-						else
-							break;
-					}
-
-					var softness = Math.max(0, 1 - p.value);
-					var normal = Math.max(0, 1 - Math.abs(p.value - 1));
-					var powerful = Math.max(0, p.value - 1);
-
-					var finalVelocity:Float = 0.0;
-
-					switch (paramName)
-					{
-						case "soft":
-							finalVelocity = softness * velocityParam.value;
-						case "mouthSoft":
-							finalVelocity = softness * velocityParam.value * mouthParam.value;
-						case "normal":
-							finalVelocity = normal * velocityParam.value;
-						case "mouth":
-							finalVelocity = normal * velocityParam.value * mouthParam.value;
-						case "power":
-							finalVelocity = powerful * velocityParam.value;
-						case "mouthPower":
-							finalVelocity = powerful * velocityParam.value * mouthParam.value;
-						default:
-							continue;
-					}
-
-					velocities.push({value: finalVelocity, time: time});
+					velocities = note.velocities;
 				}
-
-				// for breathiness parameter
-				for (b in note.breathiness)
+				else
 				{
-					var time = b.time;
-
-					var velocityParam:SongValue = {value: 1.0, time: time};
-					for (v in note.velocities)
+					for (p in note.power)
 					{
-						if (v.time == time)
-							velocityParam = v;
-						else
-							break;
+						var time = p.time;
+
+						var velocityParam:SongValue = {value: 1.0, time: time};
+						for (v in note.velocities)
+						{
+							if (v.time == time)
+								velocityParam = v;
+							else
+								break;
+						}
+
+						var mouthParam:SongValue = {value: 1.0, time: time};
+						for (m in note.mouth)
+						{
+							if (m.time == time)
+								mouthParam = m;
+							else
+								break;
+						}
+
+						var softness = Math.max(0, 1 - p.value);
+						var normal = Math.max(0, 1 - Math.abs(p.value - 1));
+						var powerful = Math.max(0, p.value - 1);
+
+						var finalVelocity:Float = 0.0;
+
+						switch (paramName)
+						{
+							case "soft":
+								finalVelocity = softness * velocityParam.value;
+							case "mouthSoft":
+								finalVelocity = softness * velocityParam.value * mouthParam.value;
+							case "normal":
+								finalVelocity = normal * velocityParam.value;
+							case "mouth":
+								finalVelocity = normal * velocityParam.value * mouthParam.value;
+							case "power":
+								finalVelocity = powerful * velocityParam.value;
+							case "mouthPower":
+								finalVelocity = powerful * velocityParam.value * mouthParam.value;
+							default:
+								continue;
+						}
+
+						velocities.push({value: finalVelocity, time: time});
 					}
 
-					var mouthParam:SongValue = {value: 1.0, time: time};
-					for (m in note.mouth)
+					// for breathiness parameter
+					for (b in note.breathiness)
 					{
-						if (m.time == time)
-							mouthParam = m;
-						else
-							break;
+						var time = b.time;
+
+						var velocityParam:SongValue = {value: 1.0, time: time};
+						for (v in note.velocities)
+						{
+							if (v.time == time)
+								velocityParam = v;
+							else
+								break;
+						}
+
+						var mouthParam:SongValue = {value: 1.0, time: time};
+						for (m in note.mouth)
+						{
+							if (m.time == time)
+								mouthParam = m;
+							else
+								break;
+						}
+
+						var breathValue = Math.max(0, b.value);
+
+						var finalVelocity:Float = 0.0;
+
+						switch (paramName)
+						{
+							case "breaths":
+								finalVelocity = breathValue * velocityParam.value;
+							case "mouthBreath":
+								finalVelocity = breathValue * velocityParam.value * mouthParam.value;
+							default:
+								continue;
+						}
+
+						velocities.push({value: finalVelocity, time: time});
 					}
-
-					var breathValue = Math.max(0, b.value);
-
-					var finalVelocity:Float = 0.0;
-
-					switch (paramName)
-					{
-						case "breaths":
-							finalVelocity = breathValue * velocityParam.value;
-						case "mouthBreath":
-							finalVelocity = breathValue * velocityParam.value * mouthParam.value;
-						default:
-							continue;
-					}
-
-					velocities.push({value: finalVelocity, time: time});
 				}
 
 				for (v in 0...velocities.length)
@@ -425,213 +442,331 @@ class VocalGenerator
 	var mouthPower:Bytes;
 	var soft:Bytes;
 	var mouthSoft:Bytes;
-	var filled:Bool = false;
+	var completed:Bool = false;
 
 	function waitForVocals(_)
 	{
-		switch (generating)
+		var res:Bytes = null;
+		var numSamples:Int = 0;
+		if (esperMode)
 		{
-			case '':
-				generateVocalsFromParameterName("normal");
-			case 'normal':
-				if (generated)
-				{
-					normal = Bytes.alloc(masterBytes.length);
-					normal.blit(0, masterBytes, 0, masterBytes.length);
-					generating = 'mouth';
-					generateVocalsFromParameterName("mouth");
-				}
-			case 'mouth':
-				if (generated)
-				{
-					mouth = Bytes.alloc(masterBytes.length);
-					mouth.blit(0, masterBytes, 0, masterBytes.length);
-					generating = 'breaths';
-					generateVocalsFromParameterName("breaths");
-				}
-			case 'breaths':
-				if (generated)
-				{
-					breath = Bytes.alloc(masterBytes.length);
-					breath.blit(0, masterBytes, 0, masterBytes.length);
-					generating = 'mouthBreath';
-					generateVocalsFromParameterName("mouthBreath");
-				}
-			case 'mouthBreath':
-				if (generated)
-				{
-					mouthBreath = Bytes.alloc(masterBytes.length);
-					mouthBreath.blit(0, masterBytes, 0, masterBytes.length);
-					generating = 'power';
-					generateVocalsFromParameterName("power");
-				}
-			case 'power':
-				if (generated)
-				{
-					power = Bytes.alloc(masterBytes.length);
-					power.blit(0, masterBytes, 0, masterBytes.length);
-					generating = 'mouthPower';
-					generateVocalsFromParameterName("mouthPower");
-				}
-			case 'mouthPower':
-				if (generated)
-				{
-					mouthPower = Bytes.alloc(masterBytes.length);
-					mouthPower.blit(0, masterBytes, 0, masterBytes.length);
-					generating = 'soft';
-					generateVocalsFromParameterName("soft");
-				}
-			case 'soft':
-				if (generated)
-				{
-					soft = Bytes.alloc(masterBytes.length);
-					soft.blit(0, masterBytes, 0, masterBytes.length);
-					generating = 'mouthSoft';
-					generateVocalsFromParameterName("mouthSoft");
-				}
-			case 'mouthSoft':
-				if (generated)
-				{
-					mouthSoft = Bytes.alloc(masterBytes.length);
-					mouthSoft.blit(0, masterBytes, 0, masterBytes.length);
-					filled = true;
-				}
+			switch (generating)
+			{
+				case '':
+					generateVocalsFromParameterName("normal");
+					generating = 'normal';
+				case 'normal':
+					if (generated)
+					{
+						normal = Bytes.alloc(masterBytes.length);
+						normal.blit(0, masterBytes, 0, masterBytes.length);
+						generating = 'complete';
+					}
+				case 'complete':
+					numSamples = Std.int(masterBytes.length / bytesPerSample);
+					res = Bytes.alloc(masterBytes.length);
+					res.blit(0, masterBytes, 0, masterBytes.length);
+					completed = true;
+			}
 		}
-		if (filled)
+		else
 		{
-			var sounds:Array<Bytes> = [normal, mouth, breath, mouthBreath, power, mouthPower, soft, mouthSoft];
-			var soundNames:Array<String> = [
-				"normal",
-				"mouth",
-				"breaths",
-				"mouthBreath",
-				"power",
-				"mouthPower",
-				"soft",
-				"mouthSoft"
-			];
-
-			var i = 0;
-			while (i < sounds.length)
+			switch (generating) // TODO: Put this in a for loop, I'm too lazy for it right now
 			{
-				if (sounds[i] == null)
+				case '':
+					generateVocalsFromParameterName("normal");
+					generating = 'normal';
+				case 'normal':
+					if (generated)
+					{
+						normal = Bytes.alloc(masterBytes.length);
+						normal.blit(0, masterBytes, 0, masterBytes.length);
+						if (voiceBank.mouth)
+						{
+							generating = 'mouth';
+							generateVocalsFromParameterName("mouth");
+						}
+						else
+						{
+							if (voiceBank.breaths)
+							{
+								generating = 'breaths';
+								generateVocalsFromParameterName("breaths");
+							}
+							else
+							{
+								if (voiceBank.power)
+								{
+									generating = 'power';
+									generateVocalsFromParameterName("power");
+								}
+								else
+								{
+									if (voiceBank.soft)
+									{
+										generating = 'soft';
+										generateVocalsFromParameterName("soft");
+									}
+									else
+									{
+										completed = true;
+									}
+								}
+							}
+						}
+					}
+				case 'mouth':
+					if (generated)
+					{
+						mouth = Bytes.alloc(masterBytes.length);
+						mouth.blit(0, masterBytes, 0, masterBytes.length);
+						if (voiceBank.breaths)
+						{
+							generating = 'breaths';
+							generateVocalsFromParameterName("breaths");
+						}
+						else
+						{
+							if (voiceBank.power)
+							{
+								generating = 'power';
+								generateVocalsFromParameterName("power");
+							}
+							else
+							{
+								if (voiceBank.soft)
+								{
+									generating = 'soft';
+									generateVocalsFromParameterName("soft");
+								}
+								else
+								{
+									completed = true;
+								}
+							}
+						}
+					}
+				case 'breaths':
+					if (generated)
+					{
+						breath = Bytes.alloc(masterBytes.length);
+						breath.blit(0, masterBytes, 0, masterBytes.length);
+						if (voiceBank.mouthBreath)
+						{
+							generating = 'mouthBreath';
+							generateVocalsFromParameterName("mouthBreath");
+						}
+						else
+						{
+							if (voiceBank.power)
+							{
+								generating = 'power';
+								generateVocalsFromParameterName("power");
+							}
+							else
+							{
+								if (voiceBank.soft)
+								{
+									generating = 'soft';
+									generateVocalsFromParameterName("soft");
+								}
+								else
+								{
+									completed = true;
+								}
+							}
+						}
+					}
+				case 'mouthBreath':
+					if (generated)
+					{
+						mouthBreath = Bytes.alloc(masterBytes.length);
+						mouthBreath.blit(0, masterBytes, 0, masterBytes.length);
+						if (voiceBank.power)
+						{
+							generating = 'power';
+							generateVocalsFromParameterName("power");
+						}
+						else
+						{
+							if (voiceBank.soft)
+							{
+								generating = 'soft';
+								generateVocalsFromParameterName("soft");
+							}
+							else
+							{
+								completed = true;
+							}
+						}
+					}
+				case 'power':
+					if (generated)
+					{
+						power = Bytes.alloc(masterBytes.length);
+						power.blit(0, masterBytes, 0, masterBytes.length);
+						if (voiceBank.mouthPower)
+						{
+							generating = 'mouthPower';
+							generateVocalsFromParameterName("mouthPower");
+						}
+						else
+						{
+							if (voiceBank.soft)
+							{
+								generating = 'soft';
+								generateVocalsFromParameterName("soft");
+							}
+							else
+							{
+								completed = true;
+							}
+						}
+					}
+				case 'mouthPower':
+					if (generated)
+					{
+						mouthPower = Bytes.alloc(masterBytes.length);
+						mouthPower.blit(0, masterBytes, 0, masterBytes.length);
+						if (voiceBank.soft)
+						{
+							generating = 'soft';
+							generateVocalsFromParameterName("soft");
+						}
+						else
+						{
+							completed = true;
+						}
+					}
+				case 'soft':
+					if (generated)
+					{
+						soft = Bytes.alloc(masterBytes.length);
+						soft.blit(0, masterBytes, 0, masterBytes.length);
+						if (voiceBank.mouthSoft)
+						{
+							generating = 'mouthSoft';
+							generateVocalsFromParameterName("mouthSoft");
+						}
+						else
+						{
+							completed = true;
+						}
+					}
+				case 'mouthSoft':
+					if (generated)
+					{
+						mouthSoft = Bytes.alloc(masterBytes.length);
+						mouthSoft.blit(0, masterBytes, 0, masterBytes.length);
+						completed = true;
+					}
+			}
+			trace('generating... $generating');
+			if (completed)
+			{
+				var sounds:Array<Bytes> = [normal, mouth, breath, mouthBreath, power, mouthPower, soft, mouthSoft];
+				var soundNames:Array<String> = [
+					"normal",
+					"mouth",
+					"breaths",
+					"mouthBreath",
+					"power",
+					"mouthPower",
+					"soft",
+					"mouthSoft"
+				];
+
+				var i = 0;
+				while (i < sounds.length)
 				{
-					sounds.splice(i, 1);
-					soundNames.splice(i, 1);
+					if (sounds[i] == null)
+					{
+						sounds.splice(i, 1);
+						soundNames.splice(i, 1);
+					}
+					else
+						i++;
 				}
-				else
-					i++;
-			}
 
-			var maxLength:Int = 0;
-			for (sound in sounds)
-			{
-				if (sound.length > maxLength)
-					maxLength = sound.length;
-			}
-
-			var mergedBytes:Bytes = Bytes.alloc(maxLength);
-			for (i in 0...mergedBytes.length)
-				mergedBytes.set(i, 0);
-
-			var numSamples:Int = Std.int(maxLength / bytesPerSample);
-			for (i in 0...numSamples)
-			{
-				var breathSampleSum:Int = 0;
-				var breathSampleCount:Int = 0;
-
-				for (j in 0...sounds.length)
+				var maxLength:Int = 0;
+				for (sound in sounds)
 				{
-					if (soundNames[j] == "breaths" || soundNames[j] == "mouthBreath")
+					if (sound.length > maxLength)
+						maxLength = sound.length;
+				}
+
+				res = Bytes.alloc(maxLength);
+				for (i in 0...res.length)
+					res.set(i, 0);
+
+				numSamples = Std.int(maxLength / bytesPerSample);
+				for (i in 0...numSamples)
+				{
+					var breathSampleSum:Int = 0;
+					var breathSampleCount:Int = 0;
+
+					for (j in 0...sounds.length)
+					{
+						if (soundNames[j] == "breaths" || soundNames[j] == "mouthBreath")
+						{
+							var offset:Int = i * bytesPerSample;
+							if (offset + bytesPerSample <= sounds[j].length)
+							{
+								var sample = getInt16(sounds[j], offset, true);
+								if (Math.abs(sample) > 0)
+								{
+									breathSampleSum += cast Math.abs(sample);
+									breathSampleCount++;
+								}
+							}
+						}
+					}
+
+					var breathIntensity:Float = 0.0;
+					if (breathSampleCount > 0)
+						breathIntensity = Math.min(1.0, (breathSampleSum / breathSampleCount) / 16384.0);
+
+					var mixedSample:Int = 0;
+					var nonBreathSampleCount:Int = 0;
+					var nonBreathSampleSum:Int = 0;
+					var breathOnlySampleSum:Int = 0;
+
+					for (j in 0...sounds.length)
 					{
 						var offset:Int = i * bytesPerSample;
 						if (offset + bytesPerSample <= sounds[j].length)
 						{
 							var sample = getInt16(sounds[j], offset, true);
-							if (Math.abs(sample) > 0)
+
+							if (soundNames[j] == "breaths" || soundNames[j] == "mouthBreath")
+								breathOnlySampleSum += sample;
+							else
 							{
-								breathSampleSum += cast Math.abs(sample);
-								breathSampleCount++;
+								var attenuationFactor:Float = 1.0 - breathIntensity;
+								nonBreathSampleSum += Std.int(sample * attenuationFactor);
+								if (Math.abs(sample) > 0)
+									nonBreathSampleCount++;
 							}
 						}
 					}
+
+					mixedSample = breathOnlySampleSum + nonBreathSampleSum;
+
+					if (Math.abs(mixedSample) > 32767)
+						mixedSample = (mixedSample > 0) ? 32767 : -32768;
+
+					setInt16(res, i * bytesPerSample, mixedSample, true);
 				}
 
-				var breathIntensity:Float = 0.0;
-				if (breathSampleCount > 0)
-					breathIntensity = Math.min(1.0, (breathSampleSum / breathSampleCount) / 16384.0);
+				var wavHeader:Bytes = AudioUtil.createWavHeader(numSamples, channels, voiceBank.sampleRate, bitsPerSample);
+				var complete:Bytes = Bytes.alloc(wavHeader.length + res.length);
+				complete.blit(0, wavHeader, 0, wavHeader.length);
+				complete.blit(wavHeader.length, res, 0, res.length);
 
-				var mixedSample:Int = 0;
-				var nonBreathSampleCount:Int = 0;
-				var nonBreathSampleSum:Int = 0;
-				var breathOnlySampleSum:Int = 0;
-
-				for (j in 0...sounds.length)
-				{
-					var offset:Int = i * bytesPerSample;
-					if (offset + bytesPerSample <= sounds[j].length)
-					{
-						var sample = getInt16(sounds[j], offset, true);
-
-						if (soundNames[j] == "breaths" || soundNames[j] == "mouthBreath")
-							breathOnlySampleSum += sample;
-						else
-						{
-							var attenuationFactor:Float = 1.0 - breathIntensity;
-							nonBreathSampleSum += Std.int(sample * attenuationFactor);
-							if (Math.abs(sample) > 0)
-								nonBreathSampleCount++;
-						}
-					}
-				}
-
-				mixedSample = breathOnlySampleSum + nonBreathSampleSum;
-
-				if (Math.abs(mixedSample) > 32767)
-					mixedSample = (mixedSample > 0) ? 32767 : -32768;
-
-				setInt16(mergedBytes, i * bytesPerSample, mixedSample, true);
+				#if debug File.saveBytes('vocals.wav', complete); #end
+				sound = Sound.fromAudioBuffer(AudioBuffer.fromBytes(complete));
+				FlxG.stage.removeEventListener(Event.ENTER_FRAME, waitForVocals);
 			}
-
-			var totalSamples:Int = numSamples;
-			// Pitch processing
-			if (hasPitchData())
-			{
-				// convert mergedBytes to samples for simpler processing
-				var samples:Array<Float> = [];
-				for (i in 0...totalSamples)
-				{
-					var offset = i * bytesPerSample;
-					if (offset + bytesPerSample <= mergedBytes.length)
-						samples.push(getInt16(mergedBytes, offset, true) / 32768.0);
-					else
-						samples.push(0.0);
-				}
-				// process pitch modulation
-				var pitches:Array<SongValue> = [];
-				for (note in notes)
-				{
-					for (pitch in note.pitches)
-						pitches.push({time: pitch.time, value: pitch.value});
-				}
-				var formantCorrectedSamples = samples;
-
-				// convert back to bytes
-				mergedBytes = Bytes.alloc(cast formantCorrectedSamples.length * bytesPerSample);
-				for (i in 0...formantCorrectedSamples.length)
-				{
-					var sample = Std.int(SSMath.clamp(cast formantCorrectedSamples[i] * 32767, -32768, 32767));
-					setInt16(mergedBytes, i * bytesPerSample, sample, true);
-				}
-			}
-			var wavHeader:Bytes = AudioUtil.createWavHeader(totalSamples, channels, voiceBank.sampleRate, bitsPerSample);
-			var complete:Bytes = Bytes.alloc(wavHeader.length + mergedBytes.length);
-			complete.blit(0, wavHeader, 0, wavHeader.length);
-			complete.blit(wavHeader.length, mergedBytes, 0, mergedBytes.length);
-
-			#if debug File.saveBytes('vocals.wav', complete); #end
-			sound = Sound.fromAudioBuffer(AudioBuffer.fromBytes(complete));
-			FlxG.stage.removeEventListener(Event.ENTER_FRAME, waitForVocals);
 		}
 	}
 

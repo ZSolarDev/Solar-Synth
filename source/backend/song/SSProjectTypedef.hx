@@ -13,6 +13,7 @@ typedef SSProjectTypedef =
 typedef NoteTypeDef =
 {
 	var time:Float;
+	var esperMode:Bool;
 	var pitches:Array<SongValue>;
 	var duration:Float;
 	var velocities:Array<SongValue>;
@@ -20,6 +21,8 @@ typedef NoteTypeDef =
 	var loopStart:Float;
 	var loopEnd:Float;
 	var shortEnd:Bool;
+	var tension:Float;
+	var roughness:Float;
 	var power:Array<SongValue>;
 	var breathiness:Array<SongValue>;
 	var tone:Array<SongValue>;

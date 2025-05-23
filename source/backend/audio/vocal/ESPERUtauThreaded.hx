@@ -1,14 +1,16 @@
 package backend.audio.vocal;
 
 import sys.io.Process;
+import sys.thread.Mutex;
 import sys.thread.Thread;
 
-class EsperUTAUThreading
+class ESPERUtauThreaded
 {
+	public var mutex = new Mutex();
 	public var numThreads:Int;
-	public var threadBatches:Array<Array<EsperUTAU>> = [];
+	public var threadBatches:Array<Array<{utau:ESPERUtau, index:Int}>> = [];
 	public var sampleSets:Array<{samples:Array<Float>, params:String}> = [];
-	public var outputSampleSets:Array<Array<Float>>;
+	public var outputSampleSets:Array<Array<Float>> = [];
 	public var completed:Bool = false;
 
 	public function new(sampleSets:Array<{samples:Array<Float>, params:String}>)
@@ -27,21 +29,23 @@ class EsperUTAUThreading
 		{
 			var threadIndex = i % numThreads;
 			var fileName = '$i';
-			threadBatches[threadIndex].push(new EsperUTAU(sampleSets[i].samples, fileName, sampleSets[i].params));
+			threadBatches[threadIndex].push({utau: new ESPERUtau(sampleSets[i].samples, fileName, sampleSets[i].params), index: i});
 		}
 
 		for (i in 0...numThreads)
 			Thread.create(() -> runBatch(threadBatches[i]));
 	}
 
-	function runBatch(batch:Array<EsperUTAU>)
+	function runBatch(batch:Array<{utau:ESPERUtau, index:Int}>)
 	{
 		for (job in batch)
 		{
-			job.run();
-			outputSampleSets.push(job.outputSamples);
+			job.utau.run();
+			mutex.acquire();
+			outputSampleSets[job.index] = job.utau.outputSamples;
 			if (outputSampleSets.length == sampleSets.length)
 				completed = true;
+			mutex.release();
 		}
 	}
 

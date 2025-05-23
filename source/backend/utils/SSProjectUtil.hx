@@ -16,8 +16,8 @@ class SSProjectUtil
 			{
 				var notes:Array<Note> = [];
 				for (note in section.notes)
-					notes.push(new Note(note.phoneme, note.time, note.duration, note.loopStart, note.loopEnd, note.shortEnd, note.pitches, note.velocities,
-						note.power, note.breathiness, note.mouth));
+					notes.push(new Note(note.phoneme, note.time, note.duration, note.loopStart, note.loopEnd, note.shortEnd, note.esperMode, note.tension,
+						note.roughness, note.pitches, note.velocities, note.power, note.breathiness, note.mouth));
 				sections.push({
 					name: section.name,
 					time: section.time,
@@ -59,6 +59,7 @@ class SSProjectUtil
 				for (note in section.notes)
 					notes.push({
 						time: note.time,
+						esperMode: note.esperMode,
 						pitches: note.pitches,
 						duration: note.duration,
 						velocities: note.velocities,
@@ -66,6 +67,8 @@ class SSProjectUtil
 						loopStart: note.loopStart,
 						loopEnd: note.loopEnd,
 						shortEnd: note.shortEnd,
+						tension: note.tension,
+						roughness: note.roughness,
 						power: note.power,
 						breathiness: note.breathiness,
 						tone: note.tone,

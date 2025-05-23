@@ -55,6 +55,12 @@ class Tab extends FlxCamera
 		}
 	}
 
+	override public function destroy()
+	{
+		FlxG.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, scrollTab);
+		super.destroy();
+	}
+
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);

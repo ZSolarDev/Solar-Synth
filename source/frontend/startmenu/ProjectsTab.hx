@@ -50,8 +50,8 @@ class Project extends FlxSpriteGroup
 				}
 			}
 		}
-		catch (e)
-			trace(e.details);
+		catch (e) // line 53
+			trace(e.details); // line 54
 	}
 }
 
