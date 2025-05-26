@@ -6,7 +6,12 @@ import backend.song.Voicebank;
 class ESPERUtauBatched
 {
 	public var batches:Array<{utau:ESPERUtau, index:Int}> = [];
-	public var sampleSets:Array<{samples:Array<Float>, params:String}> = [];
+	public var sampleSets:Array<
+		{
+			samples:Array<Float>,
+			esperPath:String,
+			params:String
+		}> = [];
 	public var outputSampleSets:Array<Array<Float>> = [];
 	public var completed:Bool = false;
 	public var fileExt:String;
@@ -15,7 +20,12 @@ class ESPERUtauBatched
 	public var voiceBank:Voicebank;
 	public var esperMode:Bool;
 
-	public function new(sampleSets:Array<{samples:Array<Float>, params:String}>, fileExt:String)
+	public function new(sampleSets:Array<
+		{
+			samples:Array<Float>,
+			esperPath:String,
+			params:String
+		}>, fileExt:String)
 	{
 		this.sampleSets = sampleSets;
 		this.fileExt = fileExt;
@@ -24,7 +34,10 @@ class ESPERUtauBatched
 	public function runBatches()
 	{
 		for (i in 0...sampleSets.length)
-			batches.push({utau: new ESPERUtau(sampleSets[i].samples, '$i-$fileExt', sampleSets[i].params), index: i});
+			batches.push({
+				utau: new ESPERUtau(sampleSets[i].samples, sampleSets[i].esperPath, '$i-$fileExt', sampleSets[i].params),
+				index: i
+			});
 
 		for (i in 0...batches.length)
 			runBatch(batches[i]);

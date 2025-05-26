@@ -10,11 +10,21 @@ class ESPERUtauThreaded
 	public var mutex = new Mutex();
 	public var numThreads:Int;
 	public var threadBatches:Array<Array<{utau:ESPERUtau, index:Int}>> = [];
-	public var sampleSets:Array<{samples:Array<Float>, params:String}> = [];
+	public var sampleSets:Array<
+		{
+			samples:Array<Float>,
+			esperPath:String,
+			params:String
+		}> = [];
 	public var outputSampleSets:Array<Array<Float>> = [];
 	public var completed:Bool = false;
 
-	public function new(sampleSets:Array<{samples:Array<Float>, params:String}>)
+	public function new(sampleSets:Array<
+		{
+			samples:Array<Float>,
+			esperPath:String,
+			params:String
+		}>)
 	{
 		this.sampleSets = sampleSets;
 		// leave *around* 1/2 of threads free for other tasks
@@ -31,7 +41,10 @@ class ESPERUtauThreaded
 		{
 			var threadIndex = i % numThreads;
 			var fileName = '$i';
-			threadBatches[threadIndex].push({utau: new ESPERUtau(sampleSets[i].samples, fileName, sampleSets[i].params), index: i});
+			threadBatches[threadIndex].push({
+				utau: new ESPERUtau(sampleSets[i].samples, sampleSets[i].esperPath, fileName, sampleSets[i].params),
+				index: i
+			});
 		}
 
 		for (i in 0...numThreads)

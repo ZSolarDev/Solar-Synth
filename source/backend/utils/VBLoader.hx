@@ -9,7 +9,7 @@ using StringTools;
 
 class VBLoader
 {
-	public static function loadVoicebankFromFolder(folderPath:String):Voicebank
+	public static function loadVoicebankFromFolder(folderPath:String, folderName:String):Voicebank
 	{
 		inline function stringToBool(s:String):Bool
 			return s.trim() == 'true';
@@ -33,7 +33,8 @@ class VBLoader
 			mouthPower: false,
 			soft: false,
 			mouthSoft: false,
-			breathSamples: 0
+			breathSamples: 0,
+			fileName: folderName
 		};
 		var config:Ini = IniManager.loadFromFile('$folderPath/config.ini');
 		// let's start from the top.

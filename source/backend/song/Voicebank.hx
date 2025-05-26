@@ -21,4 +21,5 @@ typedef Voicebank =
 	var soft:Bool;
 	var mouthSoft:Bool;
 	var breathSamples:Int;
+	var fileName:String;
 }

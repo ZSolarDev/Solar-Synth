@@ -9,6 +9,7 @@ import haxe.io.Bytes;
 import lime.media.AudioBuffer;
 import openfl.events.Event;
 import openfl.media.Sound;
+import sys.FileSystem;
 import sys.io.File;
 
 using StringTools;
@@ -103,7 +104,12 @@ class VocalSynthesizer
 
 		notes.sort(function(a, b) return Std.int(a.time - b.time));
 
-		var sampleSets:Array<{samples:Array<Float>, params:String}> = [];
+		var sampleSets:Array<
+			{
+				samples:Array<Float>,
+				esperPath:String,
+				params:String
+			}> = [];
 		sampleIndexMap = new Map();
 		for (i in 0...notes.length)
 		{
@@ -125,10 +131,14 @@ class VocalSynthesizer
 				var mappedPower = Math.round(note.power[2147483640] != null ? (note.power[2147483640].value - 1) * 100 : 0);
 				var mappedBreathiness = Math.round(((note.breathiness[2147483640] != null ? note.breathiness[2147483640].value : 0) - note.tension) * 100);
 				inline function esperParams():String
-					return 'C4 100 "pstb100bri${mappedPower}dyn${mappedPower}bre${note.atonal ? 100 : mappedBreathiness}rgh${note.roughness * 100}" 0 ${note.duration} 0 0 100 0 T120 ${PitchBendEncoder.encodePitchBend(note.pitches)}';
+					return 'C4 100 "pstb100dyn${mappedPower}int${mappedPower}bre${note.atonal ? 100 : mappedBreathiness}rgh${note.roughness * 100}" 0 ${note.duration} 0 0 100 0 T120 ${PitchBendEncoder.encodePitchBend(note.pitches)}';
 
+				var esperPath = './${voiceBank.fileName}/$paramName/${note.phoneme}.wav.esp';
+				if (!FileSystem.exists(esperPath))
+					esperPath = '';
 				sampleSets.push({
 					samples: AudioUtil.pcm16BytesToFloatArray(sampleBytes),
+					esperPath: esperPath,
 					params: esperMode ? esperParams() : 'C4 100 "pstb100bre${note.atonal ? 100 : -(note.tension * 100)}rgh${note.roughness * 100}" 0 ${note.duration} 0 0 100 0 T120 ${PitchBendEncoder.encodePitchBend(note.pitches)}'
 				});
 				sampleIndexMap.set(i, sampleSets.length - 1);

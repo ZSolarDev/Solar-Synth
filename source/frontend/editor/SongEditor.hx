@@ -30,7 +30,7 @@ class SongEditor extends FlxState
 		super.create();
 		instance = this;
 		initWindow();
-		voiceBank = VBLoader.loadVoicebankFromFolder('voicebanks/${project.voicebank}');
+		voiceBank = VBLoader.loadVoicebankFromFolder('voicebanks/${project.voicebank}', project.voicebank);
 	}
 
 	function initWindow()
