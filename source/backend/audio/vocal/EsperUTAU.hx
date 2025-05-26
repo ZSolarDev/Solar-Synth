@@ -27,7 +27,6 @@ class ESPERUtau
 		Sys.command('.\\esper\\ESPER-Utau.exe "${Path.removeTrailingSlashes(Path.normalize(Sys.getCwd()))}/esper/$fileName.wav" "${Path.removeTrailingSlashes(Path.normalize(Sys.getCwd()))}/esper/${fileName}Output.wav" $params');
 		if (FileSystem.exists('./esper/${fileName}Output.wav'))
 		{
-			// ...and the fact that in the last comment I was boasting on how clean that code was...this function chain is horrid.
 			outputSamples = AudioUtil.pcm16BytesToFloatArray(ConvertFormat.convertWav(AudioUtil.floatArrayToWav(AudioUtil.readWavFile('./esper/${fileName}Output.wav'))));
 			FileSystem.deleteFile('./esper/${fileName}.wav');
 			FileSystem.deleteFile('./esper/${fileName}Output.wav');

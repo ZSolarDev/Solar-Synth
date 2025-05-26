@@ -1,8 +1,8 @@
 package frontend.editor.actions;
 
 import backend.audio.vocal.NoteProcessor;
-import backend.audio.vocal.VocalGenerator;
-import backend.song.Note;
+import backend.audio.vocal.VocalSynthesizer;
+import backend.utils.CopyUtil;
 import openfl.media.Sound;
 
 class Play implements IAction
@@ -10,7 +10,6 @@ class Play implements IAction
 	public var complete:Bool = false;
 	public var res:Dynamic;
 	public var editor:SongEditor;
-	public var generator:VocalGenerator;
 	public var running:Bool;
 
 	public function new() {}
@@ -22,7 +21,7 @@ class Play implements IAction
 			editor = SongEditor.instance;
 			if (editor.sound == null)
 				editor.sound = new Sound();
-			generator = NoteProcessor.generateVocalsFromNotes(data, editor.voiceBank);
+			NoteProcessor.synthesizeVocalsFromNotes(data, editor.voiceBank);
 			running = true;
 			trace('loading!');
 		}
@@ -34,9 +33,10 @@ class Play implements IAction
 	{
 		try
 		{
-			if (generator.sound != null)
+			if (VocalSynthesizer.synthesized)
 			{
-				editor.sound = generator.sound;
+				editor.sound = VocalSynthesizer.sound;
+				VocalSynthesizer.synthesized = false;
 				FlxG.sound.play(editor.sound, 1);
 				endExecute();
 			}
@@ -50,7 +50,6 @@ class Play implements IAction
 		try
 		{
 			trace('COMPLETED!!!');
-			generator = null;
 			complete = true;
 		}
 		catch (e)

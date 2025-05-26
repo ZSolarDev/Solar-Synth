@@ -18,8 +18,7 @@ typedef NoteTypeDef =
 	var duration:Float;
 	var velocities:Array<SongValue>;
 	var phoneme:String;
-	var loopStart:Float;
-	var loopEnd:Float;
+	var atonal:Bool;
 	var shortEnd:Bool;
 	var tension:Float;
 	var roughness:Float;

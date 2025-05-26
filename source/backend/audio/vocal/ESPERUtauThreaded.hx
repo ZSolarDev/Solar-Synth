@@ -1,11 +1,12 @@
 package backend.audio.vocal;
 
-import sys.io.Process;
+import backend.utils.ThreadUtil;
 import sys.thread.Mutex;
 import sys.thread.Thread;
 
 class ESPERUtauThreaded
 {
+	// This is the first time i've used a mutex
 	public var mutex = new Mutex();
 	public var numThreads:Int;
 	public var threadBatches:Array<Array<{utau:ESPERUtau, index:Int}>> = [];
@@ -16,7 +17,8 @@ class ESPERUtauThreaded
 	public function new(sampleSets:Array<{samples:Array<Float>, params:String}>)
 	{
 		this.sampleSets = sampleSets;
-		numThreads = getCPUThreads() - 2;
+		// leave *around* 1/2 of threads free for other tasks
+		numThreads = Math.round(ThreadUtil.freeThreads / 2);
 
 		for (_ in 0...numThreads)
 			threadBatches.push([]);
@@ -33,7 +35,7 @@ class ESPERUtauThreaded
 		}
 
 		for (i in 0...numThreads)
-			Thread.create(() -> runBatch(threadBatches[i]));
+			ThreadUtil.createThread(() -> runBatch(threadBatches[i]));
 	}
 
 	function runBatch(batch:Array<{utau:ESPERUtau, index:Int}>)
@@ -47,22 +49,5 @@ class ESPERUtauThreaded
 				completed = true;
 			mutex.release();
 		}
-	}
-
-	function getCPUThreads():Int
-	{
-		try
-		{
-			#if sys
-			var proc = new Process("cmd /c echo %NUMBER_OF_PROCESSORS%");
-			var output = proc.stdout.readAll().toString().trim();
-			proc.close();
-			return Std.parseInt(output);
-			#else
-			return 4; // fallback default
-			#end
-		}
-		catch (_)
-			return 4; // fallback on error
 	}
 }

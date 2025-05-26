@@ -9,13 +9,10 @@ typedef Voicebank =
 	var singer:String;
 	var credits:Array<String>;
 	var language:String;
-	var sampleRate:Int;
 	var sampleStart:Float;
 	var consonantSampleStart:Float;
 	var consonantBlendRatio:Float;
 	var vowelBlendRatio:Float;
-	var sampleLoop:Float;
-	var sampleLoopEnd:Float;
 	var mouth:Bool;
 	var breaths:Bool;
 	var mouthBreath:Bool;

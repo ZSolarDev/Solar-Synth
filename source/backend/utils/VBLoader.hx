@@ -22,13 +22,10 @@ class VBLoader
 			singer: '',
 			credits: [],
 			language: '',
-			sampleRate: 0,
 			consonantSampleStart: 0,
 			consonantBlendRatio: 0,
 			vowelBlendRatio: 0,
 			sampleStart: 0,
-			sampleLoop: 0,
-			sampleLoopEnd: 0,
 			mouth: false,
 			breaths: false,
 			mouthBreath: false,
@@ -52,13 +49,10 @@ class VBLoader
 			// voicebank settings (also very simple)
 			var vbCharacter = config['Voicebank'];
 			voicebank.language = vbCharacter['language'];
-			voicebank.sampleRate = Std.parseInt(vbCharacter['sampleRate']);
 			voicebank.sampleStart = Std.parseFloat(vbCharacter['sampleStart']);
 			voicebank.consonantSampleStart = Std.parseFloat(vbCharacter['consonantSampleStart']);
 			voicebank.consonantBlendRatio = Std.parseFloat(vbCharacter['consonantBlendRatio']);
 			voicebank.vowelBlendRatio = Std.parseFloat(vbCharacter['vowelBlendRatio']);
-			voicebank.sampleLoop = Std.parseFloat(vbCharacter['sampleLoop']);
-			voicebank.sampleLoopEnd = Std.parseFloat(vbCharacter['sampleLoopEnd']);
 			// sample stuff(eh not that complicated)
 			var finalSamples:Map<String, String> = new Map();
 			var variationsAvailable = [

@@ -30,3 +30,6 @@ This could work!
 
 ## 5/20/2025-8:47 PM || Seriously...?
 I knew there was a chance ESPER-Utau might not like the fact that I stuffed more than 1 phoneme in it, but it was unhappier than I thought. The resulting noise came out distorted, almost crunchy. I'll ask CdrSonan if he can give suggestions.
+
+## 5/26/2025-4:36 PM || ESPER-UTAU INTEGRATION NEARLY COMPLETE!!!!
+WHOOOOOOOOOO! I finally got it working! You know how I was talking about ESPER-Utau running in parralel on the CPU? I thought It would never work, but I got it working! I'm so happy! All I need to do is skip past the strange pops and make note length longer than required to minimize the fade out and it's done! A MONTH AND 6 DAYSSSS

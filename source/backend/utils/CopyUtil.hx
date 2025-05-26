@@ -12,9 +12,7 @@ class CopyUtil
 		{
 			var val:Dynamic = Reflect.field(c, field);
 			if (!Reflect.isFunction(val))
-			{
 				Reflect.setField(inst, field, val);
-			}
 		}
 		return inst;
 	}
