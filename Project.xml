@@ -4,7 +4,7 @@
 
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="Solar Synth: Voicebank Creator" file="Solar Synth: Voicebank Creator" main="Main" version="1.0.0" company="ZSolarDev" />
+	<app title="Solar Synth: Voicebank Creator" file="Voicebank Creator" main="Main" version="1.0.0" company="ZSolarDev" />
 	<app preloader="flixel.system.FlxPreloader" />
 	<set name="SWF_VERSION" value="11.8" />
 
@@ -15,6 +15,7 @@
 	<set name="BUILD_DIR" value="export" />
 	<source path="source" />
 	<assets path="assets" />
+    <assets path="esper" />
     <assets path="voicebanks" />
 
 	<!-- _______________________________ Libraries ______________________________ -->
