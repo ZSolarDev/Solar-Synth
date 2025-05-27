@@ -27,26 +27,38 @@ class ESPERUtau
 	{
 		running = true;
 		AudioUtil.writeWavFile(samples, '.\\esper\\$fileName.wav', 44100);
-		trace(esperPath);
 		if (esperPath != '')
 			File.copy(esperPath, '.\\esper\\$fileName.wav.esp');
 		Sys.command('.\\esper\\ESPER-Utau.exe "${Path.removeTrailingSlashes(Path.normalize(Sys.getCwd()))}/esper/$fileName.wav" "${Path.removeTrailingSlashes(Path.normalize(Sys.getCwd()))}/esper/${fileName}Output.wav" $params');
-		if (FileSystem.exists('./esper/${fileName}Output.wav'))
+		var outputPath = './esper/${fileName}Output.wav';
+		outputSamples = AudioUtil.pcm16BytesToFloatArray(ConvertFormat.convertWav(AudioUtil.floatArrayToWav(AudioUtil.readWavFile('./esper/${fileName}Output.wav'))));
+		deleteEsperFile('./esper/${fileName}.wav');
+		deleteEsperFile(outputPath);
+
+		if (esperPath != '')
+			deleteEsperFile('./esper/${fileName}.wav.esp');
+		running = false;
+		return;
+	}
+
+	static function deleteEsperFile(path:String)
+	{
+		var waited = 0.0;
+		while (true) // why do I need all this shit to delete a fileee 😭
 		{
-			outputSamples = AudioUtil.pcm16BytesToFloatArray(ConvertFormat.convertWav(AudioUtil.floatArrayToWav(AudioUtil.readWavFile('./esper/${fileName}Output.wav'))));
-			FileSystem.deleteFile('./esper/${fileName}.wav');
-			FileSystem.deleteFile('./esper/${fileName}Output.wav');
-			if (esperPath != '')
-				FileSystem.deleteFile('./esper/${fileName}.wav.esp');
-			running = false;
-			return;
-		}
-		else
-		{
-			FileSystem.deleteFile('./esper/${fileName}.wav');
-			if (esperPath != '')
-				FileSystem.deleteFile('./esper/${fileName}.wav.esp');
-			throw 'Resampler has failed! Please tell ZSolarDev to update this crash message to be something useful'; // 😟
+			try
+			{
+				FileSystem.deleteFile(path);
+				return;
+			}
+			catch (e:Dynamic)
+			{
+				if (waited >= 5)
+					throw "Timeout deleting ESPER input/output/.esp.";
+				// file probably still locked, wait a bit then try again
+				Sys.sleep(0.05);
+				waited += 0.05;
+			}
 		}
 	}
 }

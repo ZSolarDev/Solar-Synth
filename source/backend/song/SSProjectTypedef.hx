@@ -12,13 +12,14 @@ typedef SSProjectTypedef =
 
 typedef NoteTypeDef =
 {
-	var time:Float;
-	var esperMode:Bool;
+	var time:Int;
 	var pitches:Array<SongValue>;
-	var duration:Float;
+	var duration:Int;
 	var velocities:Array<SongValue>;
 	var phoneme:String;
 	var atonal:Bool;
+	var powerValue:Float;
+	var breathinessValue:Float;
 	var shortEnd:Bool;
 	var tension:Float;
 	var roughness:Float;
@@ -45,6 +46,7 @@ typedef SSSectionTypedef =
 	var soundPath:String;
 	var notes:Array<NoteTypeDef>;
 	var bpm:Float;
+	var esperMode:Bool;
 }
 
 typedef SSProjectSettingsTypedef =

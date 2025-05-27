@@ -27,6 +27,7 @@ typedef SSSection =
 	var soundPath:String;
 	var notes:Array<Note>;
 	var bpm:Float;
+	var esperMode:Bool;
 }
 
 typedef SSProjectSettings =

@@ -2,7 +2,6 @@ package frontend.editor.actions;
 
 import backend.audio.vocal.NoteProcessor;
 import backend.audio.vocal.VocalSynthesizer;
-import backend.utils.CopyUtil;
 import openfl.media.Sound;
 
 class Play implements IAction
@@ -21,12 +20,12 @@ class Play implements IAction
 			editor = SongEditor.instance;
 			if (editor.sound == null)
 				editor.sound = new Sound();
-			NoteProcessor.synthesizeVocalsFromNotes(data, editor.voiceBank);
+			NoteProcessor.synthesizeVocalsFromNotes(data.notes, editor.voiceBank, data.esperMode);
 			running = true;
-			trace('loading!');
+			trace('Synthesizing...');
 		}
 		catch (e)
-			throw 'Error stating PLAY action:\n${e.details()}';
+			throw 'Error stating Play action:\n${e.details()}';
 	}
 
 	public function update(?data:Dynamic)
@@ -42,17 +41,17 @@ class Play implements IAction
 			}
 		}
 		catch (e)
-			throw 'Error updating PLAY action:\n${e.details()}';
+			throw 'Error updating Play action:\n${e.details()}';
 	}
 
 	public function endExecute()
 	{
 		try
 		{
-			trace('COMPLETED!!!');
+			trace('Completed Play action');
 			complete = true;
 		}
 		catch (e)
-			throw 'Error ending PLAY action:\n${e.details()}';
+			throw 'Error ending Play action:\n${e.details()}';
 	}
 }

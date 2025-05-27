@@ -18,24 +18,27 @@ class VocalSynthesizer
 {
 	public static var sound(get, null):Sound;
 	public static var bytes:Bytes;
-	public static var curParamSound(get, null):Sound;
-	static public var curParamBytes:Bytes;
-	static public var synthesized:Bool = false;
-	public static var curParamComplete:Bool = false;
 
-	static var batchedEsper:ESPERUtauBatched;
+	public var curParamSound(get, null):Sound;
+	public var curParamBytes:Bytes;
+
+	public static var synthesized:Bool = false;
+
+	public var batchedEsper:ESPERUtauBatched;
+	public var complete:Bool = false;
+
 	static var threadedSynthesizer:VocalSynthesizerThreaded;
 	static var bitsPerSample:Int = 16;
 	static var bytesPerSample:Int = 2; // the result of (bitsPerSample * channels) / 8
 
-	static var sampleIndexMap:Map<Int, Int>;
-	static var totalSamples:Int;
-	static var noteSamples:Map<Int, Bytes> = new Map();
+	var sampleIndexMap:Map<Int, Int>;
+	var totalSamples:Int;
+	var noteSamples:Map<Int, Bytes> = new Map();
 
 	static function get_sound():Sound
 		return Sound.fromAudioBuffer(AudioBuffer.fromBytes(bytes));
 
-	static function get_curParamSound():Sound
+	function get_curParamSound():Sound
 		return Sound.fromAudioBuffer(AudioBuffer.fromBytes(curParamBytes));
 
 	static function getInt16(bytes:Bytes, index:Int, littleEndian:Bool = true):Int
@@ -86,11 +89,12 @@ class VocalSynthesizer
 			dest.set(destOffset + i, source.get(srcOffset + i));
 	}
 
-	public static function synthesizeVocalsFromParameterName(paramName:String = 'normal', _notes:Array<Note>, voiceBank:Voicebank, esperMode:Bool)
+	public function new() {}
+
+	public function synthesizeVocalsFromParameterName(paramName:String = 'normal', _notes:Array<Note>, voiceBank:Voicebank, esperMode:Bool)
 	{
 		var notes = CopyUtil.copyArray(_notes);
 		noteSamples = new Map();
-		curParamComplete = false;
 		var sampleRate = 44100;
 		var totalDurationMs:Float = 0;
 		for (note in notes)
@@ -127,11 +131,10 @@ class VocalSynthesizer
 			{
 				var sampleBytes = ConvertFormat.convertWav(File.getBytes(filePath),
 					VocalUtil.isVowel(note.phoneme) ? voiceBank.sampleStart : voiceBank.consonantSampleStart);
-				// no way there is gonna be an entry at index 2147483640. That's pushing to the 32 bit integer limit...
-				var mappedPower = Math.round(note.power[2147483640] != null ? (note.power[2147483640].value - 1) * 100 : 0);
-				var mappedBreathiness = Math.round(((note.breathiness[2147483640] != null ? note.breathiness[2147483640].value : 0) - note.tension) * 100);
+				var mappedPower = Math.round((note.powerValue - 1) * 100);
+				var mappedBreathiness = Math.round((note.breathinessValue - note.tension / 100) * 100);
 				inline function esperParams():String
-					return 'C4 100 "pstb100dyn${mappedPower}int${mappedPower}bre${note.atonal ? 100 : mappedBreathiness}rgh${note.roughness * 100}" 0 ${note.duration} 0 0 100 0 T120 ${PitchBendEncoder.encodePitchBend(note.pitches)}';
+					return 'C4 100 "pstb100dyn${mappedPower}int${mappedPower}bre${note.atonal ? 100 : mappedBreathiness}rgh${note.roughness}" 0 ${note.duration} 0 0 100 0 T120 ${PitchBendEncoder.encodePitchBend(note.pitches, note.duration)}';
 
 				var esperPath = './${voiceBank.fileName}/$paramName/${note.phoneme}.wav.esp';
 				if (!FileSystem.exists(esperPath))
@@ -139,7 +142,7 @@ class VocalSynthesizer
 				sampleSets.push({
 					samples: AudioUtil.pcm16BytesToFloatArray(sampleBytes),
 					esperPath: esperPath,
-					params: esperMode ? esperParams() : 'C4 100 "pstb100bre${note.atonal ? 100 : -(note.tension * 100)}rgh${note.roughness * 100}" 0 ${note.duration} 0 0 100 0 T120 ${PitchBendEncoder.encodePitchBend(note.pitches)}'
+					params: esperMode ? esperParams() : 'C4 100 "pstb100bre${note.atonal ? 100 : -(note.tension)}rgh${note.roughness}" 0 ${note.duration} 0 0 100 0 T120 ${PitchBendEncoder.encodePitchBend(note.pitches, note.duration)}'
 				});
 				sampleIndexMap.set(i, sampleSets.length - 1);
 			}
@@ -153,7 +156,7 @@ class VocalSynthesizer
 		FlxG.stage.addEventListener(Event.ENTER_FRAME, postEsper);
 	}
 
-	static function postEsper(_)
+	function postEsper(_)
 	{
 		if (batchedEsper.completed)
 		{
@@ -434,7 +437,7 @@ class VocalSynthesizer
 					}
 				}
 			}
-			curParamComplete = true;
+			complete = true;
 		}
 	}
 

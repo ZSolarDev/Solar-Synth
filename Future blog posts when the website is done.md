@@ -33,3 +33,6 @@ I knew there was a chance ESPER-Utau might not like the fact that I stuffed more
 
 ## 5/26/2025-4:36 PM || ESPER-UTAU INTEGRATION NEARLY COMPLETE!!!!
 WHOOOOOOOOOO! I finally got it working! You know how I was talking about ESPER-Utau running in parralel on the CPU? I thought It would never work, but I got it working! I'm so happy! All I need to do is skip past the strange pops and make note length longer than required to minimize the fade out and it's done! A MONTH AND 6 DAYSSSS
+
+## 5/27/2025-1:53 PM || ESPER-UTAU INTEGRATION COMPLETE.
+Everything works. It all works. There were some bugs that leaked through but after extensive testing today, I've concluded it works well. The downside is that It takes 10~ seconds to run including the .esp files being transfered over, but I have a decent solution. Instead of synthesizing the entire section when pressing play, I can pre-synthesize it when a note is edited. The only issue with that is that if you modify a note while ESPER-Utau is running, it will take a second to wait for the previous ESPER-Utau's to complete before restarting the synthesization process to ensure file names don't collide. I've made it so far.... all I need is improved phoneme blending and realism and the synthesis is done.

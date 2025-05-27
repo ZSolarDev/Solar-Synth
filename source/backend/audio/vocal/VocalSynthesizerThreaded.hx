@@ -74,11 +74,12 @@ class VocalSynthesizerThreaded
 	{
 		for (job in batch)
 		{
-			VocalSynthesizer.synthesizeVocalsFromParameterName(job, notes, voiceBank, esperMode);
-			while (!VocalSynthesizer.curParamComplete)
+			var synthesizer = new VocalSynthesizer();
+			synthesizer.synthesizeVocalsFromParameterName(job, notes, voiceBank, esperMode);
+			while (!synthesizer.complete)
 				Sys.sleep(0.001);
-			var bytes = Bytes.alloc(VocalSynthesizer.curParamBytes.length);
-			bytes.blit(0, VocalSynthesizer.curParamBytes, 0, VocalSynthesizer.curParamBytes.length);
+			var bytes = Bytes.alloc(synthesizer.curParamBytes.length);
+			bytes.blit(0, synthesizer.curParamBytes, 0, synthesizer.curParamBytes.length);
 			mutex.acquire();
 			output.set(job, bytes);
 			if (Lambda.count(output) == batches.length)

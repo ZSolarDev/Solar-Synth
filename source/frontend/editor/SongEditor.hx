@@ -61,7 +61,7 @@ class SongEditor extends FlxState
 		if (currentAction != null)
 		{
 			if (!currentAction.running && currentAction is Play)
-				currentAction.startExecute(project.tracks[0].sections[0].notes);
+				currentAction.startExecute({notes: project.tracks[0].sections[0].notes, esperMode: project.tracks[0].sections[0].esperMode});
 			else
 			{
 				if (!currentAction.running)
@@ -93,7 +93,8 @@ class SongEditor extends FlxState
 						soundPath: '',
 						notes: [],
 						duration: 50000,
-						bpm: 120
+						bpm: 120,
+						esperMode: true
 					},
 					{
 						name: 'Instrumental',
@@ -102,22 +103,23 @@ class SongEditor extends FlxState
 						soundPath: '',
 						notes: [],
 						duration: 50000,
-						bpm: 120
+						bpm: 120,
+						esperMode: false
 					}
 				],
 				muted: false,
 				volume: 1
 			}
 			var notes = project.tracks[0].sections[0].notes;
-			notes.push(new Note("a", 0, 2000, false, false, false, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+			notes.push(new Note("a", 0, 2000, false, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+				[{time: 0, value: 0}], [{time: 0, value: 0}]));
+			notes.push(new Note("o", 2000, 1000, false, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 				[{time: 0, value: 1}], [{time: 0, value: 0}]));
-			notes.push(new Note("o", 2000, 1000, false, false, false, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+			notes.push(new Note("b3", 3000, 3000, false, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 				[{time: 0, value: 1}], [{time: 0, value: 0}]));
-			notes.push(new Note("b3", 3000, 3000, false, false, false, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
-				[{time: 0, value: 1}], [{time: 0, value: 0}]));
-			notes.push(new Note("ka", 6000, 700, false, false, false, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+			notes.push(new Note("ka", 6000, 700, false, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 				[{time: 0, value: 1}], []));
-			notes.push(new Note("na", 6700, 20000, false, false, false, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+			notes.push(new Note("na", 6700, 20000, false, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 				[{time: 0, value: 1}], [{time: 0, value: 0}]));
 
 			var proj = SSProjectUtil.projectToTypedef(project);
@@ -140,7 +142,7 @@ class SongEditor extends FlxState
 		if (FlxG.keys.justPressed.P)
 		{
 			qeuedActions.push(new Play());
-			trace('pushed');
+			trace('Qeued Play action');
 		}
 	}
 }

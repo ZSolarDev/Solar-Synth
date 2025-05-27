@@ -7,7 +7,7 @@ class PitchBendEncoder
 	static inline var PITCH_BEND_RANGE = 24.0; // semitones
 	static inline var BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-	public static function encodePitchBend(values:Array<SongValue>):String
+	public static function encodePitchBend(values:Array<SongValue>, targetDur:Int):String
 	{
 		if (values.length == 0)
 			return "";
@@ -18,6 +18,8 @@ class PitchBendEncoder
 		section.push(last);
 
 		var i = 1;
+		var encodedCount = 1; // we've added one so far
+
 		while (i < values.length)
 		{
 			var current = encodeValue(values[i].value);
@@ -33,12 +35,14 @@ class PitchBendEncoder
 			{
 				result += encodeSection(section) + "#";
 				result += repeatCount + "#";
+				encodedCount += section.length + repeatCount;
 
 				if (i < values.length)
 				{
 					last = encodeValue(values[i].value);
 					section = [last];
 					i++;
+					encodedCount++;
 				}
 			}
 			else
@@ -46,11 +50,21 @@ class PitchBendEncoder
 				section.push(current);
 				last = current;
 				i++;
+				encodedCount++;
 			}
 		}
 
 		if (section.length > 0)
+		{
 			result += encodeSection(section);
+			encodedCount += section.length;
+		}
+
+		if (encodedCount < targetDur)
+		{
+			var padCount = targetDur - encodedCount;
+			result += "#" + padCount + "#";
+		}
 
 		return result;
 	}
@@ -72,11 +86,10 @@ class PitchBendEncoder
 	static function encodeBase64Value(value:Int):String
 	{
 		var BASE64 = BASE64;
-		var inverted = -value;
-		if (inverted < 0)
-			inverted += 4096;
-		var hi = (inverted >> 6) & 0x3F;
-		var lo = inverted & 0x3F;
+		if (value < 0)
+			value += 4096;
+		var hi = (value >> 6) & 0x3F;
+		var lo = value & 0x3F;
 		return BASE64.charAt(hi) + BASE64.charAt(lo);
 	}
 }

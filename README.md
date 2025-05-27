@@ -46,23 +46,24 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
    - Add more stuff to load if needed..
  - [ ] Finish Start Menu UI - (rest of the ui require systems that are currently being worked on(ex. project loading, settings, voicebanks, etc.))
  - [ ] Finish Synthesis Engine
-    - [ ] Add pitch
-        - [ ] Get it working
-        - [ ] Add multi-octave support
-    - [ ] Add note lenth increasing
+    - [X] Add pitch
+        - [X] Get it working
+        - [X] Add multi-octave support(4 octaves is enough for now.)
+    - [X] Add note lenth increasing
     - [ ] Improve Phoneme blending
- - [ ] Plugin system
+    - [ ] Add an option for automatic tuning
+ - [ ] Haxe Plugin system
     - [ ] A way to add more right-click options to any built-in dropdowns or just custom dropdowns anywhere
     - [ ] A way to add buttons to the top bar
     - [ ] A way to interface with the Synthesis Engine
         - [ ] A way to interface with the Note processor
         - [ ] A way to interface with the Vocal Generator
  - [ ] Create Project Editor
-    - [ ] Add .ssp(solar synth project) file support for saving and loading projects
+    - [X] Add .ssp(solar synth project) file support for saving and loading projects
     - [ ] Voicebank UI (Finish voicebank system before doing this.)
-    - [ ] Track System
-        - [ ] Section System
-            - [ ] Some sections have notes, some have audio.
+    - [F] Track System
+        - [F] Section System
+            - [F] Some sections have notes, some have audio.
     - [ ] Track Viewer UI (Finish track system before doing this.)
         - [ ] Clear section viewing
         - [ ] Section selection
@@ -115,10 +116,8 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
         - [ ] General settings(opens a substate with a camera with the settings tab from the start menu ui, then when done, reload the editor state with a warning saying it will clear undo history.)
     - [ ] General Copy/Paste System
     - [ ] General Redo/Undo System
- - [X] Project saving/loading system via .ssp(just json data ALSO MAKE SURE THAT IT CONVERTS THE PROJECT NAME TO A VALID WINDOWS FILE NAME!!!!!!!)
  - [ ] Voicebank System
     - [ ] Add .ssvb(solar synth voicebank) file support for saving(in another program) and loading voicebanks
-    - [ ] Add voicebank cache
     - [ ] Make program to create them(After SS is done)
  - [ ] exe-file interaction
     - [ ] Add ability to drag and drop a project/voicebank into solar synth
