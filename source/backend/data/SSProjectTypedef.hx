@@ -1,6 +1,6 @@
-package backend.song;
+package backend.data;
 
-import backend.song.SongValue;
+import backend.data.SongValue;
 
 typedef SSProjectTypedef =
 {

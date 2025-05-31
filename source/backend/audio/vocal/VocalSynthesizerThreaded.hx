@@ -1,7 +1,7 @@
 package backend.audio.vocal;
 
-import backend.song.Note;
-import backend.song.Voicebank;
+import backend.data.Note;
+import backend.data.Voicebank;
 import backend.utils.ThreadUtil;
 import sys.io.Process;
 import sys.thread.Mutex;

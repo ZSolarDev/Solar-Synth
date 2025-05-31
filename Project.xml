@@ -24,6 +24,5 @@
     <haxelib name="openfl" />
     <haxelib name="actuate" />
 
-    <!--Removing these, no need for them-->
     <icon path="assets/SSLHighres.png" />
 </project>

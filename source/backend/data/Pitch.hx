@@ -1,3 +1,4 @@
-package backend.song;
+package backend.data;
+
 
 enum abstract Pitch(Float) {}

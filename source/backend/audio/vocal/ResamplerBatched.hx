@@ -1,8 +1,5 @@
 package backend.audio.vocal;
 
-import backend.song.Note;
-import backend.song.Voicebank;
-
 class ResamplerBatched
 {
 	public var batches:Array<{utau:Resampler, index:Int}> = [];

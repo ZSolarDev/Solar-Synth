@@ -12,7 +12,7 @@ typedef Config =
 
 class GlobalConfig
 {
-	public static var resamplerPath:String = 'esperutau/ESPER-Utau.exe';
+	public static var resamplerPath:String = 'f2resamp/f2resamp64.exe';
 	public static var resamplerName(get, null):String;
 	public static var resampler(get, null):String;
 

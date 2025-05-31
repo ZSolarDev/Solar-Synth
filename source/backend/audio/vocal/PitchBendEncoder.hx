@@ -1,6 +1,6 @@
 package backend.audio.vocal;
 
-import backend.song.SongValue;
+import backend.data.SongValue;
 
 class PitchBendEncoder
 {

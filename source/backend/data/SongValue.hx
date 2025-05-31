@@ -1,4 +1,4 @@
-package backend.song;
+package backend.data;
 
 typedef SongValue =
 {

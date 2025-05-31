@@ -1,7 +1,7 @@
 package backend.audio.vocal;
 
 import backend.config.GlobalConfig;
-import backend.song.*;
+import backend.data.*;
 import backend.utils.AudioUtil;
 import backend.utils.CopyUtil;
 import backend.utils.SSMath;

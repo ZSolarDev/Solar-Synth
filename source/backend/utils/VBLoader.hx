@@ -1,6 +1,6 @@
 package backend.utils;
 
-import backend.song.Voicebank;
+import backend.data.Voicebank;
 import backend.utils.IniParser.Ini;
 import backend.utils.IniParser.IniManager;
 import sys.FileSystem;
@@ -9,7 +9,7 @@ using StringTools;
 
 class VBLoader
 {
-	public static function loadVoicebankFromFolder(folderPath:String, folderName:String):Voicebank
+	public static function loadVoicebankFromFolder(folderPath:String):Voicebank
 	{
 		inline function stringToBool(s:String):Bool
 			return s.trim() == 'true';
@@ -32,7 +32,7 @@ class VBLoader
 			soft: false,
 			mouthSoft: false,
 			breathSamples: 0,
-			fileName: folderName
+            fileName: folderPath.split('/')[1]
 		};
 		var config:Ini = IniManager.loadFromFile('$folderPath/config.ini');
 		// let's start from the top.

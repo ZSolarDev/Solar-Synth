@@ -1,8 +1,8 @@
 package backend.utils;
 
-import backend.song.Note;
-import backend.song.SSProject;
-import backend.song.SSProjectTypedef;
+import backend.data.Note;
+import backend.data.SSProject;
+import backend.data.SSProjectTypedef;
 import haxe.Json;
 import haxe.io.Path;
 import sys.io.File;
