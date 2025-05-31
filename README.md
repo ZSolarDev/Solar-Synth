@@ -169,7 +169,6 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
 
 ## Bugs:
  - Some consonants sound off after resampling.
- - Strange pops in some consonants after resampling.
 
 ## Future Goals:
  - [ ] Make a mod application form
