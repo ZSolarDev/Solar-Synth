@@ -1,5 +1,7 @@
 package;
 
+import haxe.ui.HaxeUIApp;
+import frontend.MainView;
 import backend.config.GlobalConfig;
 import frontend.*;
 import lime.app.Application;
@@ -14,12 +16,12 @@ class Main extends Sprite
 	public function new()
 	{
 		super();
-		application = Application.current;
-		application.onExit.add((_) ->
-		{
-			GlobalConfig.saveConfig();
-		});
-		window = application.window;
-		window.focus();
+		// TODO: Add config saving on exit
+		var app = new HaxeUIApp();
+        app.ready(function() {
+            app.addComponent(new MainView());
+
+            app.start();
+        });
 	}
 }

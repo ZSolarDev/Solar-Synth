@@ -3,14 +3,10 @@
 	xsi:schemaLocation="http://lime.software/project/1.0.2 http://lime.software/xsd/project-1.0.2.xsd">
 
 	<!--Actual exe stuffs-->
-	<app title="Solar Synth" file="SolarSynth" main="Main" version="V1.0.0-420" company="HaxeFlixel" />
-
-	<!--Flixel things or smth idk-->
-	<app preloader="flixel.system.FlxPreloader" />
-	<set name="SWF_VERSION" value="11.8" />
+	<app title="Solar Synth" file="SolarSynth" main="Main" version="V1.0.0-420" company="ZSolarDev" />
 
     <!--Window stuffs-->
-	<window width="1280" height="720" fps="120" background="#000000" hardware="true" vsync="true" />
+	<window width="1280" height="720" fps="120" background="#FFFFFF" hardware="true" vsync="true" />
 	<window if="html5" resizable="false" />
 	<window if="hl" orientation="landscape" fullscreen="false" resizable="true" />
 
