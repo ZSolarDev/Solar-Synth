@@ -20,7 +20,7 @@ class Main extends Sprite
 		var app = new HaxeUIApp();
         app.ready(function() {
             app.addComponent(new MainView());
-
+			
             app.start();
         });
 	}
