@@ -26,18 +26,17 @@ class VocalSynthesizerThreaded
 	public var completed:Bool = false;
 	public var notes:Array<Note>;
 	public var voiceBank:Voicebank;
-	public var esperMode:Bool;
+	public var resampMode:Bool;
 
-	public function new(notes:Array<Note>, voiceBank:Voicebank, ?esperMode:Bool = false)
+	public function new(notes:Array<Note>, voiceBank:Voicebank, ?resampMode:Bool = false)
 	{
 		this.notes = notes;
 		this.voiceBank = voiceBank;
-		this.esperMode = esperMode;
-		// leave *around* 1/2 of threads free for other tasks
+		this.resampMode = resampMode;
 		numThreads = ThreadUtil.freeThreads;
 
 		// Remove what we dont have(this code is so ugly oh my fucking god)
-		if (esperMode)
+		if (resampMode)
 			batches = ['normal'];
 		else
 		{
@@ -75,7 +74,7 @@ class VocalSynthesizerThreaded
 		for (job in batch)
 		{
 			var synthesizer = new VocalSynthesizer();
-			synthesizer.synthesizeVocalsFromParameterName(job, notes, voiceBank, esperMode);
+			synthesizer.synthesizeVocalsFromParameterName(job, notes, voiceBank, resampMode);
 			while (!synthesizer.complete)
 				Sys.sleep(0.001);
 			var bytes = Bytes.alloc(synthesizer.curParamBytes.length);

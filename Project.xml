@@ -18,22 +18,15 @@
 	<set name="BUILD_DIR" value="export" />
 	<source path="source" />
 	<assets path="voicebanks" />
-    <assets path="esper" />
+    <assets path="resamplers" />
     <assets path="_assets" embed="true"/>
 
 	<!--Libraries-->
-	<haxelib name="flixel" />
-	<haxelib name="flixel-addons" />
-	<haxelib name="flixel-ui" />
-    <haxelib name="funkin.vis" />
-    <haxelib name="grig.audio" />
-
-	<!--Removing these, no need for them-->
-	<haxedef name="FLX_NO_TOUCH"/>
-	<haxedef name="FLX_NO_GAMEPAD" />
-	<haxedef name="FLX_NO_SOUND_TRAY" />
-	<haxedef name="FLX_NO_FOCUS_LOST_SCREEN" />
-	<haxedef name="FLX_NO_DEBUG" />
+    <haxelib name="hlwnative" />
+    <haxelib name="haxeui-core" />
+    <haxelib name="haxeui-openfl" />
+    <haxelib name="openfl" />
+    <haxelib name="actuate" />
 
     <!--Removing these, no need for them-->
     <icon path="assets/SSLHighres.png" />

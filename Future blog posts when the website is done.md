@@ -36,3 +36,6 @@ WHOOOOOOOOOO! I finally got it working! You know how I was talking about ESPER-U
 
 ## 5/27/2025-1:53 PM || ESPER-UTAU INTEGRATION COMPLETE.
 Everything works. It all works. There were some bugs that leaked through but after extensive testing today, I've concluded it works well. The downside is that It takes 10~ seconds to run including the .esp files being transfered over, but I have a decent solution. Instead of synthesizing the entire section when pressing play, I can pre-synthesize it when a note is edited. The only issue with that is that if you modify a note while ESPER-Utau is running, it will take a second to wait for the previous ESPER-Utau's to complete before restarting the synthesization process to ensure file names don't collide. I've made it so far.... all I need is improved phoneme blending and realism and the synthesis is done.
+
+## 5/31/2025-4:17 PM || Bye Flixel, hello HaxeUI!
+I'm replacing Flixel with HaxeUI after finding out how much more sophisticated it is after finding out it's much more extensive and sophisticated at UI than Flixel. Also, someone is going to be helping me with the frontend: Aura! We have both never used HaxeUI, so It's going to be a first time for the both of us. I hope this goes well!

@@ -3,6 +3,9 @@ package backend.utils;
 import backend.song.Note;
 import backend.song.SSProject;
 import backend.song.SSProjectTypedef;
+import haxe.Json;
+import haxe.io.Path;
+import sys.io.File;
 
 class SSProjectUtil
 {
@@ -16,8 +19,8 @@ class SSProjectUtil
 			{
 				var notes:Array<Note> = [];
 				for (note in section.notes)
-					notes.push(new Note(note.phoneme, note.time, note.duration, note.shortEnd, note.atonal, note.powerValue, note.breathinessValue,
-						note.tension, note.roughness, note.pitches, note.velocities, note.power, note.breathiness, note.mouth));
+					notes.push(new Note(note.phoneme, note.time, note.duration, note.automaticBlendRatio, note.blendRatio, note.atonal, note.powerValue,
+						note.breathinessValue, note.tension, note.roughness, note.pitches, note.velocities, note.power, note.breathiness, note.mouth));
 				sections.push({
 					name: section.name,
 					time: section.time,
@@ -25,8 +28,7 @@ class SSProjectUtil
 					type: section.type,
 					soundPath: section.soundPath,
 					notes: notes,
-					bpm: section.bpm,
-					esperMode: section.esperMode
+					resampMode: section.resampMode
 				});
 			}
 			tracks.push({
@@ -42,9 +44,8 @@ class SSProjectUtil
 			voicebank: tp.voicebank,
 			timeSignatureNumerator: tp.timeSignatureNumerator,
 			timeSignatureDenominator: tp.timeSignatureDenominator,
-			settings: {
-				test: tp.settings.test
-			}
+			settings: tp.settings,
+			bpm: tp.bpm
 		};
 	}
 
@@ -63,11 +64,12 @@ class SSProjectUtil
 						pitches: note.pitches,
 						duration: note.duration,
 						velocities: note.velocities,
+						blendRatio: note.blendRatio,
+						automaticBlendRatio: note.automaticBlendRatio,
 						phoneme: note.phoneme,
 						atonal: note.atonal,
 						powerValue: note.powerValue,
 						breathinessValue: note.breathinessValue,
-						shortEnd: note.shortEnd,
 						tension: note.tension,
 						roughness: note.roughness,
 						power: note.power,
@@ -82,8 +84,7 @@ class SSProjectUtil
 					type: section.type,
 					soundPath: section.soundPath,
 					notes: notes,
-					bpm: section.bpm,
-					esperMode: section.esperMode
+					resampMode: section.resampMode
 				});
 			}
 			tracks.push({
@@ -99,9 +100,30 @@ class SSProjectUtil
 			voicebank: p.voicebank,
 			timeSignatureNumerator: p.timeSignatureNumerator,
 			timeSignatureDenominator: p.timeSignatureDenominator,
-			settings: {
-				test: p.settings.test
-			}
+			settings: p.settings,
+			bpm: p.bpm
 		};
+	}
+
+	public static function validateProjectName(str:String):String
+	{
+		var res:String = str;
+		res.replace('/', '');
+		res.replace('\\', '');
+		res.replace(':', '');
+		res.replace('*', '');
+		res.replace('?', '');
+		res.replace('"', '');
+		res.replace('<', '');
+		res.replace('?', '');
+		res.replace('|', '');
+		return res;
+	}
+
+	public static function saveProjectToSSP(path:String, project:SSProject)
+	{
+		var proj = projectToTypedef(project);
+		var finalPath = path == '' ? './' : '${Path.normalize(path)}/';
+		File.saveContent(finalPath + validateProjectName(project.name) + '.ssp', Json.stringify(proj, null, '    '));
 	}
 }

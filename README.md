@@ -45,13 +45,12 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
  - [X] Finish Startup Visuals(Loading)
    - Add more stuff to load if needed..
  - [ ] Finish Start Menu UI - (rest of the ui require systems that are currently being worked on(ex. project loading, settings, voicebanks, etc.))
- - [ ] Finish Synthesis Engine
+ - [X] Finish Synthesis Engine
     - [X] Add pitch
         - [X] Get it working
         - [X] Add multi-octave support(4 octaves is enough for now.)
     - [X] Add note lenth increasing
-    - [ ] Improve Phoneme blending
-    - [ ] Add an option for automatic tuning
+    - [X] Improve Phoneme blending
  - [ ] Haxe Plugin system
     - [ ] A way to add more right-click options to any built-in dropdowns or just custom dropdowns anywhere
     - [ ] A way to add buttons to the top bar
@@ -126,7 +125,7 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
  ### Good job to have gotten this far, future me! Never thought I would get this far! I am so proud of you!! Lets move on to the next set of goals, we're almost done!
  - [ ] Get youtubers to test Solar Synth via email and hope! Repeat this process until a good number of youtubers are happy with it.
  - [ ] Update the version number. (Major.Minor.Patch-BuildNum)
- - [ ] Make a webite via compiling haxeflixel to html5 at resizable quality if haxeflixel supports it. Host it on a new render account.
+ - [ ] Make a webite via compiling haxeui to html5. Host it on a new render account.
     - [ ] Main page
         - [ ] Logo/big fancy eye-catching banner
         - [ ] Most recent announcement
@@ -162,11 +161,15 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
  - [X] Make a GitHub repository so I don't lose my progress at all
     - [X] Make branding and a huge fancy readme with what Solar Synth is, then Solar Synths backstory. Then maybe add a hardcoded sample or 2 if audio previews work with GitHub markdown after pitch shifting is fixed(That last part is optional, cause I'll most-likely run out of gas after typing up the entire readme.)
     - [X] Pin Solar Synth to my top repositories on my profile
- - [ ] Finish Synthesis Engine
+ - [X] Finish Synthesis Engine
  - [ ] Make a hardcoded sample of the synthesis engine using the temporary teto lite voicebank I made in like an hour, then show it to friends and feel good about myself.
  - [ ] Take a break from this project when previous tasks are complete.
     - I feel like I deserve this break. I've been working hard on this since March 19th, and I've already gotten this much done within a couple of months. A whole japanese vocal synthesis engine! SOLO!!! I'm not a huge expensive crazy corporation at all, and I managed to make an entire synthesis engine with 0$ and half of my sanity per day spent. Impressive if I say so myself. Also, I just genuinely need time to work on things that *actually* need to be done irl(especially that one school project. UPDATE: Already finished it. It's already summer, this took so much longer than I thought!)
     - [ ] Actually take a break for a few days so you don't get burnt out, burn out will be an issue. ESPECIALLY when doing the tedious task of editor ui.
+
+## Bugs:
+ - Some consonants sound off after resampling.
+ - Strange pops in some consonants after resampling.
 
 ## Future Goals:
  - [ ] Make a mod application form

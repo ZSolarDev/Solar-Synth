@@ -9,5 +9,7 @@
             "source.sortImports": "explicit"
         }
 	},
-	"haxe.enableExtendedIndentation": true
+    "haxe.enableExtendedIndentation": true,
+    "editor.mouseWheelZoom": true,
+    "editor.fontSize": 19
 }

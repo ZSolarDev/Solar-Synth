@@ -1,5 +1,7 @@
 package backend.song;
 
+import backend.song.SongValue;
+
 typedef SSProjectTypedef =
 {
 	var name:String;
@@ -8,6 +10,7 @@ typedef SSProjectTypedef =
 	var timeSignatureNumerator:Int;
 	var timeSignatureDenominator:Int;
 	var settings:SSProjectSettingsTypedef;
+	var bpm:Array<SongValue>;
 }
 
 typedef NoteTypeDef =
@@ -16,11 +19,12 @@ typedef NoteTypeDef =
 	var pitches:Array<SongValue>;
 	var duration:Int;
 	var velocities:Array<SongValue>;
+	var blendRatio:Int;
+	var automaticBlendRatio:Bool;
 	var phoneme:String;
 	var atonal:Bool;
 	var powerValue:Float;
 	var breathinessValue:Float;
-	var shortEnd:Bool;
 	var tension:Float;
 	var roughness:Float;
 	var power:Array<SongValue>;
@@ -45,8 +49,7 @@ typedef SSSectionTypedef =
 	var type:String;
 	var soundPath:String;
 	var notes:Array<NoteTypeDef>;
-	var bpm:Float;
-	var esperMode:Bool;
+	var resampMode:Bool;
 }
 
 typedef SSProjectSettingsTypedef =

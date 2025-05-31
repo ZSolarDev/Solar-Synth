@@ -20,7 +20,7 @@ class Play implements IAction
 			editor = SongEditor.instance;
 			if (editor.sound == null)
 				editor.sound = new Sound();
-			NoteProcessor.synthesizeVocalsFromNotes(data.notes, editor.voiceBank, data.esperMode);
+			NoteProcessor.synthesizeVocalsFromNotes(data.notes, editor.voiceBank, data.autoTune, data.resampMode);
 			running = true;
 			trace('Synthesizing...');
 		}

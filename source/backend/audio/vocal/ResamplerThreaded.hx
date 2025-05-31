@@ -4,17 +4,22 @@ import backend.utils.ThreadUtil;
 import sys.thread.Mutex;
 import sys.thread.Thread;
 
-class ESPERUtauThreaded
+class ResamplerThreaded
 {
 	// This is the first time i've used a mutex
 	public var mutex = new Mutex();
 	public var numThreads:Int;
-	public var threadBatches:Array<Array<{utau:ESPERUtau, index:Int}>> = [];
+	public var threadBatches:Array<Array<{utau:Resampler, index:Int}>> = [];
 	public var sampleSets:Array<
 		{
 			samples:Array<Float>,
 			esperPath:String,
-			params:String
+			params:String,
+			resamplerName:String,
+			resampler:String,
+			frqPath:String,
+			llsmPath:String,
+			llsmTmpPath:String
 		}> = [];
 	public var outputSampleSets:Array<Array<Float>> = [];
 	public var completed:Bool = false;
@@ -23,7 +28,12 @@ class ESPERUtauThreaded
 		{
 			samples:Array<Float>,
 			esperPath:String,
-			params:String
+			params:String,
+			resamplerName:String,
+			resampler:String,
+			frqPath:String,
+			llsmPath:String,
+			llsmTmpPath:String
 		}>)
 	{
 		this.sampleSets = sampleSets;
@@ -42,7 +52,8 @@ class ESPERUtauThreaded
 			var threadIndex = i % numThreads;
 			var fileName = '$i';
 			threadBatches[threadIndex].push({
-				utau: new ESPERUtau(sampleSets[i].samples, sampleSets[i].esperPath, fileName, sampleSets[i].params),
+				utau: new Resampler(sampleSets[i].samples, sampleSets[i].resamplerName, sampleSets[i].resampler, sampleSets[i].frqPath,
+					sampleSets[i].esperPath, sampleSets[i].llsmPath, sampleSets[i].llsmTmpPath, fileName, sampleSets[i].params),
 				index: i
 			});
 		}
@@ -51,7 +62,7 @@ class ESPERUtauThreaded
 			ThreadUtil.createThread(() -> runBatch(threadBatches[i]));
 	}
 
-	function runBatch(batch:Array<{utau:ESPERUtau, index:Int}>)
+	function runBatch(batch:Array<{utau:Resampler, index:Int}>)
 	{
 		for (job in batch)
 		{

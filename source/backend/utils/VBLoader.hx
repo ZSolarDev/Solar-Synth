@@ -23,8 +23,6 @@ class VBLoader
 			credits: [],
 			language: '',
 			consonantSampleStart: 0,
-			consonantBlendRatio: 0,
-			vowelBlendRatio: 0,
 			sampleStart: 0,
 			mouth: false,
 			breaths: false,
@@ -52,8 +50,6 @@ class VBLoader
 			voicebank.language = vbCharacter['language'];
 			voicebank.sampleStart = Std.parseFloat(vbCharacter['sampleStart']);
 			voicebank.consonantSampleStart = Std.parseFloat(vbCharacter['consonantSampleStart']);
-			voicebank.consonantBlendRatio = Std.parseFloat(vbCharacter['consonantBlendRatio']);
-			voicebank.vowelBlendRatio = Std.parseFloat(vbCharacter['vowelBlendRatio']);
 			// sample stuff(eh not that complicated)
 			var finalSamples:Map<String, String> = new Map();
 			var variationsAvailable = [

@@ -1,4 +1,4 @@
-// flixel shtuffs
+import Global;
 import flixel.*;
 import flixel.graphics.*;
 import flixel.group.*;

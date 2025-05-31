@@ -1,5 +1,6 @@
 package;
 
+import backend.config.GlobalConfig;
 import frontend.*;
 import lime.app.Application;
 import lime.ui.Window;
@@ -8,12 +9,17 @@ import openfl.display.Sprite;
 class Main extends Sprite
 {
 	public static var window:Window;
+	public static var application:Application;
 
 	public function new()
 	{
 		super();
-		window = Application.current.window;
+		application = Application.current;
+		application.onExit.add((_) ->
+		{
+			GlobalConfig.saveConfig();
+		});
+		window = application.window;
 		window.focus();
-		addChild(new FlxGame(0, 0, Startup, 60, 60, true, false));
 	}
 }

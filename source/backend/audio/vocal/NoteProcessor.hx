@@ -1,7 +1,6 @@
 package backend.audio.vocal;
 
 import backend.song.Note;
-import backend.song.SSProject.SSSection;
 import backend.song.Voicebank;
 import backend.utils.CopyUtil;
 import backend.utils.VocalUtil;
@@ -33,11 +32,24 @@ class NoteProcessor
 					nextNote.time -= consonantCompensation;
 					nextNote.duration += consonantCompensation;
 				}
+
+				if (note.automaticBlendRatio)
+				{
+					// A longer blend
+					if (VocalUtil.isBreath(nextNote.phoneme) || VocalUtil.isVowel(nextNote.phoneme))
+						note.blendRatio = 200;
+					// If the next note is a plosive, there will be a tiny pause before you hear the next note.
+					if (VocalUtil.isPlosive(nextNote.phoneme) && !VocalUtil.isBreath(nextNote.phoneme))
+						note.blendRatio = 10;
+					// It will kinda blend, have to keep it short so you can still hear the consonant though
+					if (VocalUtil.isContinuant(nextNote.phoneme))
+						note.blendRatio = 50;
+				}
 			}
 		}
 		return newNotes;
 	}
 
-	public static function synthesizeVocalsFromNotes(notes:Array<Note>, voiceBank:Voicebank, autoTune:Bool = false, esperMode:Bool = false)
-		return VocalSynthesizer.synthesizeVocals(processNotes(notes, voiceBank, autoTune), voiceBank, esperMode);
+	public static function synthesizeVocalsFromNotes(notes:Array<Note>, voiceBank:Voicebank, autoTune:Bool = false, resampMode:Bool = false)
+		return VocalSynthesizer.synthesizeVocals(processNotes(notes, voiceBank, autoTune), voiceBank, resampMode);
 }

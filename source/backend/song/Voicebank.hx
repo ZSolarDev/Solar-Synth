@@ -11,8 +11,6 @@ typedef Voicebank =
 	var language:String;
 	var sampleStart:Float;
 	var consonantSampleStart:Float;
-	var consonantBlendRatio:Float;
-	var vowelBlendRatio:Float;
 	var mouth:Bool;
 	var breaths:Bool;
 	var mouthBreath:Bool;

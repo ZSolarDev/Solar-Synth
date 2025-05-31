@@ -1,0 +1,163 @@
+var file = new FileReference();
+file.addEventListener(Event.SELECT, (_) ->
+{
+	var path:String = '';
+	@:privateAccess
+	if (file.__path != null)
+		path = file.__path;
+	if (path != '')
+		loadSongEditor(path);
+});
+file.browse([
+	new FileFilter('Solar Synth Projects(*.ssp)', '*.ssp'),
+	new FileFilter('Utau Project(*.uta)', '*.uta'),
+	new FileFilter('Midi(*.mid)', '*.mid')
+]);
+
+
+function manageActions()
+{
+	if (currentAction != null)
+	{
+		if (!currentAction.running && currentAction is Play)
+			currentAction.startExecute({
+				notes: project.tracks[0].sections[0].notes,
+				autoTune: autoTune,
+				resampMode: project.tracks[0].sections[0].resampMode
+			});
+		else
+		{
+			if (!currentAction.running)
+				currentAction.startExecute();
+			else
+			{
+				if (currentAction.complete)
+					currentAction = qeuedActions.shift();
+				else
+					currentAction.update();
+			}
+		}
+	}
+	else
+		currentAction = qeuedActions.shift();
+}
+function updateInput()
+{
+	if (FlxG.keys.justPressed.SPACE)
+	{
+		project.tracks[0] = {
+			name: 'Track 0',
+			sections: [
+				{
+					name: 'Vocals',
+					time: 0,
+					type: 'v', // v for vocal
+					soundPath: '',
+					notes: [],
+					duration: 50000,
+					resampMode: false
+				},
+				{
+					name: 'Instrumental',
+					time: 0,
+					type: 'a', // a for audio
+					soundPath: '',
+					notes: [],
+					duration: 50000,
+					resampMode: false
+				}
+			],
+			muted: false,
+			volume: 1
+		}
+		var notes = project.tracks[0].sections[0].notes;
+		notes.push(new Note("a", 0, 2000, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+			[{time: 0, value: 0}], [{time: 0, value: 0}]));
+		notes.push(new Note("o", 2000, 1000, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+			[{time: 0, value: 1}], [{time: 0, value: 0}]));
+		notes.push(new Note("b3", 3000, 3000, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+			[{time: 0, value: 1}], [{time: 0, value: 0}]));
+		notes.push(new Note("ka", 6000, 700, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+			[{time: 0, value: 1}], []));
+		notes.push(new Note("ki", 6700, 700, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 1}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+			[{time: 0, value: 1}], [{time: 0, value: 0}]));
+		notes.push(new Note("ru", 7400, 20000, true, 0, false, 0, 0, 0, 0, [{time: 0, value: -12}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+			[{time: 0, value: 1}], [{time: 0, value: 0}]));
+		SSProjectUtil.saveProjectToSSP('', project);
+	}
+	if (FlxG.keys.justPressed.P)
+	{
+		qeuedActions.push(new Play());
+		trace('Qeued Play action');
+	}
+}
+
+override public function create()
+{
+	super.create();
+	instance = this;
+	initWindow();
+	voiceBank = VBLoader.loadVoicebankFromFolder('voicebanks/${project.voicebank}', project.voicebank);
+}
+function initWindow()
+{
+	Main.window.focus();
+	Main.window.width = 1280;
+	Main.window.height = 720;
+	Main.window.borderless = false;
+	Main.window.resizable = true;
+	Main.window.x = cast Main.window.display.bounds.width / 2 - (Main.window.width / 2);
+	Main.window.y = cast Main.window.display.bounds.height / 2 - (Main.window.height / 2);
+	FlxG.resizeGame(1280, 720);
+	FlxG.scaleMode = new FixedScaleAdjustSizeScaleMode();
+}
+
+class Startup extends FlxState
+{
+	var bg:FlxSprite;
+	var loadingProg:Int = 0;
+	var maxLoadingProg:Int = 1;
+
+	override public function create()
+	{
+		super.create();
+		Main.window.focus();
+		Main.window.width = 500;
+		Main.window.height = 300;
+		Main.window.resizable = false;
+		Main.window.borderless = true;
+		Main.window.x = cast Main.window.display.bounds.width / 2 - (Main.window.width / 2);
+		Main.window.y = cast Main.window.display.bounds.height / 2 - (Main.window.height / 2);
+		FlxG.resizeGame(500, 300);
+		FlxG.scaleMode = new StageSizeScaleMode();
+		bg = new FlxSprite(0, 0, "_assets/startup.png");
+		bg.setGraphicSize(500, 300);
+		bg.updateHitbox();
+		add(bg);
+		Thread.create(loadSS);
+	}
+
+	function loadSS()
+	{
+		GlobalConfig.loadConfig();
+		FlxG.stage.addEventListener(Event.ENTER_FRAME, updateConsole);
+		if (!GlobalConfig.consoleVisible)
+			hl.UI.closeConsole();
+		loadingProg++;
+	}
+
+	function updateConsole(_)
+	{
+		hl.UI.closeConsole(); // We have our own console.
+	}
+
+	override public function update(elapsed:Float)
+	{
+		FlxG.mouse.visible = true;
+		if (FlxG.mouse.cursor != null)
+			FlxG.mouse.cursor.bitmapData = FlxGraphic.fromAssetKey("_assets/cursor.png").bitmap;
+		super.update(elapsed);
+		if (loadingProg == maxLoadingProg)
+			FlxG.switchState(StartMenu.new);
+	}
+}

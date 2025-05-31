@@ -8,6 +8,7 @@ typedef SSProject =
 	var timeSignatureNumerator:Int;
 	var timeSignatureDenominator:Int;
 	var settings:SSProjectSettings;
+	var bpm:Array<SongValue>;
 }
 
 typedef SSTrack =
@@ -26,8 +27,7 @@ typedef SSSection =
 	var type:String;
 	var soundPath:String;
 	var notes:Array<Note>;
-	var bpm:Float;
-	var esperMode:Bool;
+	var resampMode:Bool;
 }
 
 typedef SSProjectSettings =
