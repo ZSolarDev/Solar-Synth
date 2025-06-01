@@ -3,9 +3,7 @@ package backend.audio.vocal;
 import backend.data.Note;
 import backend.data.Voicebank;
 import backend.utils.ThreadUtil;
-import sys.io.Process;
 import sys.thread.Mutex;
-import sys.thread.Thread;
 
 class VocalSynthesizerThreaded
 {

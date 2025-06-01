@@ -17,6 +17,8 @@ typedef SSTrack =
 	var sections:Array<SSSection>;
 	var muted:Bool;
 	var volume:Float;
+	var type:String;
+	var pan:Float;
 }
 
 typedef SSSection =
@@ -24,13 +26,9 @@ typedef SSSection =
 	var name:String;
 	var time:Float;
 	var duration:Float;
-	var type:String;
 	var soundPath:String;
 	var notes:Array<Note>;
 	var resampMode:Bool;
 }
 
-typedef SSProjectSettings =
-{
-	var test:Bool;
-}
+typedef SSProjectSettings = {}

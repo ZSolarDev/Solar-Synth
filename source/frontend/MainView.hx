@@ -1,56 +1,80 @@
 package frontend;
 
-import openfl.media.SoundChannel;
-import haxe.ui.notifications.NotificationManager;
-import backend.data.Note;
-import backend.data.Voicebank;
-import backend.utils.VBLoader;
 import backend.audio.vocal.NoteProcessor;
 import backend.audio.vocal.VocalSynthesizer;
+import backend.data.Note;
+import backend.data.SSProject;
+import backend.data.Voicebank;
+import backend.utils.VBLoader;
 import haxe.ui.containers.VBox;
 import haxe.ui.events.MouseEvent;
+import haxe.ui.notifications.NotificationManager;
+import openfl.media.SoundChannel;
 
 @:build(haxe.ui.ComponentBuilder.build("ui/main-view.xml"))
-class MainView extends VBox {
-    var notes:Array<Note> = [];
-    var voicebank:Voicebank;
+class MainView extends VBox
+{
+	var notes:Array<Note> = [];
+	var voicebank:Voicebank;
 	var playbackChannel:SoundChannel;
-	var storedMusicPosition:Float = 0.0;
+	var project:SSProject;
 
-    public function new() {
+	public function new()
+	{
 		super();
-
-        voicebank = VBLoader.loadVoicebankFromFolder("voicebanks/Kasane Teto Lite");
-		vb_listview.dataSource.add({
-			text: voicebank.name,
-		});
-		notes.push(new Note("a", 0, 2000, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+		voicebank = VBLoader.loadVoicebankFromFolder("voicebanks/Kasane Teto Lite");
+		project = {
+			name: 'Untitled',
+			tracks: [
+				{
+					name: 'Track 1',
+					sections: [],
+					muted: false,
+					volume: 1,
+					type: 'v',
+					pan: 0
+				}
+			],
+			voicebank: voicebank.name,
+			timeSignatureNumerator: 4,
+			timeSignatureDenominator: 4,
+			settings: {},
+			bpm: [{time: 0, value: 120}]
+		};
+		// tracks_listview.dataSource.add({
+		//	text: "Frame 1",
+		//	items: [{text: "Item 1"}, {text: "Item 2"}, {text: "Item 3"}]
+		// });
+		notes.push(new Note("a", 0, 2000, 0, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 			[{time: 0, value: 0}], [{time: 0, value: 0}]));
-		notes.push(new Note("o", 2000, 1000, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+		notes.push(new Note("o", 2000, 1000, 0, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 			[{time: 0, value: 1}], [{time: 0, value: 0}]));
-		notes.push(new Note("b3", 3000, 3000, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+		notes.push(new Note("b3", 3000, 3000, 0, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 			[{time: 0, value: 1}], [{time: 0, value: 0}]));
-		notes.push(new Note("ka", 6000, 700, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+		notes.push(new Note("ka", 6000, 700, 0, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 			[{time: 0, value: 1}], []));
-		notes.push(new Note("ki", 6700, 700, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 1}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+		notes.push(new Note("ki", 6700, 700, 0, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 1}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 			[{time: 0, value: 1}], [{time: 0, value: 0}]));
-		notes.push(new Note("ru", 7400, 20000, true, 0, false, 0, 0, 0, 0, [{time: 0, value: -12}], [{time: 0, value: 1}], [{time: 0, value: 0}],
+		notes.push(new Note("ru", 7400, 20000, 0, true, 0, false, 0, 0, 0, 0, [{time: 0, value: -12}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 			[{time: 0, value: 1}], [{time: 0, value: 0}]));
-    }
-    
-    @:bind(btn_synth, MouseEvent.CLICK)
-    private function onSynthPressed(e:MouseEvent) {
+	}
+
+	@:bind(btn_synth, MouseEvent.CLICK)
+	private function onSynthPressed(e:MouseEvent)
+	{
 		NotificationManager.instance.addNotification({
 			type: Info,
 			title: "Please wait!",
 			body: "The vocals are in process, please wait!",
 		});
-        NoteProcessor.synthesizeVocalsFromNotes(notes, voicebank, false, false);
-    }
+		NoteProcessor.synthesizeVocalsFromNotes(notes, voicebank, false, false);
+	}
 
 	@:bind(btn_play, MouseEvent.CLICK)
-    private function onPlayPressed(e:MouseEvent) {
-        if (!VocalSynthesizer.synthesized) {
+	private function onPlayPressed(e:MouseEvent)
+	{
+		if (!VocalSynthesizer.synthesized)
+		{
 			NotificationManager.instance.addNotification({
 				type: Error,
 				title: "Please wait!",
@@ -60,11 +84,12 @@ class MainView extends VBox {
 		}
 
 		playbackChannel = VocalSynthesizer.sound.play();
-    }
+	}
 
 	@:bind(btn_stop, MouseEvent.CLICK)
-	private function onStopPressed(e:MouseEvent) {
-		storedMusicPosition = playbackChannel.position;
-		playbackChannel.stop();
+	private function onStopPressed(e:MouseEvent)
+	{
+		if (playbackChannel != null)
+			playbackChannel.stop();
 	}
 }

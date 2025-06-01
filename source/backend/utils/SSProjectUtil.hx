@@ -19,13 +19,13 @@ class SSProjectUtil
 			{
 				var notes:Array<Note> = [];
 				for (note in section.notes)
-					notes.push(new Note(note.phoneme, note.time, note.duration, note.automaticBlendRatio, note.blendRatio, note.atonal, note.powerValue,
-						note.breathinessValue, note.tension, note.roughness, note.pitches, note.velocities, note.power, note.breathiness, note.mouth));
+					notes.push(new Note(note.phoneme, note.time, note.duration, note.sampleStartOffset, note.automaticBlendRatio, note.blendRatio,
+						note.atonal, note.powerValue, note.breathinessValue, note.tension, note.roughness, note.pitches, note.velocities, note.power,
+						note.breathiness, note.mouth));
 				sections.push({
 					name: section.name,
 					time: section.time,
 					duration: section.duration,
-					type: section.type,
 					soundPath: section.soundPath,
 					notes: notes,
 					resampMode: section.resampMode
@@ -35,7 +35,9 @@ class SSProjectUtil
 				name: track.name,
 				sections: sections,
 				muted: track.muted,
-				volume: track.volume
+				type: track.type,
+				volume: track.volume,
+				pan: track.pan
 			});
 		}
 		return {
@@ -63,6 +65,7 @@ class SSProjectUtil
 						time: note.time,
 						pitches: note.pitches,
 						duration: note.duration,
+						sampleStartOffset: note.sampleStartOffset,
 						velocities: note.velocities,
 						blendRatio: note.blendRatio,
 						automaticBlendRatio: note.automaticBlendRatio,
@@ -81,7 +84,6 @@ class SSProjectUtil
 					name: section.name,
 					time: section.time,
 					duration: section.duration,
-					type: section.type,
 					soundPath: section.soundPath,
 					notes: notes,
 					resampMode: section.resampMode
@@ -91,7 +93,9 @@ class SSProjectUtil
 				name: track.name,
 				sections: sections,
 				muted: track.muted,
-				volume: track.volume
+				type: track.type,
+				volume: track.volume,
+				pan: track.pan
 			});
 		}
 		return {
@@ -112,7 +116,6 @@ class SSProjectUtil
 		res.replace('\\', '');
 		res.replace(':', '');
 		res.replace('*', '');
-		res.replace('?', '');
 		res.replace('"', '');
 		res.replace('<', '');
 		res.replace('?', '');

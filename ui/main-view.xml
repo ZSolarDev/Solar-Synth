@@ -9,7 +9,7 @@
             <menuitem text="Save Project as..." id="menu_file_saveas"/>
             <menuseparator />
             <menuitem text="Quit" id="menu_file_quit"/>
-        </menu>   
+        </menu>
         <menu text="Edit">
             <menuitem text="Undo" id="menu_edit_undo"/>
             <menuitem text="Redo" id="menu_edit_redo"/>
@@ -19,25 +19,34 @@
             <menuitem text="Paste" id="menu_edit_paste"/>
             <menuseparator />
             <menuitem text="Delete" id="menu_edit_delete"/>
-        </menu>   
+        </menu>
     </menubar>
     <hbox width="100%" height="100%">
         <panel width="20%" height="100%">
             <header>
                 <hbox>
-                    <button text="Synthesize" id="btn_synth"/>    
-                    <button text="Play" id="btn_play"/>    
-                    <button text="Stop" id="btn_stop"/>    
+                    <button text="Synthesize" id="btn_synth"/>
+                    <button text="Play" id="btn_play"/>
+                    <button text="Stop" id="btn_stop"/>
                 </hbox>
             </header>
             <box width="100%" height="100%">
-                <listview id="vb_listview" selectedIndex="0" width="100%" height="100%">
-                    <data>
-                    </data>
-                </listview>
+                <scrollview id="tracks_scrollview" width="100%" height="100%" contentWidth="100%">
+                    <vbox width="100%" style="padding:5px;">
+                        <frame text="Track 1" width="100%" style="margin-bottom:5px;">
+                            <hbox width="100%">
+                                <button text="Mute" width="50%"/>
+                                <button text="Solo" width="50%"/>
+                            </hbox>
+                            <hbox width="100%">
+                                <button text="Vocal Mode" width="100%"/>
+                            </hbox>
+                        </frame>
+                    </vbox>
+                </scrollview>
             </box>
         </panel>
         <panel width="100%" height="100%">
-        </panel> 
+        </panel>
     </hbox>
 </vbox>

@@ -31,6 +31,7 @@ typedef NoteTypeDef =
 	var breathiness:Array<SongValue>;
 	var tone:Array<SongValue>;
 	var mouth:Array<SongValue>;
+	var sampleStartOffset:Int;
 }
 
 typedef SSTrackTypedef =
@@ -38,7 +39,9 @@ typedef SSTrackTypedef =
 	var name:String;
 	var sections:Array<SSSectionTypedef>;
 	var muted:Bool;
+	var type:String;
 	var volume:Float;
+	var pan:Float;
 }
 
 typedef SSSectionTypedef =
@@ -46,13 +49,9 @@ typedef SSSectionTypedef =
 	var name:String;
 	var time:Float;
 	var duration:Float;
-	var type:String;
 	var soundPath:String;
 	var notes:Array<NoteTypeDef>;
 	var resampMode:Bool;
 }
 
-typedef SSProjectSettingsTypedef =
-{
-	var test:Bool;
-}
+typedef SSProjectSettingsTypedef = {}

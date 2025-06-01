@@ -136,7 +136,7 @@ class VocalSynthesizer
 			if (filePath != '')
 			{
 				var sampleBytes = ConvertFormat.convertWav(File.getBytes(filePath),
-					VocalUtil.isVowel(note.phoneme) ? voiceBank.sampleStart - 30 : voiceBank.consonantSampleStart - 30);
+					(VocalUtil.isVowel(note.phoneme) ? voiceBank.sampleStart - 30 : voiceBank.consonantSampleStart - 30) + note.sampleStartOffset);
 				var snd = Sound.fromAudioBuffer(AudioBuffer.fromBytes(sampleBytes));
 				var targetLen = note.duration + 30; // avoid the fade out created by the resampler
 				var sndLen = snd.length + 30;
