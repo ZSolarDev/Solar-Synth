@@ -162,10 +162,9 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
     - [X] Make branding and a huge fancy readme with what Solar Synth is, then Solar Synths backstory. Then maybe add a hardcoded sample or 2 if audio previews work with GitHub markdown after pitch shifting is fixed(That last part is optional, cause I'll most-likely run out of gas after typing up the entire readme.)
     - [X] Pin Solar Synth to my top repositories on my profile
  - [X] Finish Synthesis Engine
- - [ ] Make a hardcoded sample of the synthesis engine using the temporary teto lite voicebank I made in like an hour, then show it to friends and feel good about myself.
- - [ ] Take a break from this project when previous tasks are complete.
+ - [X] Take a break from this project when previous tasks are complete.
     - I feel like I deserve this break. I've been working hard on this since March 19th, and I've already gotten this much done within a couple of months. A whole japanese vocal synthesis engine! SOLO!!! I'm not a huge expensive crazy corporation at all, and I managed to make an entire synthesis engine with 0$ and half of my sanity per day spent. Impressive if I say so myself. Also, I just genuinely need time to work on things that *actually* need to be done irl(especially that one school project. UPDATE: Already finished it. It's already summer, this took so much longer than I thought!)
-    - [ ] Actually take a break for a few days so you don't get burnt out, burn out will be an issue. ESPECIALLY when doing the tedious task of editor ui.
+    - [X] Actually take a break for a few days so you don't get burnt out, burn out will be an issue. ESPECIALLY when doing the tedious task of editor ui.
 
 ## Bugs:
  - Some consonants sound off after resampling.
