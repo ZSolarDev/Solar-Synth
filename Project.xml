@@ -18,6 +18,7 @@
     <assets path="_assets" embed="true"/>
 
 	<!--Libraries-->
+	<haxelib name="hlwnative" if="hl"/>
     <haxelib name="haxeui-core" />
     <haxelib name="haxeui-openfl" />
     <haxelib name="openfl" />
