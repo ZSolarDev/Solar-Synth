@@ -1,0 +1,38 @@
+name: Build and Deploy HTML5 (Windows)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: checkout code
+      uses: actions/checkout@v3
+
+    - name: install haxe
+      uses: krdlab/setup-haxe@v1
+      with:
+        haxe-version: 4.3.7
+
+    - name: set up haxelib and install dependencies
+      run: |
+        haxelib setup C:\haxelib
+        haxelib install lime
+        haxelib install openfl
+        haxelib install actuate
+        haxelib git haxeui-core https://github.com/haxeui/haxeui-core
+        haxelib git haxeui-openfl https://github.com/haxeui/haxeui-openfl
+        haxelib run lime setup -y
+        haxelib run openfl setup -y
+
+    - name: build on html5
+      run: haxelib run lime build html5
+
+    - name: put on github pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./export/html5/bin
