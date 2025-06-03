@@ -2,7 +2,7 @@ name: Build and Deploy HTML5 (Windows)
 
 on:
   push:
-    branches: [main]
+    branches: [actions]
 
 jobs:
   build:
