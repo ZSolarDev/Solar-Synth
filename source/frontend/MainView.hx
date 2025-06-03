@@ -1,7 +1,5 @@
 package frontend;
 
-import backend.audio.vocal.NoteProcessor;
-import backend.audio.vocal.VocalSynthesizer;
 import backend.data.Note;
 import backend.data.SSProject;
 import backend.data.Voicebank;
@@ -67,23 +65,23 @@ class MainView extends VBox
 			title: "Please wait!",
 			body: "The vocals are in process, please wait!",
 		});
-		NoteProcessor.synthesizeVocalsFromNotes(notes, voicebank, false, false);
+		//NoteProcessor.synthesizeVocalsFromNotes(notes, voicebank, false, false);
 	}
 
 	@:bind(btn_play, MouseEvent.CLICK)
 	private function onPlayPressed(e:MouseEvent)
 	{
-		if (!VocalSynthesizer.synthesized)
-		{
+		//if (!VocalSynthesizer.synthesized)
+		//{
 			NotificationManager.instance.addNotification({
 				type: Error,
 				title: "Please wait!",
 				body: "The vocals have not been synthesized yet, please wait!",
 			});
 			return;
-		}
+		//}
 
-		playbackChannel = VocalSynthesizer.sound.play();
+		//playbackChannel = VocalSynthesizer.sound.play();
 	}
 
 	@:bind(btn_stop, MouseEvent.CLICK)
