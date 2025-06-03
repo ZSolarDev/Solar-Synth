@@ -1,8 +1,6 @@
 package backend.config;
 
 import haxe.Json;
-import sys.FileSystem;
-import sys.io.File;
 
 typedef Config =
 {
@@ -27,8 +25,8 @@ class GlobalConfig
 
 	public static function saveConfig(path:String = './')
 	{
-		var config:Config = globalConfigToConfig();
-		File.saveContent(path + 'config.json', Json.stringify(config, null, '    '));
+		//var config:Config = globalConfigToConfig();
+		//File.saveContent(path + 'config.json', Json.stringify(config, null, '    '));
 	}
 
 	public static function globalConfigToConfig():Config
@@ -36,11 +34,11 @@ class GlobalConfig
 
 	public static function loadConfig(path:String = './')
 	{
-		if (!FileSystem.exists(path + 'config.json'))
-			return;
+		//if (!FileSystem.exists(path + 'config.json'))
+			//return;
 
-		var config:Config = Json.parse(File.getContent(path + 'config.json'));
-		loadConfigFromInstance(config);
+		//var config:Config = Json.parse(File.getContent(path + 'config.json'));
+		//loadConfigFromInstance(config);
 	}
 
 	public static function loadConfigFromInstance(config:Config)
