@@ -33,6 +33,7 @@ class SSProjectUtil
 			}
 			tracks.push({
 				name: track.name,
+				voicebank: track.voicebank,
 				sections: sections,
 				muted: track.muted,
 				type: track.type,
@@ -43,7 +44,6 @@ class SSProjectUtil
 		return {
 			name: tp.name,
 			tracks: tracks,
-			voicebank: tp.voicebank,
 			timeSignatureNumerator: tp.timeSignatureNumerator,
 			timeSignatureDenominator: tp.timeSignatureDenominator,
 			settings: tp.settings,
@@ -91,6 +91,7 @@ class SSProjectUtil
 			}
 			tracks.push({
 				name: track.name,
+				voicebank: track.voicebank,
 				sections: sections,
 				muted: track.muted,
 				type: track.type,
@@ -101,7 +102,6 @@ class SSProjectUtil
 		return {
 			name: p.name,
 			tracks: tracks,
-			voicebank: p.voicebank,
 			timeSignatureNumerator: p.timeSignatureNumerator,
 			timeSignatureDenominator: p.timeSignatureDenominator,
 			settings: p.settings,

@@ -6,7 +6,6 @@ typedef SSProjectTypedef =
 {
 	var name:String;
 	var tracks:Array<SSTrackTypedef>;
-	var voicebank:String;
 	var timeSignatureNumerator:Int;
 	var timeSignatureDenominator:Int;
 	var settings:SSProjectSettingsTypedef;
@@ -37,6 +36,7 @@ typedef NoteTypeDef =
 typedef SSTrackTypedef =
 {
 	var name:String;
+	var voicebank:String;
 	var sections:Array<SSSectionTypedef>;
 	var muted:Bool;
 	var type:String;

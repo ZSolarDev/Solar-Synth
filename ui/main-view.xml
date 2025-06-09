@@ -22,7 +22,7 @@
         </menu>
     </menubar>
     <hbox width="100%" height="100%">
-        <panel width="20%" height="100%">
+        <panel width="325" height="100%">
             <header>
                 <hbox>
                     <button text="Synthesize" id="btn_synth"/>
@@ -32,17 +32,7 @@
             </header>
             <box width="100%" height="100%">
                 <scrollview id="tracks_scrollview" width="100%" height="100%" contentWidth="100%">
-                    <vbox width="100%" style="padding:5px;">
-                        <frame text="Track 1" width="100%" style="margin-bottom:5px;">
-                            <hbox width="100%">
-                                <button text="Mute" width="50%"/>
-                                <button text="Solo" width="50%"/>
-                            </hbox>
-                            <hbox width="100%">
-                                <button text="Vocal Mode" width="100%"/>
-                            </hbox>
-                        </frame>
-                    </vbox>
+                    
                 </scrollview>
             </box>
         </panel>

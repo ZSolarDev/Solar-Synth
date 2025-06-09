@@ -7,7 +7,7 @@ import sys.FileSystem;
 
 using StringTools;
 
-class VBLoader
+class VoicebankUtil
 {
 	public static function loadVoicebankFromFolder(folderPath:String):Voicebank
 	{
@@ -32,7 +32,7 @@ class VBLoader
 			soft: false,
 			mouthSoft: false,
 			breathSamples: 0,
-            fileName: folderPath.split('/')[1]
+			fileName: folderPath.split('/')[1]
 		};
 		var config:Ini = IniManager.loadFromFile('$folderPath/config.ini');
 		// let's start from the top.
@@ -89,5 +89,19 @@ class VBLoader
 			voicebank.samples = finalSamples;
 		}
 		return voicebank;
+	}
+
+	public static function getVoicebanks():Array<{name:String, initialized:Bool}>
+	{
+		var res:Array<{name:String, initialized:Bool}> = [];
+		var voicebanks = FileSystem.readDirectory('./voicebanks');
+		for (voicebank in voicebanks)
+		{
+			res.push({
+				name: voicebank,
+				initialized: FileSystem.exists('./voicebanks/$voicebank/_init')
+			});
+		}
+		return res;
 	}
 }

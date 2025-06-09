@@ -5,7 +5,8 @@ import backend.audio.vocal.VocalSynthesizer;
 import backend.data.Note;
 import backend.data.SSProject;
 import backend.data.Voicebank;
-import backend.utils.VBLoader;
+import backend.utils.VoicebankUtil;
+import frontend.itemrenderers.*;
 import haxe.ui.containers.VBox;
 import haxe.ui.events.MouseEvent;
 import haxe.ui.notifications.NotificationManager;
@@ -22,29 +23,28 @@ class MainView extends VBox
 	public function new()
 	{
 		super();
-		voicebank = VBLoader.loadVoicebankFromFolder("voicebanks/Kasane Teto Lite");
+		voicebank = VoicebankUtil.loadVoicebankFromFolder("voicebanks/Kasane Teto Lite");
 		project = {
 			name: 'Untitled',
 			tracks: [
 				{
 					name: 'Track 1',
+					voicebank: voicebank.name,
 					sections: [],
 					muted: false,
 					volume: 1,
 					type: 'v',
-					pan: 0
+					pan: 0,
+					track: null
 				}
 			],
-			voicebank: voicebank.name,
 			timeSignatureNumerator: 4,
 			timeSignatureDenominator: 4,
 			settings: {},
 			bpm: [{time: 0, value: 120}]
 		};
-		// tracks_listview.dataSource.add({
-		//	text: "Frame 1",
-		//	items: [{text: "Item 1"}, {text: "Item 2"}, {text: "Item 3"}]
-		// });
+		project.tracks[0].track = new Track(project.tracks[0]);
+		tracks_scrollview.addComponent(project.tracks[0].track.frame);
 		notes.push(new Note("a", 0, 2000, 0, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 			[{time: 0, value: 0}], [{time: 0, value: 0}]));
 		notes.push(new Note("o", 2000, 1000, 0, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
