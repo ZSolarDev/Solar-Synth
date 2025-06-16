@@ -4,9 +4,6 @@ import haxe.io.Bytes;
 import haxe.io.BytesBuffer;
 import haxe.io.BytesOutput;
 
-/* omg what is thiss 😭 never again bro. I do NOT like making vocal synths.. 
-	I just added a bunch of comments so i can remember what everything was can tbh im not remembering this shit..
- */
 class ConvertFormat
 {
 	static function findChunk(bytes:Bytes, id:String):{offset:Int, size:Int}

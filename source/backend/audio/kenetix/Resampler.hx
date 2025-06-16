@@ -1,4 +1,4 @@
-package backend.audio.vocal;
+package backend.audio.kenetix;
 
 import backend.utils.AudioUtil;
 import haxe.io.Path;
@@ -47,38 +47,62 @@ class Resampler
 		if (llsmTmpPath != '')
 			File.copy(llsmTmpPath, '.\\resamplers\\$resamplerName\\$fileName.wav.llsm.tmp');
 
+		trace('.\\resamplers\\$resamplerName\\$fileName.wav');
+		trace('${Path.removeTrailingSlashes(Path.normalize(Sys.getCwd()))}/resamplers/$resamplerName/$fileName.wav');
 		Sys.command('.\\resamplers\\$resamplerName\\$resampler "${Path.removeTrailingSlashes(Path.normalize(Sys.getCwd()))}/resamplers/$resamplerName/$fileName.wav" "${Path.removeTrailingSlashes(Path.normalize(Sys.getCwd()))}/resamplers/$resamplerName/${fileName}Output.wav" $params');
 		var outputPath = './resamplers/$resamplerName/${fileName}Output.wav';
-		outputSamples = AudioUtil.pcm16BytesToFloatArray(ConvertFormat.convertWav(AudioUtil.floatArrayToWav(AudioUtil.readWavFile('./resamplers/$resamplerName/${fileName}Output.wav'))));
-		deleteResamplerFile('./resamplers/$resamplerName/${fileName}.wav');
-		deleteResamplerFile(outputPath);
+		runFileTask(() ->
+		{
+			outputSamples = AudioUtil.pcm16BytesToFloatArray(ConvertFormat.convertWav(AudioUtil.floatArrayToWav(AudioUtil.readWavFile('./resamplers/$resamplerName/${fileName}Output.wav'))));
+		});
+		runFileTask(() ->
+		{
+			FileSystem.deleteFile('./resamplers/$resamplerName/${fileName}.wav');
+		});
+		runFileTask(() ->
+		{
+			FileSystem.deleteFile(outputPath);
+		});
 
-		if (frqPath != '')
-			deleteResamplerFile('./resamplers/$resamplerName/${fileName}_wav.frq');
-		if (esperPath != '')
-			deleteResamplerFile('./resamplers/$resamplerName/${fileName}.wav.esp');
-		if (llsmPath != '')
-			deleteResamplerFile('./resamplers/$resamplerName/${fileName}.wav.llsm');
-		if (llsmTmpPath != '')
-			deleteResamplerFile('./resamplers/$resamplerName/${fileName}.wav.llsm.tmp');
+		// TODO: Clean this up
+		if (FileSystem.exists('./resamplers/$resamplerName/${fileName}_wav.frq'))
+			runFileTask(() ->
+			{
+				FileSystem.deleteFile('./resamplers/$resamplerName/${fileName}_wav.frq');
+			});
+		if (FileSystem.exists('./resamplers/$resamplerName/${fileName}.wav.esp'))
+			runFileTask(() ->
+			{
+				FileSystem.deleteFile('./resamplers/$resamplerName/${fileName}.wav.esp');
+			});
+		if (FileSystem.exists('./resamplers/$resamplerName/${fileName}.wav.llsm'))
+			runFileTask(() ->
+			{
+				FileSystem.deleteFile('./resamplers/$resamplerName/${fileName}.wav.llsm');
+			});
+		if (FileSystem.exists('./resamplers/$resamplerName/${fileName}.wav.llsm.tmp'))
+			runFileTask(() ->
+			{
+				FileSystem.deleteFile('./resamplers/$resamplerName/${fileName}.wav.llsm.tmp');
+			});
 		running = false;
 		return;
 	}
 
-	static function deleteResamplerFile(path:String)
+	static function runFileTask(task:() -> Void)
 	{
 		var waited = 0.0;
-		while (true) // why do I need all this shit to delete a fileee 😭
+		while (true) // why do I need all this shit to delete/read a fileee 😭
 		{
 			try
 			{
-				FileSystem.deleteFile(path);
+				task();
 				return;
 			}
-			catch (e:Dynamic)
+			catch (e)
 			{
 				if (waited >= 5)
-					throw "Timeout deleting Resampler input/output/esp/llsm/llsm.tmp/frq file.";
+					throw 'Timeout running file task: ${e.message}\n${e.stack.toString()}';
 				// file probably still locked, wait a bit then try again
 				Sys.sleep(0.05);
 				waited += 0.05;

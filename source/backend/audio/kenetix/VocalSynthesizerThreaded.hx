@@ -1,4 +1,4 @@
-package backend.audio.vocal;
+package backend.audio.kenetix;
 
 import backend.data.Note;
 import backend.data.Voicebank;
@@ -10,16 +10,7 @@ class VocalSynthesizerThreaded
 	public var mutex = new Mutex();
 	public var numThreads:Int;
 	public var threadBatches:Array<Array<String>> = [];
-	public var batches:Array<String> = [
-		"normal",
-		"mouth",
-		"breaths",
-		"mouthBreath",
-		"power",
-		"mouthPower",
-		"soft",
-		"mouthSoft"
-	];
+	public var batches:Array<String> = ["normal", "breaths", "power", "soft",];
 	public var output:Map<String, Bytes> = new Map();
 	public var completed:Bool = false;
 	public var notes:Array<Note>;
@@ -33,25 +24,16 @@ class VocalSynthesizerThreaded
 		this.resampMode = resampMode;
 		numThreads = ThreadUtil.freeThreads;
 
-		// Remove what we dont have(this code is so ugly oh my fucking god)
 		if (resampMode)
 			batches = ['normal'];
 		else
 		{
-			if (!voiceBank.mouth)
-				batches.remove("mouth");
 			if (!voiceBank.breaths)
 				batches.remove("breaths");
-			if (!voiceBank.mouthBreath)
-				batches.remove("mouthBreath");
 			if (!voiceBank.power)
 				batches.remove("power");
-			if (!voiceBank.mouthPower)
-				batches.remove("mouthPower");
 			if (!voiceBank.soft)
 				batches.remove("soft");
-			if (!voiceBank.mouthSoft)
-				batches.remove("mouthSoft");
 		}
 
 		for (_ in 0...numThreads)

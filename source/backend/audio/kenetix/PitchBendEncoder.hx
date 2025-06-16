@@ -1,4 +1,4 @@
-package backend.audio.vocal;
+package backend.audio.kenetix;
 
 import backend.data.SongValue;
 

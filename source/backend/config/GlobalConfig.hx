@@ -8,6 +8,7 @@ typedef Config =
 {
 	var resamplerPath:String;
 	var consoleVisible:Bool;
+	var theme:String;
 }
 
 class GlobalConfig
@@ -15,6 +16,7 @@ class GlobalConfig
 	public static var resamplerPath:String = 'f2resamp/f2resamp64.exe';
 	public static var resamplerName(get, null):String;
 	public static var resampler(get, null):String;
+	public static var theme:String = 'default';
 
 	// Technical settings
 	public static var consoleVisible:Bool = false;
@@ -32,7 +34,7 @@ class GlobalConfig
 	}
 
 	public static function globalConfigToConfig():Config
-		return {resamplerPath: resamplerPath, consoleVisible: consoleVisible};
+		return {resamplerPath: resamplerPath, consoleVisible: consoleVisible, theme: theme};
 
 	public static function loadConfig(path:String = './')
 	{
@@ -47,5 +49,6 @@ class GlobalConfig
 	{
 		resamplerPath = config.resamplerPath;
 		consoleVisible = config.consoleVisible;
+		theme = config.theme;
 	}
 }

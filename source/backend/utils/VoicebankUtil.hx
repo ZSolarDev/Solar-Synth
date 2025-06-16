@@ -9,6 +9,26 @@ using StringTools;
 
 class VoicebankUtil
 {
+	public static var blankVoicebank(get, null):Voicebank;
+
+	static function get_blankVoicebank():Voicebank
+		return {
+			samples: new Map<String, String>(),
+			icon: '',
+			name: '',
+			description: '',
+			singer: '',
+			credits: [],
+			language: '',
+			consonantSampleStart: 0,
+			sampleStart: 0,
+			breaths: false,
+			power: false,
+			soft: false,
+			breathSamples: 0,
+			fileName: ''
+		};
+
 	public static function loadVoicebankFromFolder(folderPath:String):Voicebank
 	{
 		inline function stringToBool(s:String):Bool
@@ -24,13 +44,9 @@ class VoicebankUtil
 			language: '',
 			consonantSampleStart: 0,
 			sampleStart: 0,
-			mouth: false,
 			breaths: false,
-			mouthBreath: false,
 			power: false,
-			mouthPower: false,
 			soft: false,
-			mouthSoft: false,
 			breathSamples: 0,
 			fileName: folderPath.split('/')[1]
 		};
@@ -52,16 +68,7 @@ class VoicebankUtil
 			voicebank.consonantSampleStart = Std.parseFloat(vbCharacter['consonantSampleStart']);
 			// sample stuff(eh not that complicated)
 			var finalSamples:Map<String, String> = new Map();
-			var variationsAvailable = [
-				'normal',
-				'mouth',
-				'breaths',
-				'mouthBreath',
-				'power',
-				'mouthPower',
-				'soft',
-				'mouthSoft'
-			];
+			var variationsAvailable = ['normal', 'breaths', 'power', 'soft'];
 			var vbParams = config['Voicebank Parameters'];
 			for (param in vbParams.keys())
 			{

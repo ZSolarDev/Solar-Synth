@@ -1,5 +1,6 @@
-package backend.audio.vocal;
+package backend.audio.kenetix;
 
+import backend.audio.formavox.FormaVox;
 import backend.config.GlobalConfig;
 import backend.data.*;
 import backend.utils.AudioUtil;
@@ -18,21 +19,24 @@ using StringTools;
 
 class VocalSynthesizer
 {
-	public static var sound(get, null):Sound;
-	public static var bytes:Bytes;
-
 	public var curParamSound(get, null):Sound;
 	public var curParamBytes:Bytes;
-
-	public static var synthesized:Bool = false;
 
 	public var batchedResampler:ResamplerBatched;
 	public var complete:Bool = false;
 
+	@:allow(backend.audio.kenetix.Kenetix)
+	static var sound(get, null):Sound;
+	@:allow(backend.audio.kenetix.Kenetix)
+	static var bytes:Bytes;
+	@:allow(backend.audio.kenetix.Kenetix)
+	static var synthesized:Bool = false;
+	@:allow(backend.audio.kenetix.Kenetix)
 	static var threadedSynthesizer:VocalSynthesizerThreaded;
+	@:allow(backend.audio.kenetix.Kenetix)
+	static var timer:Timer;
 	static var bitsPerSample:Int = 16;
 	static var bytesPerSample:Int = 2; // the result of (bitsPerSample * channels) / 8
-	static var timer:Timer;
 
 	var sampleIndexMap:Map<Int, Int>;
 	var totalSamples:Int;
@@ -116,6 +120,7 @@ class VocalSynthesizer
 				samples:Array<Float>,
 				esperPath:String,
 				params:String,
+				note:Note,
 				resamplerName:String,
 				resampler:String,
 				frqPath:String,
@@ -163,6 +168,7 @@ class VocalSynthesizer
 					samples: AudioUtil.pcm16BytesToFloatArray(sampleBytes),
 					resamplerName: GlobalConfig.resamplerName,
 					resampler: GlobalConfig.resampler,
+					note: note,
 					frqPath: frqPath,
 					esperPath: esperPath,
 					llsmPath: llsmPath,
@@ -180,7 +186,8 @@ class VocalSynthesizer
 		for (i in sampleIndexMap.keys())
 		{
 			var outputIndex = sampleIndexMap.get(i);
-			var finalSamples = AudioUtil.floatArrayToPCM16Bytes(batchedResampler.outputSampleSets[outputIndex]);
+			var finalSamples = AudioUtil.floatArrayToPCM16Bytes(FormaVox.processSamples(batchedResampler.outputSampleSets[outputIndex].samples,
+				batchedResampler.outputSampleSets[outputIndex].note.formants, sampleRate));
 			var startIndex = 44 + bytesToSkip;
 			var lengthToExtract = finalSamples.length - startIndex - bytesToSkip;
 			if (lengthToExtract < 0)
@@ -348,15 +355,6 @@ class VocalSynthesizer
 							break;
 					}
 
-					var mouthParam:SongValue = {value: 1.0, time: time};
-					for (m in note.mouth)
-					{
-						if (m.time == time)
-							mouthParam = m;
-						else
-							break;
-					}
-
 					var softness = Math.max(0, 1 - p.value);
 					var normal = Math.max(0, 1 - Math.abs(p.value - 1));
 					var powerful = Math.max(0, p.value - 1);
@@ -368,16 +366,10 @@ class VocalSynthesizer
 					{
 						case "soft":
 							finalVelocity = softness * velocityParam.value;
-						case "mouthSoft":
-							finalVelocity = softness * velocityParam.value * mouthParam.value;
 						case "normal":
 							finalVelocity = normal * velocityParam.value;
-						case "mouth":
-							finalVelocity = normal * velocityParam.value * mouthParam.value;
 						case "power":
 							finalVelocity = powerful * velocityParam.value;
-						case "mouthPower":
-							finalVelocity = powerful * velocityParam.value * mouthParam.value;
 						default:
 							continue;
 					}
@@ -399,15 +391,6 @@ class VocalSynthesizer
 							break;
 					}
 
-					var mouthParam:SongValue = {value: 1.0, time: time};
-					for (m in note.mouth)
-					{
-						if (m.time == time)
-							mouthParam = m;
-						else
-							break;
-					}
-
 					var breathValue = Math.max(0, b.value);
 
 					var finalVelocity:Float = 0.0;
@@ -416,8 +399,6 @@ class VocalSynthesizer
 					{
 						case "breaths":
 							finalVelocity = breathValue * velocityParam.value;
-						case "mouthBreath":
-							finalVelocity = breathValue * velocityParam.value * mouthParam.value;
 						default:
 							continue;
 					}
@@ -451,6 +432,7 @@ class VocalSynthesizer
 		complete = true;
 	}
 
+	@:allow(backend.audio.kenetix.Kenetix)
 	static function waitForVocals()
 	{
 		if (threadedSynthesizer.completed)
@@ -467,24 +449,11 @@ class VocalSynthesizer
 			{
 				var sounds:Array<Bytes> = [
 					threadedSynthesizer.output.get('normal'),
-					threadedSynthesizer.output.get('mouth'),
 					threadedSynthesizer.output.get('breath'),
-					threadedSynthesizer.output.get('mouthBreath'),
 					threadedSynthesizer.output.get('power'),
-					threadedSynthesizer.output.get('mouthPower'),
-					threadedSynthesizer.output.get('soft'),
-					threadedSynthesizer.output.get('mouthSoft')
+					threadedSynthesizer.output.get('soft')
 				];
-				var soundNames:Array<String> = [
-					"normal",
-					"mouth",
-					"breaths",
-					"mouthBreath",
-					"power",
-					"mouthPower",
-					"soft",
-					"mouthSoft"
-				];
+				var soundNames:Array<String> = ["normal", "breaths", "power", "soft",];
 				var i = 0;
 				while (i < sounds.length)
 				{
@@ -512,7 +481,7 @@ class VocalSynthesizer
 					var breathSampleCount:Int = 0;
 					for (j in 0...sounds.length)
 					{
-						if (soundNames[j] == "breaths" || soundNames[j] == "mouthBreath")
+						if (soundNames[j] == "breaths")
 						{
 							var offset:Int = i * bytesPerSample;
 							if (offset + bytesPerSample <= sounds[j].length)
@@ -539,7 +508,7 @@ class VocalSynthesizer
 						if (offset + bytesPerSample <= sounds[j].length)
 						{
 							var sample = getInt16(sounds[j], offset, true);
-							if (soundNames[j] == "breaths" || soundNames[j] == "mouthBreath")
+							if (soundNames[j] == "breaths")
 								breathOnlySampleSum += sample;
 							else
 							{
@@ -566,14 +535,5 @@ class VocalSynthesizer
 			timer.stop();
 			synthesized = true;
 		}
-	}
-
-	public static function synthesizeVocals(notes:Array<Note>, voiceBank:Voicebank, resampMode:Bool)
-	{
-		synthesized = false;
-		threadedSynthesizer = new VocalSynthesizerThreaded(notes, voiceBank, resampMode);
-		threadedSynthesizer.runBatches();
-		timer = new Timer(0.001);
-		timer.run = waitForVocals;
 	}
 }

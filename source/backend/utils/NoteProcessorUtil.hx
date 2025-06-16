@@ -1,11 +1,10 @@
-package backend.audio.vocal;
+package backend.utils;
 
+import backend.audio.kenetix.Kenetix;
 import backend.data.Note;
 import backend.data.Voicebank;
-import backend.utils.CopyUtil;
-import backend.utils.VocalUtil;
 
-class NoteProcessor
+class NoteProcessorUtil
 {
 	public static function processNotes(notes:Array<Note>, voiceBank:Voicebank, autoTone:Bool):Array<Note>
 	{
@@ -51,5 +50,5 @@ class NoteProcessor
 	}
 
 	public static function synthesizeVocalsFromNotes(notes:Array<Note>, voiceBank:Voicebank, autoTune:Bool = false, resampMode:Bool = false)
-		return VocalSynthesizer.synthesizeVocals(processNotes(notes, voiceBank, autoTune), voiceBank, resampMode);
+		return Kenetix.synthesizeVocals(processNotes(notes, voiceBank, autoTune), voiceBank, resampMode);
 }

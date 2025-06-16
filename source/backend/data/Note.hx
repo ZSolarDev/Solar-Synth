@@ -1,5 +1,7 @@
 package backend.data;
 
+import backend.audio.formavox.FormaVoxValue;
+
 class Note
 {
 	public var time:Int;
@@ -15,19 +17,19 @@ class Note
 	public var breathinessValue:Float;
 	public var breathiness:Array<SongValue>;
 	public var tone:Array<SongValue> = [];
-	public var mouth:Array<SongValue>;
+	public var formants:Array<FormaVoxValue>;
 	public var blendRatio:Int = 0;
-    public var sampleStartOffset:Int = 0;
+	public var sampleStartOffset:Int = 0;
 	public var automaticBlendRatio:Bool = false;
 
-	public function new(phoneme:String, time:Int, duration:Int, sampleStartOffset:Int, automaticBlendRatio:Bool, blendRatio:Int, atonal:Bool, powerValue:Float,
-			breathinessValue:Float, tension:Float, roughness:Float, pitches:Array<SongValue>, velocities:Array<SongValue>, power:Array<SongValue>,
-			breathiness:Array<SongValue>, mouth:Array<SongValue>)
+	public function new(phoneme:String, time:Int, duration:Int, sampleStartOffset:Int, automaticBlendRatio:Bool, blendRatio:Int, atonal:Bool,
+			powerValue:Float, breathinessValue:Float, tension:Float, roughness:Float, pitches:Array<SongValue>, velocities:Array<SongValue>,
+			power:Array<SongValue>, breathiness:Array<SongValue>, formants:Array<FormaVoxValue>)
 	{
 		this.phoneme = phoneme;
 		this.time = time;
 		this.duration = duration;
-        this.sampleStartOffset = sampleStartOffset;
+		this.sampleStartOffset = sampleStartOffset;
 		this.automaticBlendRatio = automaticBlendRatio;
 		this.blendRatio = blendRatio;
 		this.atonal = atonal;
@@ -39,6 +41,6 @@ class Note
 		this.velocities = velocities;
 		this.power = power;
 		this.breathiness = breathiness;
-		this.mouth = mouth;
+		this.formants = formants;
 	}
 }

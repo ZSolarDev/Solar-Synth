@@ -19,35 +19,7 @@ class Track
 	public function new(track:SSTrack)
 	{
 		this.track = track;
-		frame = ComponentBuilder.fromString('
-            <frame id="track" width="300" height="110">
-                <hbox width="100%" height="auto">
-                    <image id="vbIcon" width="80" height="80" />
-                    <vbox width="100%" height="auto">
-                        <!--WHY CANT I HORIZONTAL ALIGN A VBOX!?!?-->
-                        <!--I had to make this stupid workaround instead...-->
-                        <hbox width="200" height="20" horizontalAlign="right">
-                            <button text="M" toggle="true" id="mute_btn" width="20" height="20"/>
-                            <dropdown text="Select a Voicebank" id="voicebankDropdown" width="100%">
-                            </dropdown>
-                        </hbox>
-                        <hbox width="200" height="20" horizontalAlign="right">
-                            <button text="S" toggle="true" id="solo_btn" width="20" height="20"/>
-                        </hbox>
-                        <hbox width="200" height="40">
-                            <vbox width="90" height="auto">
-                                <label text="Volume: 100%" id="volText"/>
-                                <slider pos="100" id="volume" height="10" width="90"/>
-                            </vbox>
-                            <vbox width="90" height="auto" style="margin-left:10px;">
-                                <label text="Pan: 0%" id="panText" />
-                                <slider pos="50" id="pan" center="50" height="10" width="90"/>
-                            </vbox>
-                        </hbox>
-                    </vbox>
-                </hbox>
-            </frame>
-        ');
+		frame = ComponentBuilder.fromFile('themes/default/objects/track.xml');
 		frame.text = track.name;
 		updateDropdown();
 		var pan = frame.findComponent("pan", Slider);
