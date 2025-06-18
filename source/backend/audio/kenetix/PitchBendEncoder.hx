@@ -76,7 +76,6 @@ class PitchBendEncoder
 		if (section.length > 0)
 			result += encodeSection(section);
 
-		trace(result);
 		return result;
 	}
 

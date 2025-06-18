@@ -1,5 +1,6 @@
 package backend.data;
 
+import backend.audio.formavox.FormaVoxValue;
 import backend.data.SongValue;
 
 typedef SSProjectTypedef =
@@ -29,7 +30,7 @@ typedef NoteTypeDef =
 	var power:Array<SongValue>;
 	var breathiness:Array<SongValue>;
 	var tone:Array<SongValue>;
-	var mouth:Array<SongValue>;
+	var formants:Array<FormaVoxValue>;
 	var sampleStartOffset:Int;
 }
 

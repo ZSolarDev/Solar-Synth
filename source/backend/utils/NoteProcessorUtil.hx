@@ -36,7 +36,7 @@ class NoteProcessorUtil
 				{
 					// A longer blend
 					if (VocalUtil.isBreath(nextNote.phoneme) || VocalUtil.isVowel(nextNote.phoneme))
-						note.blendRatio = 200;
+						note.blendRatio = 500;
 					// If the next note is a plosive, there will be a tiny pause before you hear the next note.
 					if (VocalUtil.isPlosive(nextNote.phoneme) && !VocalUtil.isBreath(nextNote.phoneme))
 						note.blendRatio = 10;

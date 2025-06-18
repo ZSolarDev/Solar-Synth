@@ -60,7 +60,7 @@ class MainView extends VBox
 			bpm: [{time: 0, value: 120}]
 		};
 		notes.push(new Note("a", 0, 2000, 0, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
-			[{time: 0, value: 0}], [{time: 0, profile: FormaVox.getProfile('a')}]));
+			[{time: 0, value: 1}], [{time: 0, profile: FormaVox.getProfile('a')}]));
 		notes.push(new Note("o", 2000, 1000, 0, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 			[{time: 0, value: 1}], [{time: 0, profile: FormaVox.getProfile('o')}]));
 		notes.push(new Note("u", 3000, 3000, 0, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 0}], [{time: 0, value: 1}], [{time: 0, value: 0}],

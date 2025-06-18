@@ -1,5 +1,6 @@
 package backend.audio.kenetix;
 
+import backend.audio.areo.Areo;
 import backend.audio.formavox.FormaVox;
 import backend.config.GlobalConfig;
 import backend.data.*;
@@ -151,7 +152,7 @@ class VocalSynthesizer
 				inline function resampParams():String
 					return 'C4 100 "pstb100dyn${mappedPower}int${mappedPower}bre${note.atonal ? 100 : mappedBreathiness}rgh${note.roughness}" 0 $finalLen 0 0 100 0 T120 ${PitchBendEncoder.encodePitchBend(note.pitches, finalLen)}';
 
-				// Possible file paths for ESPER-Utau and MoreSampler resamplers
+				// Possible file paths for ESPER-Utau, F2Resamp and MoreSampler resamplers
 				var frqPath = './${voiceBank.fileName}/$paramName/${note.phoneme}_wav.frq';
 				if (!FileSystem.exists(frqPath))
 					frqPath = '';
@@ -237,17 +238,14 @@ class VocalSynthesizer
 			var fadeInSamples = Std.int((VocalUtil.isBreath(note.phoneme) ? 500 : 50) / 1000 * sampleRate);
 			var fadeOutSamples = fadeInSamples;
 
-			// Apply samples
 			for (j in 0...noteDurationSamples)
 			{
 				var srcIndex = j + offsetAddition;
 				var destOffset = (noteStartSample + j) * bytesPerSample;
 
-				// Skip if destination is out of bounds
 				if (destOffset + bytesPerSample > curParamBytes.length)
 					continue;
 
-				// Regular sample processing
 				var srcOffset = srcIndex * bytesPerSample;
 
 				if (srcOffset < sampleData.length)
@@ -427,6 +425,87 @@ class VocalSynthesizer
 						setInt16(curParamBytes, destOffset, newVal, true);
 					}
 				}
+			}
+		}
+
+		// Third pass: breaths
+		if (voiceBank.samples.get('b1') != null)
+		{
+			try
+			{
+				for (noteIndex in 0...notes.length)
+				{
+					var note = notes[noteIndex];
+					if (!VocalUtil.isBreath(note.phoneme))
+					{
+						// Extend and loop the breath sample to match the note duration
+						var breathBytes = ConvertFormat.convertWav(File.getBytes(voiceBank.samples.get('b1')), voiceBank.sampleStart);
+						var breathLen = Std.int(breathBytes.length / bytesPerSample);
+						var noteStartSample:Int = Std.int(note.time / 1000 * sampleRate);
+						var noteEndSample:Int = Std.int((note.time + note.duration) / 1000 * sampleRate);
+						var totalNoteSamples = noteEndSample - noteStartSample;
+
+						var loopedBreathSamples:Array<Int> = [];
+						var crossfadeLen = Std.int(breathLen / 2);
+
+						for (i in 0...cast totalNoteSamples * bytesPerSample / 2)
+						{
+							var breathIndex = i % breathLen;
+							var breath:Int;
+
+							var crossfadeStart = breathLen - crossfadeLen;
+							if (breathIndex >= crossfadeStart)
+							{
+								var fadeT = (breathIndex - crossfadeStart) / crossfadeLen;
+								var offsetA = breathIndex * bytesPerSample;
+								var offsetB = (breathIndex - crossfadeStart) * bytesPerSample; // from start
+								var a = getInt16(breathBytes, offsetA, true);
+								var b = getInt16(breathBytes, offsetB, true);
+								breath = Std.int(a * (1 - fadeT) + b * fadeT);
+							}
+							else
+							{
+								var breathOffset = breathIndex * bytesPerSample;
+								breath = getInt16(breathBytes, breathOffset, true);
+							}
+
+							loopedBreathSamples.push(breath & 0xFF);
+							loopedBreathSamples.push((breath >> 8) & 0xFF);
+						}
+						var loopedBreathFloats:Array<Float> = [];
+						for (i in 0...Std.int(loopedBreathSamples.length / 2))
+						{
+							var lo = loopedBreathSamples[i * 2];
+							var hi = loopedBreathSamples[i * 2 + 1];
+
+							var sample:Int = (hi << 8) | (lo & 0xFF);
+							if (sample > 32767)
+								sample -= 65536;
+
+							loopedBreathFloats.push(sample / 32768.0);
+						}
+
+						var breathBytes = ConvertFormat.convertWav(AudioUtil.floatArrayToWav(Areo.renderBreath(loopedBreathFloats, note.breathiness,
+							sampleRate)));
+						for (i in noteStartSample...noteEndSample)
+						{
+							var destOffset = i * bytesPerSample;
+							var breathOffset = (i - noteStartSample) * bytesPerSample;
+
+							if (breathOffset + bytesPerSample <= breathBytes.length && destOffset + bytesPerSample <= curParamBytes.length)
+							{
+								var sample:Int = getInt16(curParamBytes, destOffset, true);
+								var breath:Int = getInt16(breathBytes, breathOffset, true);
+								var finalSample:Int = Std.int(SSMath.clamp(sample + breath, -32768, 32767));
+								setInt16(curParamBytes, destOffset, finalSample, true);
+							}
+						}
+					}
+				}
+			}
+			catch (e)
+			{
+				trace(e.stack.toString());
 			}
 		}
 		complete = true;

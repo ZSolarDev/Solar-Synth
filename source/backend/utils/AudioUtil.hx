@@ -142,12 +142,8 @@ class AudioUtil
 		return result;
 	}
 
-	public static function readWavFile(filePath:String):Array<Float>
+	public static function wavToFloatArray(bytes:Bytes):Array<Float>
 	{
-		var input = File.read(filePath);
-		var bytes = input.readAll();
-		input.close();
-
 		var stream = new BytesInput(bytes);
 
 		if (stream.readString(4) != "RIFF")
@@ -196,4 +192,7 @@ class AudioUtil
 				stream.read(size); // skip unknown chunk
 		}
 	}
+
+	public static function readWavFile(filePath:String):Array<Float>
+		return wavToFloatArray(File.getBytes(filePath));
 }

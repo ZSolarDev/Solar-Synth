@@ -21,7 +21,7 @@ class SSProjectUtil
 				for (note in section.notes)
 					notes.push(new Note(note.phoneme, note.time, note.duration, note.sampleStartOffset, note.automaticBlendRatio, note.blendRatio,
 						note.atonal, note.powerValue, note.breathinessValue, note.tension, note.roughness, note.pitches, note.velocities, note.power,
-						note.breathiness, note.mouth));
+						note.breathiness, note.formants));
 				sections.push({
 					name: section.name,
 					time: section.time,
@@ -78,7 +78,7 @@ class SSProjectUtil
 						power: note.power,
 						breathiness: note.breathiness,
 						tone: note.tone,
-						mouth: note.mouth,
+						formants: note.formants,
 					});
 				sections.push({
 					name: section.name,
