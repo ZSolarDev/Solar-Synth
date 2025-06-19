@@ -1,19 +1,56 @@
 package backend.audio.areo;
 
-typedef SongVal =
-{
-	var time:Float;
-	var value:Float;
-}
+import backend.data.Note;
+import backend.data.SongValue;
+import backend.utils.VocalUtil;
 
 class Areo
 {
-	public static function renderBreath(samples:Array<Float>, breathValues:Array<SongVal>, sampleRate:Float):Array<Float>
+	public static function groupBreathRegions(notes:Array<Note>):Array<BreathRegion>
+	{
+		var regions:Array<BreathRegion> = [];
+		var currentRegion:BreathRegion = null;
+
+		for (i in 0...notes.length)
+		{
+			var note = notes[i];
+			if (VocalUtil.isBreath(note.phoneme))
+			{
+				currentRegion = null;
+				continue;
+			}
+
+			if (currentRegion == null || VocalUtil.isPlosive(note.phoneme))
+			{
+				currentRegion = new BreathRegion(note.time);
+				regions.push(currentRegion);
+			}
+
+			currentRegion.notes.push(note);
+			currentRegion.endTime = note.time + note.duration;
+
+			var nextNote = (i + 1 < notes.length) ? notes[i + 1] : null;
+			if (nextNote != null)
+			{
+				var gap = nextNote.time - (note.time + note.duration);
+				var nextIsPlosive = VocalUtil.isPlosive(nextNote.phoneme);
+
+				if (gap > 50 || nextIsPlosive)
+				{
+					currentRegion = null;
+				}
+			}
+		}
+
+		return regions;
+	}
+
+	public static function renderBreath(samples:Array<Float>, breathValues:Array<SongValue>, sampleRate:Float):Array<Float>
 	{
 		try
 		{
 			var output = [];
-			var breathVals:Array<SongVal> = [];
+			var breathVals:Array<SongValue> = [];
 
 			for (val in breathValues)
 				breathVals.push({time: val.time, value: val.value});

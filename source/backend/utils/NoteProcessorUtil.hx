@@ -2,13 +2,70 @@ package backend.utils;
 
 import backend.audio.kenetix.Kenetix;
 import backend.data.Note;
+import backend.data.SongValue;
 import backend.data.Voicebank;
 
 class NoteProcessorUtil
 {
+	static function applyCurveMask(base:Array<SongValue>, modifier:Array<SongValue>):Array<SongValue>
+	{
+		var result:Array<SongValue> = [];
+
+		for (i in 0...base.length)
+		{
+			var baseVal = base[i];
+			var modVal = modifier[i];
+
+			var maskedValue = baseVal.value * (modVal.value / 100);
+			result.push({
+				time: baseVal.time,
+				value: maskedValue
+			});
+		}
+
+		return result;
+	}
+
+	static function generateBreathCurve(length:Int, type:String):Array<SongValue>
+	{
+		var values:Array<SongValue> = [];
+		if (type == "inhale")
+		{
+			for (time in 0...length)
+			{
+				var t = time / length;
+				var intensity:Float;
+
+				if (t < 0.3)
+					intensity = (t / 0.3) * 60;
+				else if (t < 0.7)
+					intensity = 60 + ((t - 0.3) / 0.4) * 40;
+				else
+					intensity = 100 - ((t - 0.7) / 0.3) * 100;
+
+				values.push({time: time, value: intensity});
+			}
+		}
+		else
+		{
+			for (time in 0...length)
+			{
+				var t = time / length;
+				var intensity:Float;
+				if (t < 0.2)
+					intensity = (t / 0.2) * 100;
+				else
+					intensity = 100 * (1 - ((t - 0.2) / 0.8));
+				values.push({time: time, value: intensity});
+			}
+		}
+		return values;
+	}
+
 	public static function processNotes(notes:Array<Note>, voiceBank:Voicebank, autoTone:Bool):Array<Note>
 	{
 		var newNotes:Array<Note> = CopyUtil.copyArray(notes);
+
 		for (noteID in 0...newNotes.length)
 		{
 			var note:Note = newNotes[noteID];
@@ -20,6 +77,14 @@ class NoteProcessorUtil
 				note.atonal = true;
 				for (pitch in note.pitches) // just in case
 					pitch.value = 0;
+			}
+
+			if (note.phoneme == "inhale" || note.phoneme == "exhale")
+			{
+				var ogBreathCurve = note.breathiness;
+				var newBreathCurve = generateBreathCurve(note.duration, note.phoneme);
+				var finalBreathCurve = applyCurveMask(newBreathCurve, ogBreathCurve);
+				note.breathiness = finalBreathCurve;
 			}
 
 			if (nextNote != null)

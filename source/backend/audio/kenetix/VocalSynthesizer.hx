@@ -134,9 +134,7 @@ class VocalSynthesizer
 			var note = notes[i];
 
 			var filePath:String = '';
-			if (VocalUtil.isBreath(note.phoneme))
-				filePath = voiceBank.samples.get(note.phoneme);
-			else
+			if (!VocalUtil.isBreath(note.phoneme))
 				filePath = voiceBank.samples.get(paramName == 'normal' ? note.phoneme : '$paramName//${note.phoneme}');
 
 			if (filePath != '')
@@ -200,7 +198,7 @@ class VocalSynthesizer
 		for (noteIndex in 0...notes.length)
 		{
 			var note = notes[noteIndex];
-			if (note.phoneme == "rest" || !noteSamples.exists(noteIndex))
+			if (!noteSamples.exists(noteIndex))
 				continue;
 
 			var sampleData = noteSamples.get(noteIndex);
@@ -274,7 +272,7 @@ class VocalSynthesizer
 			if (hasNext)
 			{
 				var nextNote = notes[noteIndex + 1];
-				if (nextNote.phoneme == "rest" || !noteSamples.exists(noteIndex + 1))
+				if (!noteSamples.exists(noteIndex + 1))
 					continue;
 
 				var crossfadeSamples = Std.int(note.blendRatio / 1000 * sampleRate);
@@ -324,7 +322,7 @@ class VocalSynthesizer
 		for (noteIndex in 0...notes.length)
 		{
 			var note = notes[noteIndex];
-			if (note.phoneme == "rest")
+			if (!noteSamples.exists(noteIndex))
 				continue;
 
 			var sampleRate = 44100;
@@ -433,72 +431,134 @@ class VocalSynthesizer
 		{
 			try
 			{
-				for (noteIndex in 0...notes.length)
+				for (regionIndex in 0...Areo.groupBreathRegions(notes).length)
 				{
-					var note = notes[noteIndex];
-					if (!VocalUtil.isBreath(note.phoneme))
+					var regions = Areo.groupBreathRegions(notes);
+					var region = regions[regionIndex];
+
+					var rawBreath = ConvertFormat.convertWav(File.getBytes(voiceBank.samples.get('b1')), voiceBank.sampleStart);
+					var breathBytesRaw = rawBreath.sub(44, rawBreath.length - 44);
+					var breathLen = Std.int(breathBytesRaw.length / bytesPerSample);
+					var regionStartSample = Std.int(region.startTime / 1000 * sampleRate);
+					var regionEndSample = Std.int(region.endTime / 1000 * sampleRate);
+					var regionDurationMs = region.endTime - region.startTime;
+					var totalRegionSamples = Std.int(regionDurationMs / 1000 * sampleRate);
+
+					// Loop and crossfade breath sample for seamless looping
+					var loopedBreathSamples:Array<Int> = [];
+					var crossfadeLen = Std.int(breathLen / 2);
+					for (i in 0...totalRegionSamples)
 					{
-						// Extend and loop the breath sample to match the note duration
-						var breathBytes = ConvertFormat.convertWav(File.getBytes(voiceBank.samples.get('b1')), voiceBank.sampleStart);
-						var breathLen = Std.int(breathBytes.length / bytesPerSample);
-						var noteStartSample:Int = Std.int(note.time / 1000 * sampleRate);
-						var noteEndSample:Int = Std.int((note.time + note.duration) / 1000 * sampleRate);
-						var totalNoteSamples = noteEndSample - noteStartSample;
+						var breathIndex = i % breathLen;
+						var breath:Int;
 
-						var loopedBreathSamples:Array<Int> = [];
-						var crossfadeLen = Std.int(breathLen / 2);
-
-						for (i in 0...cast totalNoteSamples * bytesPerSample / 2)
+						var crossfadeStart = breathLen - crossfadeLen;
+						if (breathIndex >= crossfadeStart)
 						{
-							var breathIndex = i % breathLen;
-							var breath:Int;
-
-							var crossfadeStart = breathLen - crossfadeLen;
-							if (breathIndex >= crossfadeStart)
-							{
-								var fadeT = (breathIndex - crossfadeStart) / crossfadeLen;
-								var offsetA = breathIndex * bytesPerSample;
-								var offsetB = (breathIndex - crossfadeStart) * bytesPerSample; // from start
-								var a = getInt16(breathBytes, offsetA, true);
-								var b = getInt16(breathBytes, offsetB, true);
-								breath = Std.int(a * (1 - fadeT) + b * fadeT);
-							}
-							else
-							{
-								var breathOffset = breathIndex * bytesPerSample;
-								breath = getInt16(breathBytes, breathOffset, true);
-							}
-
-							loopedBreathSamples.push(breath & 0xFF);
-							loopedBreathSamples.push((breath >> 8) & 0xFF);
+							var fadeT = (breathIndex - crossfadeStart) / crossfadeLen;
+							var offsetA = breathIndex * bytesPerSample;
+							var offsetB = (breathIndex - crossfadeStart) * bytesPerSample; // from start
+							var a = getInt16(breathBytesRaw, offsetA, true);
+							var b = getInt16(breathBytesRaw, offsetB, true);
+							breath = Std.int(a * (1 - fadeT) + b * fadeT);
 						}
-						var loopedBreathFloats:Array<Float> = [];
-						for (i in 0...Std.int(loopedBreathSamples.length / 2))
+						else
 						{
-							var lo = loopedBreathSamples[i * 2];
-							var hi = loopedBreathSamples[i * 2 + 1];
-
-							var sample:Int = (hi << 8) | (lo & 0xFF);
-							if (sample > 32767)
-								sample -= 65536;
-
-							loopedBreathFloats.push(sample / 32768.0);
+							var breathOffset = breathIndex * bytesPerSample;
+							breath = getInt16(breathBytesRaw, breathOffset, true);
 						}
 
-						var breathBytes = ConvertFormat.convertWav(AudioUtil.floatArrayToWav(Areo.renderBreath(loopedBreathFloats, note.breathiness,
-							sampleRate)));
-						for (i in noteStartSample...noteEndSample)
-						{
-							var destOffset = i * bytesPerSample;
-							var breathOffset = (i - noteStartSample) * bytesPerSample;
+						loopedBreathSamples.push(breath & 0xFF);
+						loopedBreathSamples.push((breath >> 8) & 0xFF);
+					}
 
-							if (breathOffset + bytesPerSample <= breathBytes.length && destOffset + bytesPerSample <= curParamBytes.length)
+					// Convert to floats [-1..1]
+					var loopedBreathFloats:Array<Float> = [];
+					for (i in 0...Std.int(loopedBreathSamples.length / 2))
+					{
+						var lo = loopedBreathSamples[i * 2];
+						var hi = loopedBreathSamples[i * 2 + 1];
+						var sample:Int = (hi << 8) | (lo & 0xFF);
+						if (sample > 32767)
+							sample -= 65536;
+						loopedBreathFloats.push(sample / 32768.0);
+					}
+
+					// Check if next note after this region ends is a plosive
+					var nextNoteAfterRegion:Note = null;
+					for (note in notes)
+					{
+						if (note.time >= region.endTime)
+						{
+							nextNoteAfterRegion = note;
+							break;
+						}
+					}
+
+					var fadeOutRatio = 0.03; // default fade out 3%
+					if (nextNoteAfterRegion != null && VocalUtil.isPlosive(nextNoteAfterRegion.phoneme))
+					{
+						// quick fade out because next note is plosive
+						fadeOutRatio = 0.005;
+					}
+
+					var fadeInRatio = 0.03; // fade in normal for all regions
+					var fadeInSamples = Std.int(fadeInRatio * regionDurationMs);
+					var fadeOutSamples = Std.int(fadeOutRatio * regionDurationMs);
+
+					var breathiness:Array<SongValue> = [];
+					for (i in 0...regionDurationMs)
+					{
+						var value = 10; // base breathiness
+						if (i < fadeInSamples)
+							value = cast 10 * (i / fadeInSamples);
+						else if (i >= regionDurationMs - fadeOutSamples)
+							value = cast 10 * ((regionDurationMs - i) / fadeOutSamples);
+
+						breathiness.push({
+							time: i,
+							value: value
+						});
+					}
+
+					for (note in region.notes)
+					{
+						if (VocalUtil.isPlosive(note.phoneme))
+						{
+							var plosiveStart = note.time - region.startTime;
+							var plosiveEnd = plosiveStart + note.duration;
+							var plosiveDuration = note.duration;
+
+							for (i in plosiveStart...plosiveEnd)
 							{
-								var sample:Int = getInt16(curParamBytes, destOffset, true);
-								var breath:Int = getInt16(breathBytes, breathOffset, true);
-								var finalSample:Int = Std.int(SSMath.clamp(sample + breath, -32768, 32767));
-								setInt16(curParamBytes, destOffset, finalSample, true);
+								var posInPlosive = i - plosiveStart;
+
+								// Quick fade-in pulse at plosive start (like a little bump)
+								var pulse;
+								if (posInPlosive < plosiveDuration / 3)
+									pulse = 10 * (posInPlosive / (plosiveDuration / 3)); // rise fast
+								else
+									pulse = 10 * (1 - (posInPlosive - plosiveDuration / 3) / (plosiveDuration * 2 / 3)); // fall slower
+
+								breathiness[i] = {time: i, value: pulse};
 							}
+						}
+					}
+
+					var breathBytes = ConvertFormat.convertWav(AudioUtil.floatArrayToWav(Areo.renderBreath(loopedBreathFloats, breathiness, sampleRate)));
+					var breathData = breathBytes.sub(44, breathBytes.length - 44);
+
+					for (i in regionStartSample...regionEndSample)
+					{
+						var destOffset = i * bytesPerSample;
+						var breathOffset = (i - regionStartSample) * bytesPerSample;
+
+						if (breathOffset + bytesPerSample <= breathData.length && destOffset + bytesPerSample <= curParamBytes.length)
+						{
+							var sample:Int = getInt16(curParamBytes, destOffset, true);
+							var breath:Int = Std.int(getInt16(breathData, breathOffset, true));
+							var finalSample:Int = Std.int(SSMath.clamp(sample + breath, -32768, 32767));
+							setInt16(curParamBytes, destOffset, finalSample, true);
 						}
 					}
 				}
@@ -508,6 +568,7 @@ class VocalSynthesizer
 				trace(e.stack.toString());
 			}
 		}
+
 		complete = true;
 	}
 
