@@ -9,7 +9,7 @@ class ThreadUtil
 {
 	public static var totalThreads(get, null):Int;
 	public static var freeThreads(get, null):Int;
-	private static var threadsUsed:Int = 1; // One is always used as the main thread
+	private static var threadsUsed:Int = 1; // one is always used as the main thread
 
 	#if hl
 	static function get_totalThreads():Int

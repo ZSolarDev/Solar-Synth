@@ -18,7 +18,7 @@ class GlobalConfig
 	public static var resampler(get, null):String;
 	public static var theme:String = 'default';
 
-	// Technical settings
+	// technical settings
 	public static var consoleVisible:Bool = false;
 
 	static function get_resamplerName():String

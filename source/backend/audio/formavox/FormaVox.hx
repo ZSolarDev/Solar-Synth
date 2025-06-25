@@ -47,57 +47,152 @@ class FormaVox
 			f3: 0
 		} : defaultProfiles.get(phoneme.charAt(1));
 
-	public static function processSamples(samples:Array<Float>, _formants:Array<FormaVoxValue>, sampleRate:Float):Array<Float>
+	public static function processSamples(samples:Array<Float>, _formants:Array<FormaVoxValue>, sampleRate:Float, interpolate:Bool = false):Array<Float>
 	{
-		try
+		var output = [];
+		var formants:Array<FormaVoxValue> = [];
+		for (val in _formants)
+			formants.push({
+				time: val.time,
+				profile: val.profile
+			});
+		formants.sort((a, b) -> return cast a.time - b.time);
+		if (formants.length == 0)
+			formants.push({
+				time: 0,
+				profile: {f1: 0, f2: 0, f3: 0}
+			});
+		var indices = formants.map(v -> Std.int(v.time / 1000 * sampleRate));
+		indices.push(samples.length);
+
+		var currentFormants = formants[0].profile;
+		var nextFormants:FormaVox.FormantProfile = null;
+		var formantStartIndex = indices[0];
+		var formantEndIndex = indices[1];
+		var formantRange = formantEndIndex - formantStartIndex;
+
+		var filter:LPCFilter = currentFormants != null ? new LPCFilter(currentFormants, sampleRate) : null;
+
+		for (i in 0...samples.length)
 		{
-			var output = [];
-			var formants:Array<FormaVoxValue> = [];
-			for (val in _formants)
-				formants.push({
-					time: val.time,
-					profile: val.profile
-				});
-			// sort formants by time
-			formants.sort(function(a, b) return cast a.time - b.time);
-
-			if (formants.length == 0)
-				formants.push({
-					time: 0,
-					profile: {f1: 0, f2: 0, f3: 0}
-				});
-
-			// convert times to sample indices
-			var indices = formants.map(v -> Std.int(v.time / 1000 * sampleRate));
-			indices.push(samples.length); // add one extra for the end
-
-			// initial filter
-			var currentFormants = formants[0].profile;
-			var filter = currentFormants != null ? new LPCFilter(currentFormants, sampleRate) : null;
-
-			for (i in 0...samples.length)
+			if (i >= formantEndIndex)
 			{
-				// move to next mouth region if needed
-				if (i >= indices[1])
+				formants.shift();
+				indices.shift();
+				if (formants.length > 0)
 				{
-					formants.shift();
-					indices.shift();
-					if (formants.length > 0)
-					{
-						currentFormants = formants[0].profile;
-						filter = currentFormants != null ? new LPCFilter(currentFormants, sampleRate) : null;
-					}
+					currentFormants = formants[0].profile;
+					formantStartIndex = indices[0];
+					formantEndIndex = indices[1];
+					formantRange = formantEndIndex - formantStartIndex;
 				}
+				nextFormants = null;
 
-				output[i] = filter != null ? filter.process(samples[i]) : samples[i];
+				// On formant change without interpolation, update filter once to new formants
+				if (!interpolate && filter != null && currentFormants != null)
+					filter.updateProfile(currentFormants, sampleRate);
 			}
 
-			return output;
+			if (interpolate)
+			{
+				// Prepare next formants for interpolation if available
+				if (formants.length > 1)
+					nextFormants = formants[1].profile;
+				else
+					nextFormants = currentFormants;
+
+				var ratio:Float = 0.0;
+				if (formantRange > 0)
+					ratio = (i - formantStartIndex) / formantRange;
+
+				var interpFormants = {
+					f1: currentFormants.f1 * (1 - ratio) + nextFormants.f1 * ratio,
+					f2: currentFormants.f2 * (1 - ratio) + nextFormants.f2 * ratio,
+					f3: currentFormants.f3 * (1 - ratio) + nextFormants.f3 * ratio
+				};
+
+				if (filter != null)
+					filter.updateProfile(interpFormants, sampleRate);
+			}
+
+			output[i] = filter != null ? filter.process(samples[i]) : samples[i];
 		}
-		catch (e)
+		return output;
+	}
+
+	public static function processSamplesBySamples(samples:Array<Float>, _formants:Array<FormaVoxValue>, sampleRate:Float,
+			interpolate:Bool = false):Array<Float>
+	{
+		var output = [];
+		var formants:Array<FormaVoxValue> = [];
+
+		for (val in _formants)
+			formants.push({
+				time: val.time,
+				profile: val.profile
+			});
+
+		formants.sort((a, b) -> return cast a.time - b.time);
+
+		if (formants.length == 0)
+			formants.push({
+				time: 0,
+				profile: {f1: 0, f2: 0, f3: 0}
+			});
+
+		var indices = formants.map(v -> v.time);
+		indices.push(samples.length);
+
+		var currentFormants = formants[0].profile;
+		var nextFormants:FormaVox.FormantProfile = null;
+		var formantStartIndex = indices[0];
+		var formantEndIndex = indices[1];
+		var formantRange = formantEndIndex - formantStartIndex;
+
+		var filter:LPCFilter = currentFormants != null ? new LPCFilter(currentFormants, sampleRate) : null;
+
+		for (i in 0...samples.length)
 		{
-			trace('${e.message}\n${e.stack.toString()}');
-			return samples;
+			if (i >= formantEndIndex)
+			{
+				formants.shift();
+				indices.shift();
+				if (formants.length > 0)
+				{
+					currentFormants = formants[0].profile;
+					formantStartIndex = indices[0];
+					formantEndIndex = indices[1];
+					formantRange = formantEndIndex - formantStartIndex;
+				}
+				nextFormants = null;
+
+				if (!interpolate && filter != null && currentFormants != null)
+					filter.updateProfile(currentFormants, sampleRate);
+			}
+
+			if (interpolate)
+			{
+				if (formants.length > 1)
+					nextFormants = formants[1].profile;
+				else
+					nextFormants = currentFormants;
+
+				var ratio:Float = 0.0;
+				if (formantRange > 0)
+					ratio = (i - formantStartIndex) / formantRange;
+
+				var interpFormants = {
+					f1: currentFormants.f1 * (1 - ratio) + nextFormants.f1 * ratio,
+					f2: currentFormants.f2 * (1 - ratio) + nextFormants.f2 * ratio,
+					f3: currentFormants.f3 * (1 - ratio) + nextFormants.f3 * ratio
+				};
+
+				if (filter != null)
+					filter.updateProfile(interpFormants, sampleRate);
+			}
+
+			output[i] = filter != null ? filter.process(samples[i]) : samples[i];
 		}
+		return output;
 	}
 }

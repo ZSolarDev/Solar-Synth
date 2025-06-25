@@ -13,6 +13,14 @@ class LPCFilter
 		f3 = new BiquadFilter(profile.f3, 2, sampleRate);
 	}
 
+	// update filter center freqs without resetting state
+	public function updateProfile(profile:FormaVox.FormantProfile, sampleRate:Float):Void
+	{
+		f1.updateFrequency(profile.f1, sampleRate);
+		f2.updateFrequency(profile.f2, sampleRate);
+		f3.updateFrequency(profile.f3, sampleRate);
+	}
+
 	public function process(input:Float):Float
 		return f1.process(input) + f2.process(input) + f3.process(input);
 }

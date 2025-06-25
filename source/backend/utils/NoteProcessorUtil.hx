@@ -71,7 +71,7 @@ class NoteProcessorUtil
 			var note:Note = newNotes[noteID];
 			var prevNote:Note = newNotes[noteID - 1];
 			var nextNote:Note = newNotes[noteID + 1];
-			// The breath is meant to be atonal, but there is still *sometimes* a tone. Turning up the breathiness param will make it minimal.
+			// The breath is meant to be atonal, but there is still *sometimes* a tone. Turning up the breathiness param will make it minimal
 			if (VocalUtil.isBreath(note.phoneme))
 			{
 				note.atonal = true;
@@ -107,7 +107,7 @@ class NoteProcessorUtil
 						note.blendRatio = 10;
 					// It will kinda blend, have to keep it short so you can still hear the consonant though
 					if (VocalUtil.isContinuant(nextNote.phoneme))
-						note.blendRatio = 50;
+						note.blendRatio = 100;
 				}
 			}
 		}

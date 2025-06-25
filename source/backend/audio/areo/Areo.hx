@@ -14,28 +14,31 @@ class Areo
 		for (i in 0...notes.length)
 		{
 			var note = notes[i];
-			var isPlosive = VocalUtil.isPlosive(note.phoneme);
 
-			if (currentRegion == null)
+			// Skip breath phonemes completely
+			if (VocalUtil.isBreath(note.phoneme))
+			{
+				continue;
+			}
+
+			if (currentRegion == null || VocalUtil.isPlosive(note.phoneme))
 			{
 				currentRegion = new BreathRegion(note.time);
 				regions.push(currentRegion);
 			}
+			else
+			{
+				var prevNote = notes[i - 1];
+				var gap = note.time - (prevNote.time + prevNote.duration);
+				if (gap > 50)
+				{
+					currentRegion = new BreathRegion(note.time);
+					regions.push(currentRegion);
+				}
+			}
 
 			currentRegion.notes.push(note);
 			currentRegion.endTime = note.time + note.duration;
-
-			var nextNote = (i + 1 < notes.length) ? notes[i + 1] : null;
-			if (nextNote != null)
-			{
-				var gap = nextNote.time - (note.time + note.duration);
-				var nextIsBreath = VocalUtil.isBreath(nextNote.phoneme);
-
-				if (isPlosive || gap > 50 || nextIsBreath)
-				{
-					currentRegion = null;
-				}
-			}
 		}
 
 		return regions;

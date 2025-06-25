@@ -15,7 +15,6 @@ class PitchBendEncoder
 		var result = "";
 		var section:Array<Int> = [];
 
-		// just in case
 		values.sort((a, b) -> Std.int(a.time - b.time));
 
 		var totalTime = values[values.length - 1].time;

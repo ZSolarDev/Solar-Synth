@@ -72,7 +72,6 @@ class MainView extends VBox
 			[{time: 0, value: 1}], [{time: 0, profile: FormaVox.getProfile('ki')}]));
 		notes.push(new Note("ru", 7400, 20000, 0, true, 0, false, 0, 0, 0, 0, [{time: 0, value: 2}], [{time: 0, value: 1}], [{time: 0, value: 0}],
 			[{time: 0, value: 1}], [{time: 0, profile: FormaVox.getProfile('ru')}]));
-		trace(Areo.groupBreathRegions(notes));
 	}
 
 	function initalizeTracks()

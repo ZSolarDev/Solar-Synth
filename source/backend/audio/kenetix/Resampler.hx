@@ -47,8 +47,6 @@ class Resampler
 		if (llsmTmpPath != '')
 			File.copy(llsmTmpPath, '.\\resamplers\\$resamplerName\\$fileName.wav.llsm.tmp');
 
-		trace('.\\resamplers\\$resamplerName\\$fileName.wav');
-		trace('${Path.removeTrailingSlashes(Path.normalize(Sys.getCwd()))}/resamplers/$resamplerName/$fileName.wav');
 		Sys.command('.\\resamplers\\$resamplerName\\$resampler "${Path.removeTrailingSlashes(Path.normalize(Sys.getCwd()))}/resamplers/$resamplerName/$fileName.wav" "${Path.removeTrailingSlashes(Path.normalize(Sys.getCwd()))}/resamplers/$resamplerName/${fileName}Output.wav" $params');
 		var outputPath = './resamplers/$resamplerName/${fileName}Output.wav';
 		runFileTask(() ->
@@ -64,7 +62,7 @@ class Resampler
 			FileSystem.deleteFile(outputPath);
 		});
 
-		// TODO: Clean this up
+		// TODO: clean this up
 		if (FileSystem.exists('./resamplers/$resamplerName/${fileName}_wav.frq'))
 			runFileTask(() ->
 			{
