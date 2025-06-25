@@ -14,13 +14,9 @@ class Areo
 		for (i in 0...notes.length)
 		{
 			var note = notes[i];
-			if (VocalUtil.isBreath(note.phoneme))
-			{
-				currentRegion = null;
-				continue;
-			}
+			var isPlosive = VocalUtil.isPlosive(note.phoneme);
 
-			if (currentRegion == null || VocalUtil.isPlosive(note.phoneme))
+			if (currentRegion == null)
 			{
 				currentRegion = new BreathRegion(note.time);
 				regions.push(currentRegion);
@@ -33,9 +29,9 @@ class Areo
 			if (nextNote != null)
 			{
 				var gap = nextNote.time - (note.time + note.duration);
-				var nextIsPlosive = VocalUtil.isPlosive(nextNote.phoneme);
+				var nextIsBreath = VocalUtil.isBreath(nextNote.phoneme);
 
-				if (gap > 50 || nextIsPlosive)
+				if (isPlosive || gap > 50 || nextIsBreath)
 				{
 					currentRegion = null;
 				}

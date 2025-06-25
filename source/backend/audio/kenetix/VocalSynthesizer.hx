@@ -431,9 +431,9 @@ class VocalSynthesizer
 		{
 			try
 			{
-				for (regionIndex in 0...Areo.groupBreathRegions(notes).length)
+				var regions = Areo.groupBreathRegions(notes);
+				for (regionIndex in 0...regions.length)
 				{
-					var regions = Areo.groupBreathRegions(notes);
 					var region = regions[regionIndex];
 
 					var rawBreath = ConvertFormat.convertWav(File.getBytes(voiceBank.samples.get('b1')), voiceBank.sampleStart);
@@ -444,7 +444,7 @@ class VocalSynthesizer
 					var regionDurationMs = region.endTime - region.startTime;
 					var totalRegionSamples = Std.int(regionDurationMs / 1000 * sampleRate);
 
-					// Loop and crossfade breath sample for seamless looping
+					// Loop and crossfade breath sample
 					var loopedBreathSamples:Array<Int> = [];
 					var crossfadeLen = Std.int(breathLen / 2);
 					for (i in 0...totalRegionSamples)
@@ -457,7 +457,7 @@ class VocalSynthesizer
 						{
 							var fadeT = (breathIndex - crossfadeStart) / crossfadeLen;
 							var offsetA = breathIndex * bytesPerSample;
-							var offsetB = (breathIndex - crossfadeStart) * bytesPerSample; // from start
+							var offsetB = (breathIndex - crossfadeStart) * bytesPerSample;
 							var a = getInt16(breathBytesRaw, offsetA, true);
 							var b = getInt16(breathBytesRaw, offsetB, true);
 							breath = Std.int(a * (1 - fadeT) + b * fadeT);
@@ -484,36 +484,51 @@ class VocalSynthesizer
 						loopedBreathFloats.push(sample / 32768.0);
 					}
 
-					// Check if next note after this region ends is a plosive
-					var nextNoteAfterRegion:Note = null;
-					for (note in notes)
+					// Determine if next region starts with a plosive
+					var nextRegionStartsWithPlosive = false;
+					if (regionIndex + 1 < regions.length)
 					{
-						if (note.time >= region.endTime)
+						var nextRegion = regions[regionIndex + 1];
+						if (nextRegion.notes.length > 0 && VocalUtil.isPlosive(nextRegion.notes[0].phoneme))
+							nextRegionStartsWithPlosive = true;
+					}
+
+					// Determine if current region ends with a plosive near the end
+					var endsWithPlosive = false;
+					if (region.notes.length > 0)
+					{
+						var lastNote = region.notes[region.notes.length - 1];
+						if (VocalUtil.isPlosive(lastNote.phoneme))
 						{
-							nextNoteAfterRegion = note;
-							break;
+							var regionEndExpected = lastNote.time + lastNote.duration;
+							if (Math.abs(regionEndExpected - region.endTime) < 2)
+								endsWithPlosive = true;
 						}
 					}
 
-					var fadeOutRatio = 0.03; // default fade out 3%
-					if (nextNoteAfterRegion != null && VocalUtil.isPlosive(nextNoteAfterRegion.phoneme))
+					var skipFadeIn = false;
+					if (region.notes.length > 0 && VocalUtil.isPlosive(region.notes[0].phoneme))
 					{
-						// quick fade out because next note is plosive
-						fadeOutRatio = 0.005;
+						// This region starts with a plosive — likely just continued from previous
+						skipFadeIn = true;
 					}
 
-					var fadeInRatio = 0.03; // fade in normal for all regions
+					// Set fade durations
+					var fadeInRatio = 0.03;
+					var fadeOutRatio = nextRegionStartsWithPlosive ? 0.005 : 0.03;
 					var fadeInSamples = Std.int(fadeInRatio * regionDurationMs);
 					var fadeOutSamples = Std.int(fadeOutRatio * regionDurationMs);
 
+					// Build initial breathiness envelope
 					var breathiness:Array<SongValue> = [];
 					for (i in 0...regionDurationMs)
 					{
-						var value = 10; // base breathiness
-						if (i < fadeInSamples)
-							value = cast 10 * (i / fadeInSamples);
-						else if (i >= regionDurationMs - fadeOutSamples)
-							value = cast 10 * ((regionDurationMs - i) / fadeOutSamples);
+						var value = 10.0;
+
+						if (!skipFadeIn && i < fadeInSamples)
+							value = 10 * (i / fadeInSamples);
+						else if (!endsWithPlosive && i >= regionDurationMs - fadeOutSamples)
+							value = 10 * ((regionDurationMs - i) / fadeOutSamples);
 
 						breathiness.push({
 							time: i,
@@ -521,6 +536,7 @@ class VocalSynthesizer
 						});
 					}
 
+					// Apply plosive bumps without overwriting fades
 					for (note in region.notes)
 					{
 						if (VocalUtil.isPlosive(note.phoneme))
@@ -531,16 +547,18 @@ class VocalSynthesizer
 
 							for (i in plosiveStart...plosiveEnd)
 							{
-								var posInPlosive = i - plosiveStart;
+								if (i >= 0 && i < breathiness.length)
+								{
+									var posInPlosive = i - plosiveStart;
+									var pulse = 0.0;
+									if (posInPlosive < plosiveDuration / 3)
+										pulse = 10 * (posInPlosive / (plosiveDuration / 3)); // fast rise
+									else
+										pulse = 10 * (1 - (posInPlosive - plosiveDuration / 3) / (plosiveDuration * 2 / 3)); // slower fall
 
-								// Quick fade-in pulse at plosive start (like a little bump)
-								var pulse;
-								if (posInPlosive < plosiveDuration / 3)
-									pulse = 10 * (posInPlosive / (plosiveDuration / 3)); // rise fast
-								else
-									pulse = 10 * (1 - (posInPlosive - plosiveDuration / 3) / (plosiveDuration * 2 / 3)); // fall slower
-
-								breathiness[i] = {time: i, value: pulse};
+									// Blend: keep whichever is stronger (fade or bump)
+									breathiness[i].value = Math.max(breathiness[i].value, pulse);
+								}
 							}
 						}
 					}
