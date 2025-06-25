@@ -161,7 +161,7 @@ To find more info such as how to use it, mod it, where to get voicebanks from, e
  - [X] Find out the synthesis engine could use a bit of an upgrade (Synthesis engine is now called Kenetix)
  - [X] Make a formant modification system (Complete, It's called FormaVox)
  - [X] Make a breath engine (Going to be named Areo)
- - [x] Integrate Areo into Kenetix
+ - [X] Integrate Areo into Kenetix
  - [ ] Integrate FormaVox into Kenetix via shifting formants for improved phoneme blending
 
 ## Bugs:
